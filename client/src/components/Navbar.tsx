@@ -4,6 +4,8 @@ import { Link, useLocation, useSearchParams } from "react-router";
 import { CATEGORIES, GENDERS, TYPES, categoryLabel } from "../lib/format";
 import { cancelAiSearch, useAiSearchPending } from "../lib/aiSearch";
 import { browseUrl, readSearch } from "../lib/search";
+import { BasketButton } from "./Basket";
+import { SavedButton } from "./Saved";
 import CategoryMenu from "./CategoryMenu";
 import Logo from "./Logo";
 import SearchBar from "./SearchBar";
@@ -61,7 +63,10 @@ export default function Navbar() {
           current={searchParams}
         />
 
-        <div className="hidden sm:block sm:flex-1" aria-hidden="true" />
+        <div className="ml-auto flex justify-end sm:flex-1">
+          <SavedButton />
+          <BasketButton />
+        </div>
       </div>
 
       <nav
@@ -79,7 +84,7 @@ export default function Navbar() {
             onPointerEnter={(e) => e.pointerType === "mouse" && schedule(c.value, open ? 0 : 120)}
             onFocus={() => window.matchMedia("(min-width: 1024px)").matches && schedule(c.value, 0)}
             // While a menu is open the underline follows it, not the current category.
-            className={`relative whitespace-nowrap px-4 py-3 font-medium no-underline after:absolute after:inset-x-4 after:-bottom-px after:h-[2.5px] after:rounded-sm hover:text-ink ${
+            className={`relative whitespace-nowrap px-4 py-3 text-[15px] font-medium tracking-wide uppercase no-underline after:absolute after:inset-x-4 after:-bottom-px after:h-[2.5px] after:rounded-sm hover:text-ink ${
               (open ? open.category === c.value : category === c.value)
                 ? "font-semibold text-ink after:bg-ink"
                 : "text-ink-2 after:bg-transparent"
