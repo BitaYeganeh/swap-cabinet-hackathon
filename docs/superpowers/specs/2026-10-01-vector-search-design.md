@@ -35,7 +35,7 @@ Sharetribe data.
 
 - **LanceDB** (`@lancedb/lancedb`): embedded vector database, stored as files in `server/data/lancedb/` (git-ignored). No extra server.
 - **CLIP** (`Xenova/clip-vit-base-patch32` through `@huggingface/transformers`): runs locally, free. Image and text vectors share one space.
-- **Text model** (`Xenova/multilingual-e5-small`): runs locally, free, handles Finnish.
+- **Text model** (`Xenova/paraphrase-multilingual-MiniLM-L12-v2`): runs locally, free, handles Finnish. Chosen over `multilingual-e5-small` after a test: clearer score gaps between related and unrelated listings.
 - **Claude** (`@anthropic-ai/sdk`, already in the server, same `ANTHROPIC_API_KEY`): labels, with structured output (zod), like the AI search does.
 
 ### Table `listings`, one row per listing
@@ -65,7 +65,8 @@ Sharetribe data.
 
 ## Part 2: photo search
 
-- Client: a camera button in the search bar (`<input type="file" accept="image/*" capture>`).
+- Client: a camera button in the search bar (`<input type="file" accept="image/jpeg,image/png,image/webp">`,
+  no `capture`, so phones offer both "take photo" and "choose from library").
 - Server: `POST /api/search/image`, one photo, JPG, PNG or WEBP, max 5 MB.
   Uses the existing AI rate limit and daily budget.
 
@@ -110,5 +111,5 @@ fallbacks stay.
 ## Risks
 
 - Only 26 listings: groups are often small, and Same product is often empty (1 listing has a brand).
-- First run downloads the models (about 150 MB and 120 MB). Run the sync before the demo.
+- First run downloads the models (about 430 MB in total). Run the sync before the demo.
 - Stock: the store does not check stock count. Sold items disappear on the next sync.
