@@ -94,7 +94,86 @@ function toListing(listing, includedById) {
   };
 }
 
+// Fetch every page of a query (100 per page, the Marketplace API maximum).
+async function queryAll(query) {
+  const data = [];
+  const included = [];
+  let page = 1;
+  let totalPages = 1;
+
+  do {
+    const response = await sharetribe.listings.query({ ...query, perPage: 100, page });
+    data.push(...response.data.data);
+    included.push(...(response.data.included || []));
+    totalPages = response.data.meta.totalPages;
+    page++;
+  } while (page <= totalPages);
+
+  return { data, included };
+}
+
+const normalizeBrand = (brand) => (brand || "").trim().toLowerCase();
+
+// Brand isn't in the marketplace search schema, so Sharetribe ignores pub_brand.
+// Instead fetch everything matching the other filters (already sorted) and
+// filter + paginate here.
+async function getListingsByBrand(params) {
+  const { perPage, page: _page, ...query } = buildQuery(params);
+  const { data, included } = await queryAll(query);
+
+  const wanted = normalizeBrand(params.brand);
+  const matches = data.filter((listing) => normalizeBrand(listing.attributes.publicData?.brand) === wanted);
+
+  const page = Math.max(1, parseInt(params.page, 10) || 1);
+  const includedById = Object.fromEntries(included.map((item) => [item.id.uuid, item]));
+
+  return {
+    listings: matches
+      .slice((page - 1) * perPage, page * perPage)
+      .map((listing) => toListing(listing, includedById)),
+    pagination: {
+      page,
+      totalPages: Math.ceil(matches.length / perPage),
+      totalItems: matches.length,
+      perPage,
+    },
+  };
+}
+
+const BRANDS_CACHE_MS = 5 * 60 * 1000;
+let brandsCache = null; // { promise, expiresAt }
+
+// Distinct brands across all listings, most listings first: [{ name, count }]
+async function fetchBrands() {
+  const { data } = await queryAll({ "fields.listing": ["publicData"] });
+  const brands = new Map();
+
+  for (const listing of data) {
+    const name = listing.attributes.publicData?.brand?.trim();
+    if (!name) continue;
+    const key = name.toLowerCase();
+    const entry = brands.get(key) || { name, count: 0 };
+    entry.count++;
+    brands.set(key, entry);
+  }
+
+  return [...brands.values()].sort((a, b) => b.count - a.count || a.name.localeCompare(b.name));
+}
+
+function getBrands() {
+  if (!brandsCache || brandsCache.expiresAt < Date.now()) {
+    const promise = fetchBrands().catch((error) => {
+      brandsCache = null; // retry on the next request instead of caching the failure
+      throw error;
+    });
+    brandsCache = { promise, expiresAt: Date.now() + BRANDS_CACHE_MS };
+  }
+  return brandsCache.promise;
+}
+
 async function getListings(params = {}) {
+  if (params.brand && params.brand.trim()) return getListingsByBrand(params);
+
   const response = await sharetribe.listings.query(buildQuery(params));
   const { data, included = [], meta } = response.data;
 
@@ -123,4 +202,5 @@ async function getListing(id) {
 module.exports = {
   getListings,
   getListing,
+  getBrands,
 };

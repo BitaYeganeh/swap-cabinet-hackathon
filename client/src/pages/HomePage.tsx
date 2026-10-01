@@ -19,7 +19,7 @@ const CATEGORY_HEADINGS: Record<string, string> = {
 };
 
 export default function HomePage() {
-  const { listings, pagination } = useLoaderData<typeof listingsLoader>();
+  const { listings, pagination, brands } = useLoaderData<typeof listingsLoader>();
   const { category } = useParams();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
@@ -48,6 +48,7 @@ export default function HomePage() {
     category && { key: "category", label: categoryLabel(category) },
     params.condition && { key: "condition", label: labelFor(CONDITIONS, params.condition) },
     params.color && { key: "color", label: labelFor(COLORS, params.color) },
+    params.brand && { key: "brand", label: params.brand },
     (params.minPrice || params.maxPrice) && {
       key: "price",
       label: `€${params.minPrice || "0"} – ${params.maxPrice ? `€${params.maxPrice}` : "any"}`,
@@ -85,7 +86,7 @@ export default function HomePage() {
               <LuX className="size-5" />
             </button>
           </div>
-          <Filters params={params} onChange={update} onClear={clearAll} />
+          <Filters params={params} brands={brands} onChange={update} onClear={clearAll} />
           <button type="button" className={`${btn.primary} mt-5 w-full lg:hidden`} onClick={() => setFiltersOpen(false)}>
             Show {pagination.totalItems} results
           </button>

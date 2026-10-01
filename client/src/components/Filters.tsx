@@ -1,17 +1,18 @@
 import { useState, type SubmitEvent } from "react";
-import type { SearchParams } from "../lib/api";
+import type { Brand, SearchParams } from "../lib/api";
 import { CATEGORIES, COLORS, CONDITIONS } from "../lib/format";
 import { btn } from "../lib/ui";
 
 type Props = {
   params: SearchParams;
+  brands: Brand[];
   onChange: (changes: Partial<SearchParams>) => void;
   onClear: () => void;
 };
 
 const groupTitle = "mb-3 text-[13px] font-semibold tracking-wider text-ink-2 uppercase";
 
-export default function Filters({ params, onChange, onClear }: Props) {
+export default function Filters({ params, brands, onChange, onClear }: Props) {
   return (
     <div>
       <div className="flex items-baseline justify-between border-b border-line pb-3.5">
@@ -101,6 +102,33 @@ export default function Filters({ params, onChange, onClear }: Props) {
           })}
         </div>
       </section>
+
+      {brands.length > 0 && (
+        <section className="border-b border-line py-[18px]">
+          <h3 className={groupTitle}>Brand</h3>
+          <div className="flex flex-wrap gap-2">
+            {brands.map((b) => {
+              const active = params.brand?.toLowerCase() === b.name.toLowerCase();
+              return (
+                <button
+                  type="button"
+                  key={b.name}
+                  aria-pressed={active}
+                  onClick={() => onChange({ brand: active ? "" : b.name })}
+                  className={`rounded-full border px-3.5 py-[7px] text-sm transition ${
+                    active
+                      ? "border-ink bg-ink text-white"
+                      : "border-line bg-surface hover:border-ink-3"
+                  }`}
+                >
+                  {b.name}
+                  <span className={`ml-1.5 ${active ? "text-white/70" : "text-ink-3"}`}>{b.count}</span>
+                </button>
+              );
+            })}
+          </div>
+        </section>
+      )}
     </div>
   );
 }

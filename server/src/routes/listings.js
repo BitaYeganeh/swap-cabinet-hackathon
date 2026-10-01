@@ -1,5 +1,5 @@
 const express = require("express");
-const { getListings, getListing } = require("../services/listingService");
+const { getListings, getListing, getBrands } = require("../services/listingService");
 
 const router = express.Router();
 
@@ -12,7 +12,27 @@ function logSharetribeError(error) {
   );
 }
 
-// GET /api/listings?keywords=&category=&condition=&color=&minPrice=&maxPrice=&sort=&page=
+// GET /api/listings/brands — brands available for the brand filter.
+// Must stay above "/:id" so "brands" isn't treated as a listing id.
+router.get("/brands", async (req, res) => {
+  try {
+    const brands = await getBrands();
+
+    res.json({
+      success: true,
+      brands,
+    });
+  } catch (error) {
+    logSharetribeError(error);
+
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch brands",
+    });
+  }
+});
+
+// GET /api/listings?keywords=&category=&condition=&color=&brand=&minPrice=&maxPrice=&sort=&page=
 router.get("/", async (req, res) => {
   try {
     const { listings, pagination } = await getListings(req.query);

@@ -44,6 +44,7 @@ export type SearchParams = {
   category?: string;
   condition?: string;
   color?: string;
+  brand?: string;
   minPrice?: string;
   maxPrice?: string;
   sort?: string;
@@ -93,6 +94,16 @@ export function getListings(
   });
 
   return request(`/api/listings?${query}`, signal);
+}
+
+export type Brand = {
+  name: string;
+  count: number;
+};
+
+export async function getBrands(signal?: AbortSignal): Promise<Brand[]> {
+  const body = await request<{ brands: Brand[] }>("/api/listings/brands", signal);
+  return body.brands;
 }
 
 export async function getListing(id: string, signal?: AbortSignal): Promise<Listing> {

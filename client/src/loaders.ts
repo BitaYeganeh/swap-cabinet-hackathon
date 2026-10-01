@@ -1,5 +1,5 @@
 import { data, type LoaderFunctionArgs } from "react-router";
-import { ApiError, getListing, getListings } from "./lib/api";
+import { ApiError, getBrands, getListing, getListings } from "./lib/api";
 import { CATEGORIES } from "./lib/format";
 import { readSearch } from "./lib/search";
 
@@ -12,7 +12,11 @@ export async function listingsLoader({ request, params }: LoaderFunctionArgs) {
   }
 
   const search = readSearch(new URL(request.url).searchParams);
-  return getListings({ ...search, category }, request.signal);
+  const [results, brands] = await Promise.all([
+    getListings({ ...search, category }, request.signal),
+    getBrands(request.signal).catch(() => []),
+  ]);
+  return { ...results, brands };
 }
 
 // "/listings/:id" — one listing plus a few more from the same category.
