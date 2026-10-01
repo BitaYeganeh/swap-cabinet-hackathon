@@ -1,7 +1,7 @@
 import type { SearchParams } from "./api";
 
 // Filters kept in the query string. Category lives in the path: /category/:category
-export const QUERY_KEYS = ["keywords", "condition", "color", "brand", "minPrice", "maxPrice", "sort"] as const;
+export const QUERY_KEYS = ["keywords", "type", "gender", "condition", "color", "brand", "minPrice", "maxPrice", "sort"] as const;
 
 export function readSearch(searchParams: URLSearchParams): SearchParams {
   const params: SearchParams = {};
@@ -30,6 +30,11 @@ export function browseUrl(
 ) {
   const next = new URLSearchParams(current);
   if (!("page" in changes)) next.delete("page");
+  // Subcategories belong to a category, so switching category drops them.
+  if ("category" in changes) {
+    next.delete("type");
+    next.delete("gender");
+  }
 
   Object.entries(changes).forEach(([key, value]) => {
     if (key === "category") return;

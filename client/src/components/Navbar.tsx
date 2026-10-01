@@ -1,8 +1,8 @@
 import { useState, type SubmitEvent } from "react";
 import { LuHeart, LuSearch, LuX } from "react-icons/lu";
-import { NavLink, useLocation, useMatch, useNavigate, useSearchParams } from "react-router";
+import { Link, NavLink, useLocation, useMatch, useNavigate, useSearchParams } from "react-router";
 import { useFavorites } from "../lib/favorites";
-import { CATEGORIES } from "../lib/format";
+import { CATEGORIES, GENDERS, TYPES } from "../lib/format";
 import { browseUrl, isBrowsePath } from "../lib/search";
 import { countBadge } from "../lib/ui";
 import Logo from "./Logo";
@@ -71,7 +71,54 @@ export default function Navbar() {
           </NavLink>
         ))}
       </nav>
+
+      {onBrowse && category && <SubcategoryNav category={category} current={searchParams} />}
     </header>
+  );
+}
+
+const subLink = (active: boolean) =>
+  `shrink-0 whitespace-nowrap rounded-full px-3.5 py-1.5 text-sm font-medium no-underline transition ${
+    active ? "bg-ink text-white" : "bg-surface-2 text-ink-2 hover:text-ink"
+  }`;
+
+function SubcategoryNav({ category, current }: { category: string; current: URLSearchParams }) {
+  const gender = current.get("gender") ?? "";
+  const type = current.get("type") ?? "";
+
+  return (
+    <nav
+      className="border-t border-line"
+      aria-label="Subcategories"
+    >
+      <div className="mx-auto flex max-w-7xl items-center gap-2 overflow-x-auto px-4 py-2 [scrollbar-width:none] sm:px-6">
+        {category === "kids" && (
+          <>
+            {[{ value: "", label: "All kids" }, ...GENDERS].map((g) => (
+              <Link
+                key={g.value}
+                to={browseUrl(category, current, { gender: g.value })}
+                aria-current={gender === g.value ? "page" : undefined}
+                className={subLink(gender === g.value)}
+              >
+                {g.label}
+              </Link>
+            ))}
+            <span className="mx-1 h-5 w-px shrink-0 bg-line" aria-hidden="true" />
+          </>
+        )}
+        {TYPES.map((t) => (
+          <Link
+            key={t.value}
+            to={browseUrl(category, current, { type: type === t.value ? "" : t.value })}
+            aria-current={type === t.value ? "page" : undefined}
+            className={subLink(type === t.value)}
+          >
+            {t.label}
+          </Link>
+        ))}
+      </div>
+    </nav>
   );
 }
 

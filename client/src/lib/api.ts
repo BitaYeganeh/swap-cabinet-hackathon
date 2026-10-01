@@ -1,4 +1,5 @@
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
+// Empty by default: requests go to the same origin and Vite proxies /api to the server.
+const API_URL = import.meta.env.VITE_API_URL || "";
 
 export type Money = {
   amount: number;
@@ -14,6 +15,7 @@ export type Listing = {
   listingType: string;
   category?: string;
   subcategory?: string;
+  gender: "boys" | "girls" | "unisex" | null;
   condition?: string;
   conditionDetails?: string;
   color?: string;
@@ -28,6 +30,7 @@ export type Listing = {
   shippingPrice: number | null;
   address: string | null;
   city: string | null;
+  geolocation: { lat: number; lng: number } | null;
   sellerName: string | null;
   images: { url: string; url2x: string }[];
 };
@@ -42,6 +45,8 @@ export type Pagination = {
 export type SearchParams = {
   keywords?: string;
   category?: string;
+  type?: string;
+  gender?: string;
   condition?: string;
   color?: string;
   brand?: string;

@@ -7,7 +7,7 @@ import Hero from "../components/Hero";
 import ListingCard, { ListingGrid } from "../components/ListingCard";
 import Pagination from "../components/Pagination";
 import type { SearchParams } from "../lib/api";
-import { COLORS, CONDITIONS, SORTS, categoryLabel, labelFor } from "../lib/format";
+import { COLORS, CONDITIONS, SORTS, TYPES, categoryLabel, genderLabel, labelFor } from "../lib/format";
 import { QUERY_KEYS, browseUrl, isBrowsePath, readSearch } from "../lib/search";
 import { BRAND, btn, countBadge } from "../lib/ui";
 import type { listingsLoader } from "../loaders";
@@ -16,6 +16,8 @@ const CATEGORY_HEADINGS: Record<string, string> = {
   women: "Women's pre-loved fashion",
   men: "Men's pre-loved fashion",
   kids: "Kids' pre-loved fashion",
+  boys: "Boys' pre-loved fashion",
+  girls: "Girls' pre-loved fashion",
 };
 
 export default function HomePage() {
@@ -46,6 +48,8 @@ export default function HomePage() {
   const pills = [
     params.keywords && { key: "keywords", label: `“${params.keywords}”` },
     category && { key: "category", label: categoryLabel(category) },
+    params.gender && { key: "gender", label: genderLabel(params.gender) },
+    params.type && { key: "type", label: labelFor(TYPES, params.type) },
     params.condition && { key: "condition", label: labelFor(CONDITIONS, params.condition) },
     params.color && { key: "color", label: labelFor(COLORS, params.color) },
     params.brand && { key: "brand", label: params.brand },
@@ -58,10 +62,15 @@ export default function HomePage() {
   const removePill = (key: string) =>
     update(key === "price" ? { minPrice: "", maxPrice: "" } : { [key]: "" });
 
+  const sectionHeading = CATEGORY_HEADINGS[(category === "kids" && params.gender) || category || ""];
+  const typeHeading = params.type && labelFor(TYPES, params.type);
+
   const heading = params.keywords
     ? `Results for “${params.keywords}”`
-    : category
-      ? CATEGORY_HEADINGS[category]
+    : sectionHeading
+      ? typeHeading
+        ? `${sectionHeading.replace(" fashion", "")} ${typeHeading.toLowerCase()}`
+        : sectionHeading
       : "All items";
 
   return (
@@ -72,11 +81,13 @@ export default function HomePage() {
 
       <div
         ref={resultsRef}
-        className="mx-auto grid max-w-7xl scroll-mt-[170px] gap-10 px-4 pt-6 pb-16 sm:scroll-mt-[130px] sm:px-6 sm:pt-8 lg:grid-cols-[250px_1fr]"
+        className={`mx-auto grid max-w-7xl gap-6 px-4 pt-5 pb-16 sm:px-6 sm:pt-8 lg:grid-cols-[230px_1fr] lg:gap-10 ${
+          category ? "scroll-mt-[220px] sm:scroll-mt-[180px]" : "scroll-mt-[170px] sm:scroll-mt-[130px]"
+        }`}
       >
         {/* Sidebar: static on desktop, slide-in drawer below lg. */}
         <aside
-          className={`self-start lg:sticky lg:top-[140px] max-lg:fixed max-lg:inset-y-0 max-lg:left-0 max-lg:z-60 max-lg:w-[min(340px,88vw)] max-lg:overflow-y-auto max-lg:bg-bg max-lg:px-5 max-lg:pb-5 max-lg:transition-transform max-lg:duration-300 ${
+          className={`self-start lg:sticky ${category ? "lg:top-[185px]" : "lg:top-[140px]"} lg:max-h-[calc(100vh-200px)] lg:overflow-y-auto max-lg:fixed max-lg:inset-y-0 max-lg:left-0 max-lg:z-60 max-lg:w-[min(340px,88vw)] max-lg:overflow-y-auto max-lg:bg-bg max-lg:px-5 max-lg:pb-5 max-lg:transition-transform max-lg:duration-300 ${
             filtersOpen ? "max-lg:translate-x-0 max-lg:shadow-float" : "max-lg:-translate-x-full"
           }`}
         >
