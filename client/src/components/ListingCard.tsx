@@ -10,7 +10,17 @@ import { formatSize, useSizeSystem } from "../lib/sizes";
 
 // H&M-style product tile: a tall photo with the size tagged bottom-left and the
 // heart bottom-right, then the title and price on the plain page below.
-export default function ListingCard({ listing, reason }: { listing: Listing; reason?: string }) {
+// `onOpen` lets a page show the popup itself instead of opening it through the
+// URL (the photo search page keeps its results in memory, not in the URL).
+export default function ListingCard({
+  listing,
+  reason,
+  onOpen,
+}: {
+  listing: Listing;
+  reason?: string;
+  onOpen?: (listing: Listing) => void;
+}) {
   const [searchParams] = useSearchParams();
   const favorite = !!useFavorites()[listing.id];
   const image = listing.images[0];
@@ -25,6 +35,11 @@ export default function ListingCard({ listing, reason }: { listing: Listing; rea
         to={browseUrl(searchParams, { item: listing.id })}
         state={{ openedItem: true }}
         preventScrollReset
+        onClick={(e) => {
+          if (!onOpen) return;
+          e.preventDefault();
+          onOpen(listing);
+        }}
         aria-label={listing.title}
         className="flex flex-1 flex-col no-underline"
       >

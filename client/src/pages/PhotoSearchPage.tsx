@@ -2,6 +2,8 @@ import { useEffect, useRef, useState } from "react";
 import { LuLoaderCircle } from "react-icons/lu";
 import { useLocation } from "react-router";
 import ListingCard, { ListingGrid } from "../components/ListingCard";
+import ListingModal from "../components/ListingModal";
+import type { Listing } from "../lib/api";
 import PhotoSearchButton from "../components/PhotoSearchButton";
 import { GROUP_TITLES, photoSearch, type PhotoLabels, type PhotoSearchResponse } from "../lib/photoSearch";
 import { BRAND } from "../lib/ui";
@@ -37,6 +39,9 @@ function PhotoPreview({ file }: { file: File }) {
 
 function PhotoResults({ file }: { file?: File }) {
   const [state, setState] = useState<State>({ status: file ? "loading" : "idle" });
+  // The popup is opened here, not through the URL: a navigation would remount
+  // this page and search the photo again.
+  const [opened, setOpened] = useState<Listing | null>(null);
 
   useEffect(() => {
     if (!file) return;
@@ -84,7 +89,7 @@ function PhotoResults({ file }: { file?: File }) {
               </h3>
               <ListingGrid>
                 {group.listings.map((listing) => (
-                  <ListingCard key={listing.id} listing={listing} />
+                  <ListingCard key={listing.id} listing={listing} onOpen={setOpened} />
                 ))}
               </ListingGrid>
             </section>
@@ -95,13 +100,15 @@ function PhotoResults({ file }: { file?: File }) {
               <h3 className="mb-3 text-lg font-semibold">People also look for this</h3>
               <ListingGrid>
                 {state.result.wanted.map((listing) => (
-                  <ListingCard key={listing.id} listing={listing} />
+                  <ListingCard key={listing.id} listing={listing} onOpen={setOpened} />
                 ))}
               </ListingGrid>
             </section>
           )}
         </div>
       )}
+
+      {opened && <ListingModal key={opened.id} id={opened.id} known={opened} onClose={() => setOpened(null)} />}
     </div>
   );
 }
