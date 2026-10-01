@@ -9,6 +9,7 @@ const PER_PAGE = 12;
 // them here, so it can tolerate typos. These bound that fetch.
 const FETCH_PER_PAGE = 100; // Sharetribe maximum
 const MAX_FETCH_PAGES = 10;
+const SEMANTIC_LIMIT = FETCH_PER_PAGE * MAX_FETCH_PAGES; // same bound as getCandidates
 const CANDIDATE_TTL_MS = 60 * 1000;
 
 // UI sort keys -> Sharetribe sort values ("-" prefix means ascending).
@@ -305,7 +306,7 @@ async function searchByKeywords(params) {
   // because only candidates can be added.
   const found = new Set(matches.map((l) => l.id));
   const byId = new Map(candidates.map((l) => [l.id, l]));
-  const extra = (await similarIds(keywords)).filter((id) => !found.has(id) && byId.has(id)).map((id) => byId.get(id));
+  const extra = (await similarIds(keywords, { limit: SEMANTIC_LIMIT })).filter((id) => !found.has(id) && byId.has(id)).map((id) => byId.get(id));
   matches = [...matches, ...extra];
 
   if (IN_MEMORY_SORTS[params.sort]) matches = [...matches].sort(IN_MEMORY_SORTS[params.sort]);
@@ -369,7 +370,7 @@ async function getAiCandidates(params = {}, query = null) {
 
   let chosen = all;
   if (query) {
-    const order = await similarIds(query, { limit: AI_CANDIDATES * 3, minScore: 0 });
+    const order = await similarIds(query, { limit: SEMANTIC_LIMIT, minScore: 0 });
     const byId = new Map(all.map((l) => [l.id, l]));
     const ranked = order.map((id) => byId.get(id)).filter(Boolean);
     // Store empty or behind: fall back to the first listings, as before.
