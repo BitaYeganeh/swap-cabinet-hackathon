@@ -17,15 +17,15 @@ export default function Hero({ listings }: { listings: Listing[] }) {
           <p className="mb-3.5 text-[13px] font-semibold tracking-[0.12em] text-warm uppercase">
             Second-hand marketplace
           </p>
-          <h1 className="font-display text-[clamp(36px,5vw,60px)] leading-[1.05] font-medium tracking-tight">
+          <h1 className="font-display text-[clamp(32px,5vw,60px)] leading-[1.05] font-medium tracking-tight">
             Pre-loved style,
             <br />
             <em className="text-accent">fresh finds</em> every day.
           </h1>
-          <p className="mt-[18px] max-w-[440px] text-[17px] text-ink-2">
+          <p className="mt-4 max-w-[440px] text-base text-ink-2 sm:mt-[18px] sm:text-[17px]">
             Shop quality second-hand clothing, shoes and bundles from people in your area.
           </p>
-          <div className="mt-7 flex flex-wrap gap-5 text-sm font-medium text-ink-2">
+          <div className="mt-5 flex flex-wrap gap-x-5 gap-y-2 text-sm sm:mt-7 font-medium text-ink-2">
             <span className="inline-flex items-center gap-2">
               <LuTruck className="size-[18px] text-accent" /> Shipping or pickup
             </span>

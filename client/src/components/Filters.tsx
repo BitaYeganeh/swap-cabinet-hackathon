@@ -1,6 +1,6 @@
 import { useState, type SubmitEvent } from "react";
 import type { SearchParams } from "../lib/api";
-import { CATEGORIES, COLORS, CONDITIONS } from "../lib/format";
+import { CATEGORIES, COLORS, CONDITIONS, GENDERS, TYPES } from "../lib/format";
 import { btn } from "../lib/ui";
 
 type Props = {
@@ -10,6 +10,11 @@ type Props = {
 };
 
 const groupTitle = "mb-3 text-[13px] font-semibold tracking-wider text-ink-2 uppercase";
+
+const chipButton = (active: boolean) =>
+  `rounded-full border px-3.5 py-[7px] text-sm transition ${
+    active ? "border-ink bg-ink text-white" : "border-line bg-surface hover:border-ink-3"
+  }`;
 
 export default function Filters({ params, onChange, onClear }: Props) {
   return (
@@ -39,6 +44,50 @@ export default function Filters({ params, onChange, onClear }: Props) {
         </div>
       </section>
 
+      {params.category && (
+        <section className="border-b border-line py-[18px]">
+          <h3 className={groupTitle}>Subcategory</h3>
+
+          {params.category === "kids" && (
+            <div className="mb-3 grid grid-cols-3 rounded-full border border-line bg-surface p-1 text-sm">
+              {[{ value: "", label: "All kids" }, ...GENDERS].map((g) => {
+                const active = (params.gender || "") === g.value;
+                return (
+                  <button
+                    type="button"
+                    key={g.value}
+                    aria-pressed={active}
+                    onClick={() => onChange({ gender: g.value })}
+                    className={`rounded-full py-1.5 font-medium transition ${
+                      active ? "bg-ink text-white" : "text-ink-2 hover:text-ink"
+                    }`}
+                  >
+                    {g.label}
+                  </button>
+                );
+              })}
+            </div>
+          )}
+
+          <div className="flex flex-wrap gap-2">
+            {TYPES.map((t) => {
+              const active = params.type === t.value;
+              return (
+                <button
+                  type="button"
+                  key={t.value}
+                  aria-pressed={active}
+                  onClick={() => onChange({ type: active ? "" : t.value })}
+                  className={chipButton(active)}
+                >
+                  {t.label}
+                </button>
+              );
+            })}
+          </div>
+        </section>
+      )}
+
       <section className="border-b border-line py-[18px]">
         <h3 className={groupTitle}>Condition</h3>
         <div className="flex flex-wrap gap-2">
@@ -50,11 +99,7 @@ export default function Filters({ params, onChange, onClear }: Props) {
                 key={c.value}
                 aria-pressed={active}
                 onClick={() => onChange({ condition: active ? "" : c.value })}
-                className={`rounded-full border px-3.5 py-[7px] text-sm transition ${
-                  active
-                    ? "border-ink bg-ink text-white"
-                    : "border-line bg-surface hover:border-ink-3"
-                }`}
+                className={chipButton(active)}
               >
                 {c.label}
               </button>
