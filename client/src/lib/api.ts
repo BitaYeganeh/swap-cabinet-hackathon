@@ -54,6 +54,8 @@ export type SearchParams = {
   maxPrice?: string;
   sort?: string;
   page?: number;
+  /** Comma-separated listing ids, e.g. the AI's picks. */
+  ids?: string;
 };
 
 export type AiSearchResponse = {
@@ -65,6 +67,10 @@ export type AiSearchResponse = {
   isNeed: boolean;
   /** Filters the server removed because the full set matched nothing. */
   dropped: string[];
+  /** For need searches: the listings the AI picked, best first, with why. */
+  picks?: { id: string; reason: string }[];
+  /** A need search where nothing in stock fit; filters hold keyword results. */
+  noPicks?: boolean;
 };
 
 export type ListingsResponse = {

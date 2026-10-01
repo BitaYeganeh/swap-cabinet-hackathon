@@ -8,6 +8,7 @@ import ListingCard, { ListingGrid } from "../components/ListingCard";
 import Pagination from "../components/Pagination";
 import type { SearchParams } from "../lib/api";
 import { COLORS, CONDITIONS, SORTS, TYPES, categoryLabel, genderLabel, labelFor } from "../lib/format";
+import { readPickReasons } from "../lib/aiPicks";
 import { sizeFilterLabel, useSizeSystem } from "../lib/sizes";
 import { QUERY_KEYS, browseUrl, isBrowsePath, readSearch } from "../lib/search";
 import { BRAND, btn, countBadge } from "../lib/ui";
@@ -35,6 +36,9 @@ export default function HomePage() {
   const aiQuery = searchParams.get("q");
   const aiSummary = searchParams.get("ai");
   const relaxed = searchParams.get("relaxed")?.split(",").filter(Boolean) ?? [];
+  const picked = !!params.ids;
+  const noPicks = searchParams.get("nopicks") === "1";
+  const reasons = picked ? readPickReasons(aiQuery) : {};
   const loading = navigation.state === "loading" && isBrowsePath(navigation.location.pathname);
 
   const update = (changes: Partial<SearchParams>) =>
@@ -148,7 +152,9 @@ export default function HomePage() {
             </div>
           </div>
 
-          {aiQuery && aiSummary && <AiBanner query={aiQuery} relaxed={relaxed} />}
+          {aiQuery && aiSummary && (
+            <AiBanner query={aiQuery} relaxed={relaxed} picked={picked} noPicks={noPicks} />
+          )}
 
           {pills.length > 0 && (
             <div className="mb-5 flex flex-wrap items-center gap-2">
@@ -184,7 +190,7 @@ export default function HomePage() {
           ) : (
             <ListingGrid dimmed={loading}>
               {listings.map((listing) => (
-                <ListingCard key={listing.id} listing={listing} />
+                <ListingCard key={listing.id} listing={listing} reason={reasons[listing.id]} />
               ))}
             </ListingGrid>
           )}
@@ -207,15 +213,37 @@ const RELAXED_LABELS: Record<string, string> = {
   type: "item type",
 };
 
-function AiBanner({ query, relaxed }: { query: string; relaxed: string[] }) {
+function AiBanner({
+  query,
+  relaxed,
+  picked,
+  noPicks,
+}: {
+  query: string;
+  relaxed: string[];
+  picked: boolean;
+  noPicks: boolean;
+}) {
   return (
     <div className="mb-4 flex gap-3 rounded-2xl border border-accent/20 bg-accent-soft/60 px-4 py-3 text-sm">
       <LuSparkles className="mt-0.5 size-[18px] shrink-0 text-accent" />
       <div className="min-w-0 flex-1">
-        <p className="text-ink">
-          AI search for <strong className="font-semibold break-words">“{query}”</strong>. Adjust the filters
-          below to refine it.
-        </p>
+        {picked ? (
+          <p className="text-ink">
+            The AI picked these for <strong className="font-semibold break-words">“{query}”</strong>, best
+            match first. Each item says why it fits.
+          </p>
+        ) : (
+          <p className="text-ink">
+            AI search for <strong className="font-semibold break-words">“{query}”</strong>. Adjust the
+            filters below to refine it.
+          </p>
+        )}
+        {noPicks && (
+          <p className="mt-1 text-ink-2">
+            Nothing in the shop is a clear fit yet, so these are the closest matches by keyword.
+          </p>
+        )}
         {relaxed.length > 0 && (
           <p className="mt-1 text-ink-2">
             No exact matches, so we left out: {relaxed.map((key) => RELAXED_LABELS[key] ?? key).join(", ")}.

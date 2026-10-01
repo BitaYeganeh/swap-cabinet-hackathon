@@ -1,7 +1,7 @@
 import type { SearchParams } from "./api";
 
 // Filters kept in the query string. Category lives in the path: /category/:category
-export const QUERY_KEYS = ["keywords", "type", "gender", "size", "condition", "color", "minPrice", "maxPrice", "sort"] as const;
+export const QUERY_KEYS = ["keywords", "type", "gender", "size", "condition", "color", "minPrice", "maxPrice", "sort", "ids"] as const;
 
 export function readSearch(searchParams: URLSearchParams): SearchParams {
   const params: SearchParams = {};
@@ -15,9 +15,9 @@ export function readSearch(searchParams: URLSearchParams): SearchParams {
 }
 
 // An AI search adds these to the URL: the shopper's own words, the AI's summary
-// of what it searched for, and any filters dropped to find matches. They drive
-// the banner above the results.
-export const AI_KEYS = ["q", "ai", "relaxed"] as const;
+// of what it searched for, any filters dropped to find matches, and for need
+// searches the picked listing ids. They drive the banner above the results.
+export const AI_KEYS = ["q", "ai", "relaxed", "nopicks", "ids"] as const;
 
 export const categoryPath = (category?: string) => (category ? `/category/${category}` : "/");
 
@@ -67,15 +67,17 @@ export type AiResult = {
   filters: Partial<Record<keyof SearchParams, string>>;
   summary: string;
   dropped: string[];
+  noPicks?: boolean;
 };
 
 // Browse URL for an AI search: a fresh search built only from the AI's filters.
-export function aiBrowseUrl({ query, filters, summary, dropped }: AiResult) {
+export function aiBrowseUrl({ query, filters, summary, dropped, noPicks }: AiResult) {
   const { category, ...rest } = filters;
   const next = new URLSearchParams();
   Object.entries(rest).forEach(([key, value]) => value && next.set(key, value));
   next.set("q", query);
   next.set("ai", summary);
   if (dropped.length) next.set("relaxed", dropped.join(","));
+  if (noPicks) next.set("nopicks", "1");
   return `${categoryPath(category)}?${next}`;
 }

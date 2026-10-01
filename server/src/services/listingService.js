@@ -30,13 +30,17 @@ function applySize(query, size) {
   else query.pub_size = size;
 }
 
-function buildQuery({ keywords, category, type, size, condition, color, minPrice, maxPrice, sort, page }) {
+const WANTED_TYPE = "in-search-of-clothing";
+
+function buildQuery({ keywords, category, type, size, condition, color, minPrice, maxPrice, sort, page, ids }) {
   const query = {
     perPage: PER_PAGE,
     page: Math.max(1, parseInt(page, 10) || 1),
     ...INCLUDES,
   };
 
+  // Specific listings, e.g. the AI's picks. Order is restored in getListings.
+  if (ids) query.ids = ids;
   if (keywords && keywords.trim()) query.keywords = keywords.trim();
   if (category) query.pub_categoryLevel1 = category;
   // Types are stored per category ("kids-shoes"); without a category, match any of them.
@@ -149,9 +153,16 @@ async function getListings(params = {}) {
   const { data, included = [], meta } = response.data;
 
   const includedById = Object.fromEntries(included.map((item) => [item.id.uuid, item]));
+  const listings = data.map((listing) => toListing(listing, includedById));
+
+  // Sharetribe ignores the order of `ids`; keep the order we asked for (the AI's ranking).
+  if (params.ids) {
+    const rank = params.ids.split(",");
+    listings.sort((a, b) => rank.indexOf(a.id) - rank.indexOf(b.id));
+  }
 
   return {
-    listings: data.map((listing) => toListing(listing, includedById)),
+    listings,
     pagination: {
       page: meta.page,
       totalPages: meta.totalPages,
@@ -184,6 +195,22 @@ async function getListingsByGender(query, gender) {
   };
 }
 
+// Up to 100 buyable listings matching the filters (keywords ignored), for the
+// AI to choose from. "Wanted" requests are left out: they aren't for sale.
+async function getCandidates(params = {}) {
+  const query = { ...buildQuery({ ...params, keywords: "", ids: "" }), page: 1, perPage: MAX_PER_PAGE };
+  const response = await sharetribe.listings.query(query);
+  const { data, included = [] } = response.data;
+
+  const includedById = Object.fromEntries(included.map((item) => [item.id.uuid, item]));
+  const gender = params.category === "kids" && GENDERS.includes(params.gender) ? params.gender : null;
+
+  return data
+    .map((listing) => toListing(listing, includedById))
+    .filter((listing) => listing.listingType !== WANTED_TYPE)
+    .filter((listing) => !gender || listing.gender === gender || listing.gender === "unisex");
+}
+
 async function getListing(id) {
   const response = await sharetribe.listings.show({ id, ...INCLUDES });
   const { data, included = [] } = response.data;
@@ -196,4 +223,5 @@ async function getListing(id) {
 module.exports = {
   getListings,
   getListing,
+  getCandidates,
 };

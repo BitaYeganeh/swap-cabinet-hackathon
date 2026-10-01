@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, type SubmitEvent } from "react";
 import { LuHeart, LuLoaderCircle, LuSearch, LuSparkles, LuX } from "react-icons/lu";
 import { Link, NavLink, useLocation, useMatch, useNavigate, useSearchParams } from "react-router";
+import { savePickReasons } from "../lib/aiPicks";
 import { aiSearch } from "../lib/api";
 import { useFavorites } from "../lib/favorites";
 import { CATEGORIES, GENDERS, TYPES } from "../lib/format";
@@ -161,11 +162,14 @@ function SearchForm({
     pending.current?.abort();
     const controller = new AbortController();
     pending.current = controller;
-    const timeout = setTimeout(() => controller.abort(), 15_000);
+    // Need searches make two AI calls (understand, then pick), so allow ~30s.
+    const timeout = setTimeout(() => controller.abort(), 30_000);
     setThinking(true);
 
     try {
-      navigate(aiBrowseUrl(await aiSearch(query, controller.signal)));
+      const result = await aiSearch(query, controller.signal);
+      if (result.picks?.length) savePickReasons(result.query, result.picks);
+      navigate(aiBrowseUrl(result));
     } catch {
       // AI unavailable, slow or confused: never leave the shopper without results.
       if (pending.current === controller) keywordSearch();
