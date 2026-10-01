@@ -1,6 +1,6 @@
 import { useRef } from "react";
 import { LuSearch, LuX } from "react-icons/lu";
-import { useLoaderData, useNavigate, useNavigation, useParams, useSearchParams } from "react-router";
+import { useLoaderData, useNavigate, useNavigation, useSearchParams } from "react-router";
 import EmptyState from "../components/EmptyState";
 import FilterBar from "../components/FilterBar";
 import Hero from "../components/Hero";
@@ -9,7 +9,7 @@ import Pagination from "../components/Pagination";
 import type { SearchParams } from "../lib/api";
 import { COLORS, CONDITIONS, SORTS, TYPES, categoryLabel, genderLabel, labelFor } from "../lib/format";
 import { sizeFilterLabel, useSizeSystem } from "../lib/sizes";
-import { QUERY_KEYS, browseUrl, isBrowsePath, readSearch } from "../lib/search";
+import { browseUrl, isLanding, readSearch } from "../lib/search";
 import { BRAND, btn } from "../lib/ui";
 import { useHeaderHeight } from "../lib/useHeaderHeight";
 import type { listingsLoader } from "../loaders";
@@ -24,7 +24,6 @@ const CATEGORY_HEADINGS: Record<string, string> = {
 
 export default function HomePage() {
   const { listings, pagination, suggestion, brands } = useLoaderData<typeof listingsLoader>();
-  const { category } = useParams();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const navigation = useNavigation();
@@ -32,11 +31,12 @@ export default function HomePage() {
   const sizeSystem = useSizeSystem();
   const headerHeight = useHeaderHeight();
 
-  const params: SearchParams = { ...readSearch(searchParams), category };
-  const loading = navigation.state === "loading" && isBrowsePath(navigation.location.pathname);
+  const params: SearchParams = readSearch(searchParams);
+  const { category } = params;
+  const loading = navigation.state === "loading" && navigation.location.pathname === "/";
 
   const update = (changes: Partial<SearchParams>) =>
-    navigate(browseUrl(category, searchParams, changes), { preventScrollReset: true });
+    navigate(browseUrl(searchParams, changes), { preventScrollReset: true });
 
   const clearAll = () => navigate("/", { preventScrollReset: true });
 
@@ -45,9 +45,6 @@ export default function HomePage() {
     resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
   };
 
-  // The hero shows on the home page and on each category's landing page.
-  const hasFilters = QUERY_KEYS.some((key) => key !== "sort" && params[key]);
-  const showHero = !hasFilters && (params.page ?? 1) === 1;
 
   const pills = [
     params.keywords && { key: "keywords", label: `“${params.keywords}”` },
@@ -78,11 +75,18 @@ export default function HomePage() {
         : sectionHeading
       : "All items";
 
+  if (isLanding(params)) {
+    return (
+      <>
+        <title>{`${BRAND} · Pre-loved fashion`}</title>
+        <Hero />
+      </>
+    );
+  }
+
   return (
     <>
       <title>{`${heading} · ${BRAND}`}</title>
-
-      {showHero && <Hero category={category} />}
 
       <div
         ref={resultsRef}

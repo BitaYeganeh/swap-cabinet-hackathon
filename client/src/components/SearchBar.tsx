@@ -102,12 +102,13 @@ export default function SearchBar({
 
   const search = (keywords: string) => {
     setOpen(false);
-    navigate(browseUrl(category, current, { keywords: keywords.trim() }));
+    navigate(browseUrl(current, { keywords: keywords.trim() }));
   };
 
   const choose = (option: Option) => {
     setOpen(false);
-    if (option.kind === "item") navigate(`/listings/${option.item.id}`);
+    // No item pages: picking an item searches for it on the page.
+    if (option.kind === "item") search(option.item.title);
     else if (option.kind === "place") search(option.place.query);
     else search(text);
   };

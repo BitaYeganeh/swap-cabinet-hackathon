@@ -7,7 +7,7 @@ import { browseUrl } from "../lib/search";
 
 // Menu links start a fresh search, like a store's department menu.
 const linkTo = (category: string, changes: Partial<SearchParams> = {}) =>
-  browseUrl(category, new URLSearchParams(), { category, ...changes });
+  browseUrl(new URLSearchParams(), { category, ...changes });
 
 type MenuLink = { label: string; to: string; highlight?: boolean; strong?: boolean };
 
@@ -73,7 +73,7 @@ export default function CategoryMenu({ category }: { category: string }) {
 
   const tiles =
     picks && picks.length > 0
-      ? picks.map((l) => ({ key: l.id, src: l.images[0].url2x || l.images[0].url, title: l.title, to: `/listings/${l.id}` }))
+      ? picks.map((l) => ({ key: l.id, src: l.images[0].url2x || l.images[0].url, title: l.title, to: linkTo(category, { keywords: l.title }) }))
       : [{ key: "hero", src: heroPhoto, title: "New in", to: linkTo(category, { sort: "newest" }) }];
 
   return (

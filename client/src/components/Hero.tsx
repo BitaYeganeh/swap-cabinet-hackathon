@@ -2,13 +2,23 @@ import { LuShieldCheck, LuTruck } from "react-icons/lu";
 import { Link } from "react-router";
 import heroPhoto from "../assets/hero-rack.jpg";
 import { CATEGORIES } from "../lib/format";
+import { browseUrl } from "../lib/search";
+import { useHeaderHeight } from "../lib/useHeaderHeight";
 import { btn } from "../lib/ui";
 
-// Full-width black-and-white photo; a white fade gives the copy a clean
-// "white side" to sit on (from the left on desktop, from the top on phones).
-export default function Hero({ category }: { category?: string }) {
+// Height of the green announcement strip above the header.
+const BANNER_HEIGHT = 33;
+
+// Full-width black-and-white photo filling the screen below the header; a white
+// fade gives the copy a clean "white side" (from the left on desktop, the top on phones).
+export default function Hero() {
+  const headerHeight = useHeaderHeight();
+
   return (
-    <section className="relative isolate overflow-hidden border-b border-line bg-white">
+    <section
+      style={{ minHeight: `calc(100svh - ${headerHeight + BANNER_HEIGHT}px)` }}
+      className="relative isolate flex flex-col overflow-hidden bg-white"
+    >
       <img
         src={heroPhoto}
         alt="Second-hand shirts and jackets hanging on a clothing rail"
@@ -19,7 +29,7 @@ export default function Hero({ category }: { category?: string }) {
       />
       <div className="absolute inset-0 -z-10 bg-linear-to-b from-white from-45% via-white/80 via-70% to-white/10 lg:bg-linear-to-r lg:from-white lg:from-30% lg:via-white/85 lg:via-50% lg:to-transparent lg:to-75%" />
 
-      <div className="mx-auto flex max-w-7xl items-center px-4 pt-10 pb-48 sm:px-6 sm:pb-64 lg:h-[min(78vh,680px)] lg:min-h-[540px] lg:py-0">
+      <div className="mx-auto flex w-full max-w-7xl flex-1 px-4 pt-10 pb-48 sm:px-6 sm:pb-64 lg:items-center lg:py-12">
         <div className="max-w-[520px] animate-fade-up">
           <p className="mb-4 text-[13px] font-semibold tracking-[0.18em] text-ink-2 uppercase">
             Second-hand marketplace
@@ -37,9 +47,8 @@ export default function Hero({ category }: { category?: string }) {
             {CATEGORIES.filter((c) => c.value).map((c, i) => (
               <Link
                 key={c.value}
-                to={`/category/${c.value}`}
-                aria-current={c.value === category ? "page" : undefined}
-                className={(category ? c.value === category : i === 0) ? `${btn.dark} h-11 px-6` : `${btn.ghost} px-6`}
+                to={browseUrl(new URLSearchParams(), { category: c.value })}
+                className={i === 0 ? `${btn.dark} h-11 px-6` : `${btn.ghost} px-6`}
               >
                 Shop {c.label.toLowerCase()}
               </Link>

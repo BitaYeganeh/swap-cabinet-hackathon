@@ -1,12 +1,11 @@
-import { createBrowserRouter } from "react-router";
-import { BrowseSkeleton, DetailSkeleton } from "./components/Skeletons";
+import { Navigate, createBrowserRouter } from "react-router";
+import { BrowseSkeleton } from "./components/Skeletons";
 import RootLayout from "./layouts/RootLayout";
-import { listingLoader, listingsLoader } from "./loaders";
-import ErrorPage, { NotFoundPage } from "./pages/ErrorPage";
+import { listingsLoader } from "./loaders";
+import ErrorPage from "./pages/ErrorPage";
 import HomePage from "./pages/HomePage";
-import ListingPage from "./pages/ListingPage";
-import SavedPage from "./pages/SavedPage";
 
+// A single page: categories, search and filters all live in the query string.
 export const router = createBrowserRouter([
   {
     path: "/",
@@ -23,24 +22,9 @@ export const router = createBrowserRouter([
             hydrateFallbackElement: <BrowseSkeleton />,
           },
           {
-            path: "category/:category",
-            element: <HomePage />,
-            loader: listingsLoader,
-            hydrateFallbackElement: <BrowseSkeleton />,
-          },
-          {
-            path: "listings/:id",
-            element: <ListingPage />,
-            loader: listingLoader,
-            hydrateFallbackElement: <DetailSkeleton />,
-          },
-          {
-            path: "saved",
-            element: <SavedPage />,
-          },
-          {
+            // Any other address goes back to the one page.
             path: "*",
-            element: <NotFoundPage />,
+            element: <Navigate to="/" replace />,
           },
         ],
       },

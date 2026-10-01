@@ -1,11 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { LuHeart } from "react-icons/lu";
-import { Link, NavLink, useLocation, useMatch, useSearchParams } from "react-router";
-import { useFavorites } from "../lib/favorites";
+import { Link, useLocation, useSearchParams } from "react-router";
 import { CATEGORIES, GENDERS, TYPES, categoryLabel } from "../lib/format";
-import { browseUrl, isBrowsePath } from "../lib/search";
-import { countBadge } from "../lib/ui";
+import { browseUrl, readSearch } from "../lib/search";
 import CategoryMenu from "./CategoryMenu";
 import Logo from "./Logo";
 import SearchBar from "./SearchBar";
@@ -13,13 +10,7 @@ import SearchBar from "./SearchBar";
 export default function Navbar() {
   const location = useLocation();
   const [searchParams] = useSearchParams();
-  const category = useMatch("/category/:category")?.params.category;
-  const favoriteCount = Object.keys(useFavorites()).length;
-
-  const onBrowse = isBrowsePath(location.pathname);
-  // Filters only carry over while browsing; from other pages start a fresh search.
-  const currentSearch = onBrowse ? searchParams : new URLSearchParams();
-  const keywords = onBrowse ? (searchParams.get("keywords") ?? "") : "";
+  const { category, keywords = "" } = readSearch(searchParams);
 
   // Desktop flyout: hovering (or focusing) a category tab slides its menu in
   // from the left, just below the tab row. Touch screens use the tabs directly.
@@ -57,31 +48,11 @@ export default function Navbar() {
         <SearchBar
           key={keywords}
           initial={keywords}
-          category={onBrowse ? category : undefined}
-          current={currentSearch}
+          category={category}
+          current={searchParams}
         />
 
-        <div className="ml-auto flex justify-end sm:flex-1">
-          <NavLink
-            to="/saved"
-            className={({ isActive }) =>
-              `relative ml-auto inline-flex flex-col items-center gap-0.5 rounded-lg px-3 py-1.5 text-xs font-medium no-underline hover:bg-surface-2 sm:order-none ${
-                isActive ? "bg-surface-2 text-warm" : "text-ink"
-              }`
-            }
-            aria-label={`Saved items (${favoriteCount})`}
-          >
-            {({ isActive }) => (
-              <>
-                <LuHeart className={`size-5 ${isActive ? "fill-current" : ""}`} />
-                <span className="hidden sm:inline">Saved</span>
-                {favoriteCount > 0 && (
-                  <span className={`${countBadge} absolute top-0.5 right-0.5`}>{favoriteCount}</span>
-                )}
-              </>
-            )}
-          </NavLink>
-        </div>
+        <div className="hidden sm:block sm:flex-1" aria-hidden="true" />
       </div>
 
       <nav
@@ -91,21 +62,22 @@ export default function Navbar() {
         onPointerLeave={(e) => e.pointerType === "mouse" && schedule(null, 200)}
       >
         {CATEGORIES.filter((c) => c.value).map((c) => (
-          <NavLink
+          <Link
             key={c.value}
-            to={browseUrl(c.value, currentSearch, { category: c.value })}
-            end
+            to={browseUrl(searchParams, { category: c.value })}
+            aria-current={category === c.value ? "page" : undefined}
             aria-expanded={open?.category === c.value}
             onPointerEnter={(e) => e.pointerType === "mouse" && schedule(c.value, open ? 0 : 120)}
             onFocus={() => window.matchMedia("(min-width: 1024px)").matches && schedule(c.value, 0)}
-            className={({ isActive }) =>
-              `relative whitespace-nowrap px-4 py-3 font-medium no-underline after:absolute after:inset-x-4 after:-bottom-px after:h-[2.5px] after:rounded-sm hover:text-ink ${
-                isActive ? "font-semibold text-ink after:bg-ink" : "text-ink-2 after:bg-transparent"
-              }`
-            }
+            // While a menu is open the underline follows it, not the current category.
+            className={`relative whitespace-nowrap px-4 py-3 font-medium no-underline after:absolute after:inset-x-4 after:-bottom-px after:h-[2.5px] after:rounded-sm hover:text-ink ${
+              (open ? open.category === c.value : category === c.value)
+                ? "font-semibold text-ink after:bg-ink"
+                : "text-ink-2 after:bg-transparent"
+            }`}
           >
             {c.label}
-          </NavLink>
+          </Link>
         ))}
       </nav>
 
@@ -132,7 +104,7 @@ export default function Navbar() {
           document.body
         )}
 
-      {onBrowse && category && <SubcategoryNav category={category} current={searchParams} />}
+      {category && <SubcategoryNav category={category} current={searchParams} />}
     </header>
   );
 }
@@ -157,7 +129,7 @@ function SubcategoryNav({ category, current }: { category: string; current: URLS
             {[{ value: "", label: "All kids" }, ...GENDERS].map((g) => (
               <Link
                 key={g.value}
-                to={browseUrl(category, current, { gender: g.value })}
+                to={browseUrl(current, { gender: g.value })}
                 aria-current={gender === g.value ? "page" : undefined}
                 className={subLink(gender === g.value)}
               >
@@ -170,7 +142,7 @@ function SubcategoryNav({ category, current }: { category: string; current: URLS
         {TYPES.map((t) => (
           <Link
             key={t.value}
-            to={browseUrl(category, current, { type: type === t.value ? "" : t.value })}
+            to={browseUrl(current, { type: type === t.value ? "" : t.value })}
             aria-current={type === t.value ? "page" : undefined}
             className={subLink(type === t.value)}
           >
