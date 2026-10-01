@@ -75,6 +75,10 @@ function createStore(dir = DEFAULT_DIR) {
       await (await table()).delete(`id IN (${ids.map(quote).join(", ")})`);
     },
 
+    async count() {
+      return (await table()).countRows();
+    },
+
     async all() {
       return (await (await table()).query().toArray()).map(fromRecord);
     },

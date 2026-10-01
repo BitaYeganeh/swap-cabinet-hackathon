@@ -26,4 +26,13 @@ const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
+
+  // Load the local models in the background so the first search is not slow.
+  const { store } = require("./vectorStore/store");
+  const { textVector, clipTextVector } = require("./vectorStore/embed");
+  store
+    .count()
+    .then((rows) => (rows > 0 ? Promise.all([textVector("warm up"), clipTextVector("warm up")]) : null))
+    .then((done) => done && console.log("Search models ready"))
+    .catch((error) => console.error("Model warm-up failed:", error.message));
 });
