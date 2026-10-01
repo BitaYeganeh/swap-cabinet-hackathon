@@ -29,7 +29,10 @@ export type Listing = {
   pickupEnabled: boolean;
   shippingPrice: number | null;
   address: string | null;
+  street: string | null;
+  postcode: string | null;
   city: string | null;
+  country: string | null;
   geolocation: { lat: number; lng: number } | null;
   sellerName: string | null;
   images: { url: string; url2x: string }[];
@@ -60,6 +63,8 @@ export type ListingsResponse = {
   success: boolean;
   listings: Listing[];
   pagination: Pagination;
+  /** Spelling-corrected keywords, when the search had likely typos. */
+  suggestion?: string | null;
 };
 
 export class ApiError extends Error {
@@ -99,6 +104,36 @@ export function getListings(
   });
 
   return request(`/api/listings?${query}`, signal);
+}
+
+export type AutocompleteItem = Pick<Listing, "id" | "title" | "listingType" | "price" | "city"> & {
+  image: string | null;
+};
+
+export type AutocompletePlace = {
+  kind: "city" | "postcode" | "street";
+  value: string;
+  /** City the postcode or street is in. */
+  city: string | null;
+  /** Listings at this place; null when combined with other typed words. */
+  count: number | null;
+  /** Search to run when this place is picked. */
+  query: string;
+};
+
+export type AutocompleteResponse = {
+  items: AutocompleteItem[];
+  places: AutocompletePlace[];
+};
+
+export function getAutocomplete(
+  q: string,
+  category?: string,
+  signal?: AbortSignal
+): Promise<AutocompleteResponse> {
+  const query = new URLSearchParams({ q });
+  if (category) query.set("category", category);
+  return request(`/api/listings/autocomplete?${query}`, signal);
 }
 
 export async function getListing(id: string, signal?: AbortSignal): Promise<Listing> {

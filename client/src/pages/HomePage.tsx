@@ -22,7 +22,7 @@ const CATEGORY_HEADINGS: Record<string, string> = {
 };
 
 export default function HomePage() {
-  const { listings, pagination } = useLoaderData<typeof listingsLoader>();
+  const { listings, pagination, suggestion } = useLoaderData<typeof listingsLoader>();
   const { category } = useParams();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
@@ -115,6 +115,15 @@ export default function HomePage() {
               <p className="mt-1 text-sm text-ink-3">
                 {pagination.totalItems} {pagination.totalItems === 1 ? "item" : "items"}
               </p>
+              {suggestion && (
+                <p className="mt-1 text-sm text-ink-2">
+                  Did you mean{" "}
+                  <button type="button" className={btn.link} onClick={() => update({ keywords: suggestion })}>
+                    “{suggestion}”
+                  </button>
+                  ?
+                </p>
+              )}
             </div>
 
             <div className="flex gap-2.5">

@@ -1,6 +1,13 @@
 const sharetribe = require("../config/sharetribe");
+const { searchListings, suggestKeywords, autocomplete } = require("./fuzzySearch");
 
 const PER_PAGE = 12;
+
+// Keyword search fetches every listing that passes the other filters and ranks
+// them here, so it can tolerate typos. These bound that fetch.
+const FETCH_PER_PAGE = 100; // Sharetribe maximum
+const MAX_FETCH_PAGES = 10;
+const CANDIDATE_TTL_MS = 60 * 1000;
 
 // UI sort keys -> Sharetribe sort values ("-" prefix means ascending).
 const SORTS = {
@@ -60,12 +67,19 @@ function buildQuery({ keywords, category, type, size, condition, color, minPrice
   return query;
 }
 
-// "Fleminginkatu 5, 00530 Helsinki, Finland" -> "Helsinki"
-function cityFromAddress(address) {
-  if (!address) return null;
+// "Fleminginkatu 5, 00530 Helsinki, Finland"
+//   -> { street: "Fleminginkatu", postcode: "00530", city: "Helsinki", country: "Finland" }
+function parseAddress(address) {
+  if (!address) return { street: null, postcode: null, city: null, country: null };
   const parts = address.split(",").map((p) => p.trim());
   const cityPart = parts.length >= 2 ? parts[parts.length - 2] : parts[0];
-  return cityPart.replace(/^\d+\s*/, "") || null;
+  return {
+    // Street name without the house number, so searching "5" doesn't match it.
+    street: parts.length >= 3 ? parts[0].replace(/\s*\d+\w?$/, "") || null : null,
+    postcode: cityPart.match(/^\d{3,}/)?.[0] || null,
+    city: cityPart.replace(/^\d+\s*/, "") || null,
+    country: parts.length >= 2 ? parts[parts.length - 1] : null,
+  };
 }
 
 // "dress shoes" is a shoe style, not a hint.
@@ -101,6 +115,9 @@ function toListing(listing, includedById) {
       url2x: image.attributes.variants["landscape-crop2x"]?.url,
     }));
 
+  const address = publicData.location?.address || null;
+  const { street, postcode, city, country } = parseAddress(address);
+
   const authorRef = relationships?.author?.data;
   const author = authorRef && includedById[authorRef.id.uuid];
 
@@ -128,8 +145,11 @@ function toListing(listing, includedById) {
     shippingEnabled: !!publicData.shippingEnabled,
     pickupEnabled: !!publicData.pickupEnabled,
     shippingPrice: publicData.shippingPriceInSubunitsOneItem ?? null,
-    address: publicData.location?.address || null,
-    city: cityFromAddress(publicData.location?.address),
+    address,
+    street,
+    postcode,
+    city,
+    country,
     geolocation: attributes.geolocation
       ? { lat: attributes.geolocation.lat, lng: attributes.geolocation.lng }
       : null,
@@ -138,19 +158,90 @@ function toListing(listing, includedById) {
   };
 }
 
-async function getListings(params = {}) {
-  const query = buildQuery(params);
-  const gender = params.category === "kids" && GENDERS.includes(params.gender) ? params.gender : null;
-
-  if (gender) return getListingsByGender(query, gender);
-
-  const response = await sharetribe.listings.query(query);
+function mapResponse(response) {
   const { data, included = [], meta } = response.data;
-
   const includedById = Object.fromEntries(included.map((item) => [item.id.uuid, item]));
+  return { listings: data.map((listing) => toListing(listing, includedById)), meta };
+}
+
+// Filter query -> { expires, promise } so paging through results doesn't refetch.
+const candidateCache = new Map();
+
+// Every listing matching the non-keyword filters, across Sharetribe pages.
+function getCandidates(filters) {
+  const { keywords, sort, page, ...rest } = buildQuery(filters);
+  const key = JSON.stringify(rest);
+
+  const cached = candidateCache.get(key);
+  if (cached && cached.expires > Date.now()) return cached.promise;
+
+  const promise = (async () => {
+    const listings = [];
+    for (let page = 1; page <= MAX_FETCH_PAGES; page++) {
+      const response = await sharetribe.listings.query({ ...rest, perPage: FETCH_PER_PAGE, page });
+      const { listings: batch, meta } = mapResponse(response);
+      listings.push(...batch);
+      if (page >= meta.totalPages) break;
+    }
+    return listings;
+  })();
+
+  candidateCache.set(key, { expires: Date.now() + CANDIDATE_TTL_MS, promise });
+  promise.catch(() => candidateCache.delete(key));
+  return promise;
+}
+
+const priceOf = (listing) => listing.price?.amount ?? Infinity;
+
+// Same sorts as SORTS, applied in memory. No sort keeps relevance order.
+const IN_MEMORY_SORTS = {
+  newest: (a, b) => new Date(b.createdAt) - new Date(a.createdAt),
+  "price-asc": (a, b) => priceOf(a) - priceOf(b),
+  "price-desc": (a, b) => priceOf(b) - priceOf(a),
+};
+
+// Kids gender filter value, or null when it doesn't apply.
+function genderFilter(params) {
+  return params.category === "kids" && GENDERS.includes(params.gender) ? params.gender : null;
+}
+
+const matchesGender = (gender) => (listing) => listing.gender === gender || listing.gender === "unisex";
+
+async function searchByKeywords(params) {
+  const gender = genderFilter(params);
+  let candidates = await getCandidates(params);
+  if (gender) candidates = candidates.filter(matchesGender(gender));
+  const keywords = params.keywords.trim();
+
+  let matches = searchListings(candidates, keywords);
+  const suggestion = suggestKeywords(candidates, keywords);
+
+  // Nothing matched as typed, but a corrected spelling does: search that instead.
+  if (!matches.length && suggestion) matches = searchListings(candidates, suggestion);
+
+  if (IN_MEMORY_SORTS[params.sort]) matches = [...matches].sort(IN_MEMORY_SORTS[params.sort]);
+
+  const totalItems = matches.length;
+  const totalPages = Math.max(1, Math.ceil(totalItems / PER_PAGE));
+  const page = Math.min(Math.max(1, parseInt(params.page, 10) || 1), totalPages);
 
   return {
-    listings: data.map((listing) => toListing(listing, includedById)),
+    listings: matches.slice((page - 1) * PER_PAGE, page * PER_PAGE),
+    pagination: { page, totalPages, totalItems, perPage: PER_PAGE },
+    suggestion,
+  };
+}
+
+async function getListings(params = {}) {
+  if (params.keywords && params.keywords.trim()) return searchByKeywords(params);
+
+  const gender = genderFilter(params);
+  if (gender) return getListingsByGender(buildQuery(params), gender);
+
+  const { listings, meta } = mapResponse(await sharetribe.listings.query(buildQuery(params)));
+
+  return {
+    listings,
     pagination: {
       page: meta.page,
       totalPages: meta.totalPages,
@@ -163,12 +254,7 @@ async function getListings(params = {}) {
 async function getListingsByGender(query, gender) {
   const { page } = query;
   const response = await sharetribe.listings.query({ ...query, page: 1, perPage: MAX_PER_PAGE });
-  const { data, included = [] } = response.data;
-
-  const includedById = Object.fromEntries(included.map((item) => [item.id.uuid, item]));
-  const matches = data
-    .map((listing) => toListing(listing, includedById))
-    .filter((listing) => listing.gender === gender || listing.gender === "unisex");
+  const matches = mapResponse(response).listings.filter(matchesGender(gender));
 
   const start = (page - 1) * PER_PAGE;
 
@@ -192,7 +278,24 @@ async function getListing(id) {
   return toListing(data, includedById);
 }
 
+// Search-bar suggestions: matching listings (slimmed down) and places.
+async function getAutocomplete({ q, category } = {}) {
+  const { items, places } = autocomplete(await getCandidates({ category }), q || "");
+  return {
+    items: items.map((l) => ({
+      id: l.id,
+      title: l.title,
+      listingType: l.listingType,
+      price: l.price,
+      city: l.city,
+      image: l.images[0]?.url || null,
+    })),
+    places,
+  };
+}
+
 module.exports = {
   getListings,
   getListing,
+  getAutocomplete,
 };
