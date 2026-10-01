@@ -20,7 +20,7 @@ function emptyTotals() {
   return {
     searches: 0,
     cacheHits: 0,
-    calls: { understand: 0, pick: 0 },
+    calls: { understand: 0, pick: 0, label: 0 },
     tokens: { input: 0, output: 0, cacheWrite: 0, cacheRead: 0 },
     costUsd: 0,
   };
