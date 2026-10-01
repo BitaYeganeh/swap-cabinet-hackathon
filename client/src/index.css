@@ -23,6 +23,8 @@
 
   --animate-shimmer: shimmer 1.3s linear infinite;
   --animate-fade-up: fade-up 0.35s ease both;
+  --animate-slide-in: slide-in 0.25s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  --animate-fade-in: fade-in 0.2s ease both;
 
   @keyframes shimmer {
     to {
@@ -34,6 +36,18 @@
     from {
       opacity: 0;
       transform: translateY(12px);
+    }
+  }
+
+  @keyframes slide-in {
+    from {
+      transform: translateX(-100%);
+    }
+  }
+
+  @keyframes fade-in {
+    from {
+      opacity: 0;
     }
   }
 }
