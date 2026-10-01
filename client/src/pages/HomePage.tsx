@@ -1,6 +1,6 @@
 import { useRef, useState } from "react";
-import { LuSearch, LuSlidersHorizontal, LuX } from "react-icons/lu";
-import { useLoaderData, useNavigate, useNavigation, useParams, useSearchParams } from "react-router";
+import { LuSearch, LuSlidersHorizontal, LuSparkles, LuX } from "react-icons/lu";
+import { Link, useLoaderData, useNavigate, useNavigation, useParams, useSearchParams } from "react-router";
 import EmptyState from "../components/EmptyState";
 import Filters from "../components/Filters";
 import Hero from "../components/Hero";
@@ -32,6 +32,9 @@ export default function HomePage() {
   const sizeSystem = useSizeSystem();
 
   const params: SearchParams = { ...readSearch(searchParams), category };
+  const aiQuery = searchParams.get("q");
+  const aiSummary = searchParams.get("ai");
+  const relaxed = searchParams.get("relaxed")?.split(",").filter(Boolean) ?? [];
   const loading = navigation.state === "loading" && isBrowsePath(navigation.location.pathname);
 
   const update = (changes: Partial<SearchParams>) =>
@@ -52,7 +55,11 @@ export default function HomePage() {
     category && { key: "category", label: categoryLabel(category) },
     params.gender && { key: "gender", label: genderLabel(params.gender) },
     params.type && { key: "type", label: labelFor(TYPES, params.type) },
-    params.size && { key: "size", label: `Size ${sizeFilterLabel(params.size, category, sizeSystem)}` },
+    params.size && {
+      key: "size",
+      // Shoe labels already read "Shoe EU 38".
+      label: `${params.size.startsWith("shoe-") ? "" : "Size "}${sizeFilterLabel(params.size, category, sizeSystem)}`,
+    },
     params.condition && { key: "condition", label: labelFor(CONDITIONS, params.condition) },
     params.color && { key: "color", label: labelFor(COLORS, params.color) },
     (params.minPrice || params.maxPrice) && {
@@ -67,7 +74,9 @@ export default function HomePage() {
   const sectionHeading = CATEGORY_HEADINGS[(category === "kids" && params.gender) || category || ""];
   const typeHeading = params.type && labelFor(TYPES, params.type);
 
-  const heading = params.keywords
+  const heading = aiSummary
+    ? aiSummary
+    : params.keywords
     ? `Results for “${params.keywords}”`
     : sectionHeading
       ? typeHeading
@@ -139,6 +148,8 @@ export default function HomePage() {
             </div>
           </div>
 
+          {aiQuery && aiSummary && <AiBanner query={aiQuery} relaxed={relaxed} />}
+
           {pills.length > 0 && (
             <div className="mb-5 flex flex-wrap items-center gap-2">
               {pills.map((pill) => (
@@ -146,9 +157,9 @@ export default function HomePage() {
                   type="button"
                   key={pill.key}
                   onClick={() => removePill(pill.key)}
-                  className="inline-flex items-center gap-1.5 rounded-full bg-accent-soft py-1.5 pr-2.5 pl-3.5 text-sm font-medium text-accent hover:bg-[#d3e6dc]"
+                  className="inline-flex max-w-full items-center gap-1.5 rounded-full bg-accent-soft py-1.5 pr-2.5 pl-3.5 text-sm font-medium text-accent hover:bg-[#d3e6dc]"
                 >
-                  {pill.label}
+                  <span className="truncate">{pill.label}</span>
                   <LuX className="size-3.5" />
                 </button>
               ))}
@@ -182,5 +193,41 @@ export default function HomePage() {
         </section>
       </div>
     </>
+  );
+}
+
+const RELAXED_LABELS: Record<string, string> = {
+  color: "colour",
+  condition: "condition",
+  size: "size",
+  minPrice: "minimum price",
+  maxPrice: "maximum price",
+  keywords: "some search words",
+  gender: "boys/girls",
+  type: "item type",
+};
+
+function AiBanner({ query, relaxed }: { query: string; relaxed: string[] }) {
+  return (
+    <div className="mb-4 flex gap-3 rounded-2xl border border-accent/20 bg-accent-soft/60 px-4 py-3 text-sm">
+      <LuSparkles className="mt-0.5 size-[18px] shrink-0 text-accent" />
+      <div className="min-w-0 flex-1">
+        <p className="text-ink">
+          AI search for <strong className="font-semibold break-words">“{query}”</strong>. Adjust the filters
+          below to refine it.
+        </p>
+        {relaxed.length > 0 && (
+          <p className="mt-1 text-ink-2">
+            No exact matches, so we left out: {relaxed.map((key) => RELAXED_LABELS[key] ?? key).join(", ")}.
+          </p>
+        )}
+        <Link
+          to={`/?keywords=${encodeURIComponent(query)}`}
+          className="mt-1 inline-block font-semibold text-accent no-underline hover:underline"
+        >
+          Search for the exact words instead
+        </Link>
+      </div>
+    </div>
   );
 }

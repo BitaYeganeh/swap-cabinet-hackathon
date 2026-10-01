@@ -4,6 +4,7 @@ const express = require("express");
 const cors = require("cors");
 
 const listingsRouter = require("./routes/listings");
+const searchRouter = require("./routes/search");
 
 const app = express();
 
@@ -17,6 +18,7 @@ app.get("/", (req, res) => {
 });
 
 app.use("/api/listings", listingsRouter);
+app.use("/api/search", searchRouter);
 
 const PORT = 3000;
 

@@ -56,6 +56,17 @@ export type SearchParams = {
   page?: number;
 };
 
+export type AiSearchResponse = {
+  success: boolean;
+  query: string;
+  /** Filters for the regular listing search; same keys as SearchParams. */
+  filters: Partial<Record<keyof SearchParams, string>>;
+  summary: string;
+  isNeed: boolean;
+  /** Filters the server removed because the full set matched nothing. */
+  dropped: string[];
+};
+
 export type ListingsResponse = {
   success: boolean;
   listings: Listing[];
@@ -86,6 +97,28 @@ async function request<T>(path: string, signal?: AbortSignal): Promise<T> {
   }
 
   return response.json();
+}
+
+// Ask the AI to turn a natural-language search into listing filters.
+export async function aiSearch(query: string, signal?: AbortSignal): Promise<AiSearchResponse> {
+  let response: Response;
+  try {
+    response = await fetch(`${API_URL}/api/search/ai`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ query }),
+      signal,
+    });
+  } catch (error) {
+    if ((error as Error).name === "AbortError") throw error;
+    throw new ApiError("Can't reach the server.", 0);
+  }
+
+  const body = await response.json().catch(() => null);
+  if (!response.ok || !body?.success) {
+    throw new ApiError(body?.message || "AI search failed", response.status);
+  }
+  return body;
 }
 
 export function getListings(

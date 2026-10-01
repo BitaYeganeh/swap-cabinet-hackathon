@@ -1,4 +1,5 @@
 const sharetribe = require("../config/sharetribe");
+const { CATEGORIES, GENDERS, TYPES } = require("../config/catalog");
 
 const PER_PAGE = 12;
 
@@ -16,11 +17,6 @@ const INCLUDES = {
   "fields.image": ["variants.landscape-crop", "variants.landscape-crop2x"],
   "fields.user": ["profile.displayName"],
 };
-
-// Subcategory types, stored in Sharetribe as categoryLevel2 = "<category>-<type>".
-const TYPES = ["tops", "bottoms", "shoes", "accessories", "bundles"];
-
-const GENDERS = ["boys", "girls"];
 
 // The gender filter is applied here rather than by Sharetribe, so fetch every
 // match in one go (Sharetribe caps perPage at 100) and paginate locally.
@@ -43,7 +39,12 @@ function buildQuery({ keywords, category, type, size, condition, color, minPrice
 
   if (keywords && keywords.trim()) query.keywords = keywords.trim();
   if (category) query.pub_categoryLevel1 = category;
-  if (category && TYPES.includes(type)) query.pub_categoryLevel2 = `${category}-${type}`;
+  // Types are stored per category ("kids-shoes"); without a category, match any of them.
+  if (TYPES.includes(type)) {
+    query.pub_categoryLevel2 = category
+      ? `${category}-${type}`
+      : CATEGORIES.map((c) => `${c}-${type}`).join(",");
+  }
   applySize(query, size);
   if (condition) query.pub_condition = condition;
   if (color) query.pub_color = color;
