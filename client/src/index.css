@@ -1,0 +1,87 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", system-ui, "Segoe UI", Roboto, sans-serif;
+  --font-display: "Fraunces", Georgia, "Times New Roman", serif;
+
+  --color-bg: #faf8f4;
+  --color-surface: #ffffff;
+  --color-surface-2: #f3efe8;
+  --color-ink: #1d1b18;
+  --color-ink-2: #57524b;
+  --color-ink-3: #8b857c;
+  --color-line: #e7e1d7;
+  --color-accent: #1f5c46;
+  --color-accent-hover: #174a38;
+  --color-accent-soft: #e3efe9;
+  --color-warm: #c2562f;
+  --color-gold: #e9b949;
+  --color-cream: #fdf6e3;
+
+  --shadow-card: 0 10px 30px -12px rgb(29 27 24 / 0.22);
+  --shadow-float: 0 30px 80px -20px rgb(29 27 24 / 0.45);
+
+  --animate-shimmer: shimmer 1.3s linear infinite;
+  --animate-fade-up: fade-up 0.35s ease both;
+
+  @keyframes shimmer {
+    to {
+      background-position: -200% 0;
+    }
+  }
+
+  @keyframes fade-up {
+    from {
+      opacity: 0;
+      transform: translateY(12px);
+    }
+  }
+}
+
+@layer base {
+  :root {
+    color-scheme: light;
+  }
+
+  body {
+    @apply min-w-80 bg-bg font-sans text-[15px] leading-relaxed text-ink antialiased;
+  }
+
+  button,
+  [role="button"] {
+    cursor: pointer;
+  }
+
+  button:disabled {
+    cursor: not-allowed;
+  }
+
+  :focus-visible {
+    @apply outline-2 outline-offset-2 outline-accent;
+  }
+
+  input[type="search"]::-webkit-search-cancel-button {
+    display: none;
+  }
+}
+
+/* Loading placeholder sweep used by skeleton cards. */
+@utility shimmer {
+  background: linear-gradient(
+    90deg,
+    var(--color-surface-2) 25%,
+    #ebe5db 50%,
+    var(--color-surface-2) 75%
+  );
+  background-size: 200% 100%;
+  animation: var(--animate-shimmer);
+}
+
+/* Striped background for listings without a photo. */
+@utility stripes {
+  background: repeating-linear-gradient(
+    -45deg,
+    var(--color-surface-2) 0 12px,
+    #efe9e0 12px 24px
+  );
+}
