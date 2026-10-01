@@ -18,7 +18,13 @@ function describe(labels: PhotoLabels) {
 }
 
 export default function PhotoSearchPage() {
-  const file = (useLocation().state as { file?: File } | null)?.file;
+  const location = useLocation();
+  const file = (location.state as { file?: File } | null)?.file;
+  // A new pick navigates again (new location.key) and remounts with fresh state.
+  return <PhotoResults key={location.key} file={file} />;
+}
+
+function PhotoResults({ file }: { file?: File }) {
   const preview = useMemo(() => (file ? URL.createObjectURL(file) : null), [file]);
   const [state, setState] = useState<State>({ status: file ? "loading" : "idle" });
 
@@ -29,7 +35,6 @@ export default function PhotoSearchPage() {
   useEffect(() => {
     if (!file) return;
     const controller = new AbortController();
-    setState({ status: "loading" });
     photoSearch(file, controller.signal)
       .then((result) => setState({ status: "done", result }))
       .catch((error) => {
