@@ -1,11 +1,10 @@
-import { useEffect, useRef, useState, type SubmitEvent } from "react";
+import { useEffect, useState, type SubmitEvent } from "react";
 import { LuHeart, LuLoaderCircle, LuSearch, LuSparkles, LuX } from "react-icons/lu";
 import { Link, NavLink, useLocation, useMatch, useNavigate, useSearchParams } from "react-router";
-import { savePickReasons } from "../lib/aiPicks";
-import { aiSearch } from "../lib/api";
+import { cancelAiSearch, runAiSearch, useAiSearchPending } from "../lib/aiSearch";
 import { useFavorites } from "../lib/favorites";
 import { CATEGORIES, GENDERS, TYPES } from "../lib/format";
-import { aiBrowseUrl, browseUrl, isBrowsePath, shouldUseAi } from "../lib/search";
+import { browseUrl, isBrowsePath, shouldUseAi } from "../lib/search";
 import { countBadge } from "../lib/ui";
 import Logo from "./Logo";
 
@@ -20,6 +19,11 @@ export default function Navbar() {
   const currentSearch = onBrowse ? searchParams : new URLSearchParams();
   // After an AI search, show the shopper's own words rather than the AI's keywords.
   const keywords = onBrowse ? (searchParams.get("q") ?? searchParams.get("keywords") ?? "") : "";
+  const aiPending = useAiSearchPending() !== null;
+
+  // Moving to another page while an AI search runs cancels it, so a late
+  // answer can't pull the shopper away from where they went.
+  useEffect(() => cancelAiSearch(), [location.key]);
 
   return (
     <header className="sticky top-0 z-20 border-b border-line bg-bg/90 backdrop-blur-md backdrop-saturate-150">
@@ -76,6 +80,12 @@ export default function Navbar() {
       </nav>
 
       {onBrowse && category && <SubcategoryNav category={category} current={searchParams} />}
+
+      {aiPending && (
+        <div className="absolute inset-x-0 -bottom-px h-0.5 overflow-hidden bg-accent-soft" aria-hidden="true">
+          <div className="h-full w-1/3 animate-progress rounded-full bg-accent" />
+        </div>
+      )}
     </header>
   );
 }
@@ -136,50 +146,20 @@ function SearchForm({
 }) {
   const navigate = useNavigate();
   const [text, setText] = useState(initial);
-  const [thinking, setThinking] = useState(false);
-  const pending = useRef<AbortController | null>(null);
+  const pending = useAiSearchPending();
+  const thinking = pending !== null;
+  // While an AI search runs (possibly started from an example chip), show its words.
+  const shown = pending ?? text;
 
-  // Leaving the page (or a new search remounting this form) cancels a pending
-  // AI request; clearing the ref first stops it falling back to a keyword search.
-  useEffect(
-    () => () => {
-      const controller = pending.current;
-      pending.current = null;
-      controller?.abort();
-    },
-    []
-  );
+  const useAi = shouldUseAi(shown);
 
-  const useAi = shouldUseAi(text);
-
-  const submit = async (e: SubmitEvent) => {
+  const submit = (e: SubmitEvent) => {
     e.preventDefault();
     const query = text.trim();
-    const keywordSearch = () => navigate(browseUrl(category, current, { keywords: query }));
-
-    if (!useAi) return keywordSearch();
-
-    pending.current?.abort();
-    const controller = new AbortController();
-    pending.current = controller;
-    // Need searches make two AI calls (understand, then pick), so allow ~30s.
-    const timeout = setTimeout(() => controller.abort(), 30_000);
-    setThinking(true);
-
-    try {
-      const result = await aiSearch(query, controller.signal);
-      if (result.picks?.length) savePickReasons(result.query, result.picks);
-      navigate(aiBrowseUrl(result));
-    } catch {
-      // AI unavailable, slow or confused: never leave the shopper without results.
-      if (pending.current === controller) keywordSearch();
-    } finally {
-      clearTimeout(timeout);
-      if (pending.current === controller) {
-        pending.current = null;
-        setThinking(false);
-      }
-    }
+    const keywordUrl = browseUrl(category, current, { keywords: query });
+    if (!useAi) return navigate(keywordUrl);
+    // AI unavailable, slow or confused: the keyword search is the fallback.
+    runAiSearch(query, navigate, keywordUrl);
   };
 
   return (
@@ -194,20 +174,24 @@ function SearchForm({
       ) : (
         <LuSearch className="absolute left-[18px] size-5 text-ink-3" />
       )}
+      <span className="sr-only" aria-live="polite">
+        {thinking ? "Searching with AI…" : ""}
+      </span>
       <input
         type="search"
-        value={text}
+        value={shown}
         onChange={(e) => setText(e.target.value)}
         readOnly={thinking}
         placeholder="Search, or describe what you need…"
         aria-label="Search listings"
         className="h-full min-w-0 flex-1 bg-transparent outline-none placeholder:text-ink-3"
       />
-      {text && (
+      {shown && (
         <button
           type="button"
-          onClick={() => setText("")}
-          aria-label="Clear search text"
+          onClick={() => (thinking ? cancelAiSearch() : setText(""))}
+          aria-label={thinking ? "Cancel AI search" : "Clear search text"}
+          title={thinking ? "Cancel" : undefined}
           className="mr-1 grid size-8 place-items-center rounded-full bg-surface-2 text-ink-2"
         >
           <LuX className="size-4" />

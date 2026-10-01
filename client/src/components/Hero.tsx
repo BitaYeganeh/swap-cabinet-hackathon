@@ -1,7 +1,16 @@
-import { LuChevronRight, LuShieldCheck, LuTruck } from "react-icons/lu";
-import { Link } from "react-router";
+import { LuChevronRight, LuShieldCheck, LuSparkles, LuTruck } from "react-icons/lu";
+import { Link, useNavigate } from "react-router";
+import { runAiSearch, useAiSearchPending } from "../lib/aiSearch";
 import type { Listing } from "../lib/api";
 import { CATEGORIES } from "../lib/format";
+
+// Example searches that show off the AI: a plain request, a need, and filters in words.
+const EXAMPLES = [
+  "Shoes for kids",
+  "Something to keep me dry in the rain",
+  "Warm clothes for my son this winter",
+  "Outfit for a job interview",
+];
 
 const tileColors: Record<string, string> = {
   women: "bg-[#b7654a]",
@@ -10,6 +19,9 @@ const tileColors: Record<string, string> = {
 };
 
 export default function Hero({ listings }: { listings: Listing[] }) {
+  const navigate = useNavigate();
+  const pending = useAiSearchPending();
+
   return (
     <section className="pt-6 pb-4 sm:pt-10">
       <div className="mx-auto grid max-w-7xl items-center gap-7 px-4 sm:px-6 lg:grid-cols-[1fr_1.25fr] lg:gap-10">
@@ -32,6 +44,31 @@ export default function Hero({ listings }: { listings: Listing[] }) {
             <span className="inline-flex items-center gap-2">
               <LuShieldCheck className="size-[18px] text-accent" /> Condition checked
             </span>
+          </div>
+
+          <div className="mt-6 sm:mt-7">
+            <p className="mb-2.5 inline-flex items-center gap-1.5 text-sm font-semibold text-ink">
+              <LuSparkles className="size-4 text-accent" /> Try asking
+            </p>
+            <div className="flex flex-wrap gap-2">
+              {EXAMPLES.map((example) => (
+                <button
+                  type="button"
+                  key={example}
+                  disabled={pending !== null}
+                  onClick={() =>
+                    runAiSearch(example, navigate, `/?keywords=${encodeURIComponent(example)}`)
+                  }
+                  className={`rounded-full border px-3.5 py-1.5 text-left text-sm transition disabled:cursor-wait ${
+                    pending === example
+                      ? "border-accent bg-accent-soft text-accent"
+                      : "border-line bg-surface text-ink-2 hover:border-accent hover:text-accent disabled:opacity-60"
+                  }`}
+                >
+                  {example}
+                </button>
+              ))}
+            </div>
           </div>
         </div>
 
