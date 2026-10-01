@@ -2,7 +2,7 @@ import { LuChevronLeft, LuChevronRight } from "react-icons/lu";
 import type { Pagination as PaginationData } from "../lib/api";
 
 const pageBtn =
-  "grid h-[42px] min-w-[42px] place-items-center rounded-full border px-2 font-semibold transition disabled:opacity-35";
+  "grid h-10 min-w-10 place-items-center sm:h-[42px] sm:min-w-[42px] rounded-full border px-2 font-semibold transition disabled:opacity-35";
 
 export default function Pagination({
   pagination,
@@ -15,7 +15,7 @@ export default function Pagination({
   if (totalPages <= 1) return null;
 
   return (
-    <nav className="mt-12 flex justify-center gap-2" aria-label="Pagination">
+    <nav className="mt-10 flex flex-wrap justify-center gap-1.5 sm:mt-12 sm:gap-2" aria-label="Pagination">
       <button
         type="button"
         className={`${pageBtn} border-line bg-surface hover:enabled:border-ink`}

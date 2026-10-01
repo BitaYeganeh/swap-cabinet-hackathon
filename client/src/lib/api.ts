@@ -15,6 +15,7 @@ export type Listing = {
   listingType: string;
   category?: string;
   subcategory?: string;
+  gender: "boys" | "girls" | "unisex" | null;
   condition?: string;
   conditionDetails?: string;
   color?: string;
@@ -29,6 +30,7 @@ export type Listing = {
   shippingPrice: number | null;
   address: string | null;
   city: string | null;
+  geolocation: { lat: number; lng: number } | null;
   sellerName: string | null;
   images: { url: string; url2x: string }[];
 };
@@ -43,6 +45,9 @@ export type Pagination = {
 export type SearchParams = {
   keywords?: string;
   category?: string;
+  type?: string;
+  gender?: string;
+  size?: string;
   condition?: string;
   color?: string;
   minPrice?: string;

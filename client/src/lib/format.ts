@@ -7,6 +7,23 @@ export const CATEGORIES = [
   { value: "kids", label: "Kids" },
 ];
 
+// Subcategory types, stored as categoryLevel2 = "<category>-<type>".
+export const TYPES = [
+  { value: "tops", label: "Tops" },
+  { value: "bottoms", label: "Bottoms" },
+  { value: "shoes", label: "Shoes" },
+  { value: "accessories", label: "Accessories" },
+  { value: "bundles", label: "Bundles" },
+];
+
+// Only the kids category is split by gender.
+export const GENDERS = [
+  { value: "boys", label: "Boys" },
+  { value: "girls", label: "Girls" },
+];
+
+export const genderLabel = (value?: string | null) => (value ? labelFor(GENDERS, value) : "");
+
 export const CONDITIONS = [
   { value: "like-new", label: "Like new" },
   { value: "gently-used", label: "Gently used" },
