@@ -377,10 +377,23 @@ async function getAutocomplete({ q, category } = {}) {
   };
 }
 
+// Full listing data for the given ids, 100 per request (Sharetribe maximum).
+// Listings that are no longer published are simply missing from the map.
+async function getListingsByIds(ids) {
+  const byId = new Map();
+  for (let i = 0; i < ids.length; i += FETCH_PER_PAGE) {
+    const chunk = ids.slice(i, i + FETCH_PER_PAGE);
+    const response = await sharetribe.listings.query({ ids: chunk.join(","), perPage: FETCH_PER_PAGE, ...INCLUDES });
+    for (const listing of mapResponse(response).listings) byId.set(listing.id, listing);
+  }
+  return byId;
+}
+
 module.exports = {
   getListings,
   getListing,
   getAutocomplete,
   getBrands,
   getAiCandidates,
+  getListingsByIds,
 };

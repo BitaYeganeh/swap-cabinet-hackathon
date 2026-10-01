@@ -5,6 +5,7 @@ const cors = require("cors");
 
 const listingsRouter = require("./routes/listings");
 const searchRouter = require("./routes/search");
+const imageSearchRouter = require("./routes/imageSearch");
 
 const app = express();
 
@@ -18,6 +19,7 @@ app.get("/", (req, res) => {
 });
 
 app.use("/api/listings", listingsRouter);
+app.use("/api/search/image", imageSearchRouter);
 app.use("/api/search", searchRouter);
 
 const PORT = process.env.PORT || 3000;
