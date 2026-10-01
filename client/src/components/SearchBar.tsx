@@ -19,6 +19,7 @@ import {
 import { formatMoney, WANTED_TYPE } from "../lib/format";
 import { cancelAiSearch, runAiSearch, useAiSearchPending } from "../lib/aiSearch";
 import { browseUrl, shouldUseAi } from "../lib/search";
+import PhotoSearchButton from "./PhotoSearchButton";
 
 const DEBOUNCE_MS = 150;
 const EMPTY: AutocompleteResponse = { items: [], places: [] };
@@ -302,6 +303,7 @@ export default function SearchBar({
           <LuX className="size-4" />
         </button>
       )}
+      <PhotoSearchButton className="mr-1" />
       <button
         type="submit"
         disabled={thinking}

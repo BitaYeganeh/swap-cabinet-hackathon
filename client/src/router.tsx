@@ -4,6 +4,7 @@ import RootLayout from "./layouts/RootLayout";
 import { listingsLoader } from "./loaders";
 import ErrorPage from "./pages/ErrorPage";
 import HomePage from "./pages/HomePage";
+import PhotoSearchPage from "./pages/PhotoSearchPage";
 
 // A single page: categories, search and filters all live in the query string.
 export const router = createBrowserRouter([
@@ -20,6 +21,10 @@ export const router = createBrowserRouter([
             element: <HomePage />,
             loader: listingsLoader,
             hydrateFallbackElement: <BrowseSkeleton />,
+          },
+          {
+            path: "photo",
+            element: <PhotoSearchPage />,
           },
           {
             // Any other address goes back to the one page.
