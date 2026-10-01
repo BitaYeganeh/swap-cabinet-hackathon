@@ -25,7 +25,9 @@ async function searchByPhoto(buffer, mediaType) {
         return { items: null };
       }
     ),
-    imageVector(buffer),
+    imageVector(buffer).catch(() => {
+      throw new ImageSearchError("Couldn't read this photo, try a JPG, PNG or WEBP", 400);
+    }),
     store.all(),
   ]);
 

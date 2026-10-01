@@ -23,7 +23,7 @@ const Item = z.object({
 });
 const Labels = z.object({ items: z.array(Item) });
 
-// Kept byte-for-byte stable so it can be prompt-cached.
+// Kept stable between calls so labels stay consistent.
 const SYSTEM_PROMPT = `You label second-hand clothing for a search index. Every item gets the same labels, so items from listings and from shoppers' photos can be compared exactly.
 
 - kind: the most specific kind from the allowed list. If none fits, use "other-<group>", e.g. "other-shoes".
@@ -48,7 +48,7 @@ async function callClaude(content) {
     messages: [{ role: "user", content }],
   });
   usage.recordCall("label", response.usage);
-  if (response.stop_reason === "refusal" || !response.parsed_output) return [];
+  if (response.stop_reason === "refusal" || !response.parsed_output) throw new Error("Labelling declined");
   return normalizeItems(response.parsed_output.items);
 }
 

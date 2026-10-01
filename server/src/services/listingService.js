@@ -374,7 +374,9 @@ async function getAiCandidates(params = {}, query = null) {
     const byId = new Map(all.map((l) => [l.id, l]));
     const ranked = order.map((id) => byId.get(id)).filter(Boolean);
     // Store empty or behind: fall back to the first listings, as before.
-    chosen = (ranked.length ? ranked : all).slice(0, AI_CANDIDATES);
+    // Listings the store has not seen yet go after the ranked ones, so they can still be picked.
+    const seen = new Set(ranked.map((l) => l.id));
+    chosen = [...ranked, ...all.filter((l) => !seen.has(l.id))].slice(0, AI_CANDIDATES);
   }
 
   const labels = await labelsById(chosen.map((l) => l.id));
