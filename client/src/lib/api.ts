@@ -1,4 +1,5 @@
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
+// Empty by default: requests go to the same origin and Vite proxies /api to the server.
+const API_URL = import.meta.env.VITE_API_URL || "";
 
 export type Money = {
   amount: number;
