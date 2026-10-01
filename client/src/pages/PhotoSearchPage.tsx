@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { LuLoaderCircle } from "react-icons/lu";
 import { useLocation } from "react-router";
 import ListingCard, { ListingGrid } from "../components/ListingCard";
@@ -24,13 +24,19 @@ export default function PhotoSearchPage() {
   return <PhotoResults key={location.key} file={file} />;
 }
 
-function PhotoResults({ file }: { file?: File }) {
-  const preview = useMemo(() => (file ? URL.createObjectURL(file) : null), [file]);
-  const [state, setState] = useState<State>({ status: file ? "loading" : "idle" });
+// Each effect run makes and revokes its own URL, so StrictMode's extra run is safe.
+function PhotoPreview({ file }: { file: File }) {
+  const ref = useRef<HTMLImageElement>(null);
+  useEffect(() => {
+    const url = URL.createObjectURL(file);
+    if (ref.current) ref.current.src = url;
+    return () => URL.revokeObjectURL(url);
+  }, [file]);
+  return <img ref={ref} alt="Your photo" className="size-20 rounded-xl border border-line object-cover" />;
+}
 
-  useEffect(() => () => {
-    if (preview) URL.revokeObjectURL(preview);
-  }, [preview]);
+function PhotoResults({ file }: { file?: File }) {
+  const [state, setState] = useState<State>({ status: file ? "loading" : "idle" });
 
   useEffect(() => {
     if (!file) return;
@@ -48,9 +54,7 @@ function PhotoResults({ file }: { file?: File }) {
       <title>{`Photo search · ${BRAND}`}</title>
 
       <div className="mb-6 flex items-center gap-4">
-        {preview ? (
-          <img src={preview} alt="Your photo" className="size-20 rounded-xl border border-line object-cover" />
-        ) : null}
+        {file && <PhotoPreview file={file} />}
         <div className="min-w-0 flex-1">
           <h2 className="font-display text-2xl leading-tight font-medium tracking-tight sm:text-3xl">Photo search</h2>
           <p className="mt-1 text-sm text-ink-3">
