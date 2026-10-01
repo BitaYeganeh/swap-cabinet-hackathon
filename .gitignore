@@ -8,3 +8,6 @@ dist/
 .vscode/
 # Hackathon materials (the credentials PDF contains secrets)
 *.pdf
+
+# Local vector store and downloaded models (rebuild with `npm run sync` in server/)
+server/data/
