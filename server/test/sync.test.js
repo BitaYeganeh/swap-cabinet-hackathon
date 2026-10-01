@@ -44,6 +44,15 @@ test("sync adds new, updates changed, skips unchanged, removes gone", async () =
   assert.deepEqual([...store.data.keys()].sort(), ["edit", "keep", "new"]);
 });
 
+test("an empty fetch does not wipe the store", async () => {
+  const store = fakeStore([{ id: "a", contentHash: "x" }]);
+  const logs = [];
+  const result = await syncListings({ store, sources: [], buildRow: async () => ({}), log: (m) => logs.push(m) });
+  assert.equal(result.removed, 0);
+  assert.deepEqual([...store.data.keys()], ["a"]);
+  assert.match(logs.join("\n"), /not removing anything/);
+});
+
 test("a listing that fails to build is reported and retried next time", async () => {
   const store = fakeStore();
   const result = await syncListings({

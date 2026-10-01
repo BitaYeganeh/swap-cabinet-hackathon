@@ -87,7 +87,7 @@ Steps:
    "People also look for this".
 6. If Claude fails, return one list ordered by photo similarity only.
 
-Response: `{ groups: [{ name, listings }], wanted: [...], labels, fallback }`. Empty groups are left out.
+Response: `{ groups: [{ key, listings }], wanted, labels, fallback, noClothing }`, with `key` one of `same`, `exact`, `close`, `other`. Empty groups are left out. When labelling fails (`fallback`), a `closest` list ranked by looks is returned instead.
 
 ## Part 3: upgrade the AI text search
 

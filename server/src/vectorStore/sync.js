@@ -111,6 +111,11 @@ async function syncListings({ store, sources, buildRow: build, log = console.log
   }
   await Promise.all(Array.from({ length: CONCURRENCY }, worker));
 
+  if (sources.length === 0 && existing.size > 0) {
+    log("Sharetribe returned no listings; not removing anything");
+    return result;
+  }
+
   const current = new Set(sources.map((s) => s.id));
   const gone = [...existing.keys()].filter((id) => !current.has(id));
   await store.remove(gone);

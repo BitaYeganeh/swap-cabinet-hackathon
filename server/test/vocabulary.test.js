@@ -7,7 +7,8 @@ test("every kind maps to a known group", () => {
 });
 
 test("kinds are unique", () => {
-  assert.equal(new Set(V.KINDS).size, V.KINDS.length);
+  const all = Object.values(V.KINDS_BY_GROUP).flat();
+  assert.equal(new Set(all).size, all.length);
 });
 
 test("each group has an other-kind", () => {
