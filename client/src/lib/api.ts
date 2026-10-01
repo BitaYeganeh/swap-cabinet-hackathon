@@ -119,6 +119,8 @@ export type AutocompletePlace = {
 export type AutocompleteResponse = {
   items: AutocompleteItem[];
   places: AutocompletePlace[];
+  /** Spelling-corrected text, when what was typed looks misspelled. */
+  suggestion?: string | null;
 };
 
 export function getAutocomplete(

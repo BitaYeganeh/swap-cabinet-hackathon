@@ -3,7 +3,9 @@
 // "jakcet" -> jacket (transposition), "levi" -> levis (prefix),
 // "sneekers" -> sneakers (edit distance), "tee" -> t-shirt (synonym),
 // "helsnki" -> Helsinki, "005" -> postcodes 00510 and 00530 (location),
-// "esbo"/"helsingfors" -> Espoo/Helsinki (alias), "flemingin katu" -> Fleminginkatu.
+// "esbo"/"helsingfors" -> Espoo/Helsinki (alias), "flemingin katu" -> Fleminginkatu,
+// "puuvilla" -> cotton, "cotton" also finds denim (material), "autumn clothes" ->
+// wool sweaters, jackets, boots... (season).
 
 // Higher weight = a hit in this field counts for more when ranking.
 const FIELD_WEIGHTS = {
@@ -26,27 +28,273 @@ const LOCATION_FIELDS = ["postcode", "city", "street", "country"];
 
 const STOPWORDS = new Set(["a", "an", "and", "the", "for", "with", "in", "of", "on", "to", "or"]);
 
+// Words that mean "any item": "autumn clothes" searches autumn, "clothes" alone shows everything.
+const GENERIC_WORDS = new Set([
+  "clothes", "clothing", "wear", "outfit", "outfits", "garment", "garments", "apparel",
+  "item", "items", "stuff", "things", "vaatteet", "vaate", "vaatetta",
+]);
+
 // Groups of words treated as interchangeable. Every word in a group expands to the others.
 const SYNONYM_GROUPS = [
   ["tshirt", "tee", "top", "shirt"],
-  ["sneakers", "trainers", "shoes", "sneaker", "trainer"],
+  ["sneakers", "trainers", "shoes", "sneaker", "trainer", "footwear", "kicks"],
   ["hoodie", "hoody", "sweatshirt"],
   ["sweater", "jumper", "pullover", "knit", "cardigan"],
-  ["pants", "trousers", "jeans", "chinos"],
-  ["jacket", "coat", "parka", "blazer"],
-  ["dress", "gown"],
-  ["bag", "handbag", "purse", "backpack"],
-  ["kids", "children", "child", "baby", "toddler"],
-  ["women", "womens", "ladies", "woman"],
-  ["men", "mens", "man"],
-  ["multicolor", "multicolour", "colorful", "colourful"],
+  ["pants", "trousers", "jeans", "chinos", "slacks", "joggers", "sweatpants"],
+  ["jacket", "coat", "parka", "blazer", "outerwear", "anorak"],
+  ["dress", "gown", "frock"],
+  ["bag", "handbag", "purse", "backpack", "tote"],
+  ["kids", "children", "child", "baby", "toddler", "boy", "boys", "girl", "girls", "junior", "youth", "infant", "teen", "teens"],
+  ["women", "womens", "ladies", "woman", "lady", "female"],
+  ["men", "mens", "man", "male", "gents", "gentlemen"],
+  ["bundle", "bundles", "set", "lot", "pack", "collection"],
+  ["accessories", "accessory"],
+  ["bottoms", "bottom"],
+  ["tops"],
+  ["multicolor", "multicolour", "colorful", "colourful", "multi", "rainbow"],
   ["grey", "gray"],
+  ["navy", "darkblue"],
+  ["beige", "cream", "ecru", "tan"],
+  ["wine", "burgundy", "maroon", "bordeaux"],
+  ["purple", "violet", "lilac", "lavender"],
+  ["pink", "rose", "blush"],
+  ["bronze", "copper"],
+  ["wanted", "looking", "seeking", "search"],
 ];
 
+// Materials, each group being one material's names (English spellings and
+// Finnish). Matched against the material field, title and description.
+const MATERIAL_GROUPS = [
+  ["cotton", "puuvilla"],
+  ["wool", "woolen", "woollen", "villa", "villainen"],
+  ["leather", "nahka", "nahkainen"],
+  ["faux", "synthetic", "vegan", "pleather", "imitation", "tekonahka", "keinonahka"],
+  ["linen", "pellava"],
+  ["silk", "silkki", "silky"],
+  ["denim", "farkku", "farkkukangas"],
+  ["polyester", "polyesteri"],
+  ["nylon", "polyamide", "polyamidi"],
+  ["elastane", "spandex", "lycra", "elastaani", "stretch"],
+  ["viscose", "rayon", "viskoosi"],
+  ["acrylic", "akryyli"],
+  ["cashmere", "kashmir"],
+  ["merino", "merinowool", "merinovilla"],
+  ["alpaca", "alpakka"],
+  ["mohair"],
+  ["angora"],
+  ["lambswool"],
+  ["tweed"],
+  ["fleece", "fleecy", "fliisi"],
+  ["down", "untuva", "feather", "feathers", "untuvatakki"],
+  ["suede", "mokka", "nubuck"],
+  ["corduroy", "vakosametti"],
+  ["velvet", "velour", "sametti"],
+  ["satin", "sateen", "satiini"],
+  ["jersey", "trikoo"],
+  ["flannel", "flanelli"],
+  ["chambray"],
+  ["poplin"],
+  ["twill"],
+  ["seersucker"],
+  ["muslin", "musliini"],
+  ["terry", "frotee"],
+  ["chiffon", "sifonki"],
+  ["lace", "pitsi"],
+  ["tulle", "tylli"],
+  ["canvas", "kanvas"],
+  ["rubber", "kumi", "latex"],
+  ["hemp", "hamppu"],
+  ["bamboo", "bambu"],
+  ["tencel", "lyocell"],
+  ["modal"],
+  ["acetate", "asetaatti"],
+  ["neoprene", "neopreeni"],
+  ["goretex"],
+  ["polyurethane"],
+  ["fur", "turkis"],
+  ["shearling", "lampaannahka"],
+  ["felt", "huopa"],
+  ["straw", "olki"],
+  ["cork", "korkki"],
+  ["jute", "juutti"],
+  ["plastic", "muovi"],
+  ["crepe", "kreppi"],
+  ["organza"],
+  ["georgette"],
+  ["taffeta", "tafti"],
+  ["gabardine", "gabardiini"],
+  ["brocade", "brokadi"],
+  ["jacquard"],
+  ["damask", "damasti"],
+  ["voile"],
+  ["boucle"],
+  ["chenille"],
+  ["sherpa", "teddy"],
+  ["plush", "pehmo"],
+  ["mesh"],
+  ["microfiber", "microfibre", "mikrokuitu"],
+  ["softshell"],
+  ["ripstop"],
+  ["cordura"],
+  ["oilskin", "waxed", "vahakangas"],
+  ["vinyl", "pvc"],
+  ["patent", "lakka", "lakkanahka"],
+  ["lurex", "metallic"],
+  ["sequin", "sequins", "paljetti", "paljetit"],
+  ["raffia", "rafia"],
+  ["rattan"],
+  ["wood", "wooden", "puu", "puinen"],
+  ["metal", "metalli"],
+  ["steel", "stainless", "teras"],
+  ["primaloft"],
+  ["thinsulate"],
+  ["kevlar"],
+];
+
+// One-way: searching the key also finds the narrower materials made of it
+// ("cotton" finds denim), but not the other way round.
+const NARROWER = new Map([
+  ["cotton", ["denim", "canvas", "corduroy", "flannel", "chambray", "jersey", "poplin", "twill", "terry", "muslin", "seersucker", "voile", "oilskin"]],
+  ["wool", ["merino", "cashmere", "alpaca", "mohair", "angora", "lambswool", "tweed", "felt", "shearling", "boucle", "gabardine"]],
+  ["leather", ["suede", "nubuck", "shearling", "patent"]],
+  ["synthetic", ["polyester", "nylon", "polyamide", "acrylic", "elastane", "spandex", "fleece", "neoprene", "polyurethane", "microfiber", "vinyl", "sherpa"]],
+  ["silk", ["satin", "chiffon", "organza", "georgette", "taffeta", "crepe"]],
+  ["denim", ["jeans"]],
+]);
+
+const MATERIAL_WORDS = new Set(MATERIAL_GROUPS.flat());
+
+// Finnish seasons. Listings have no season field, so a season word finds the
+// items and materials worn then.
+const SEASON_TERMS = {
+  winter: [
+    "winter", "wool", "merino", "cashmere", "alpaca", "down", "puffer", "padded", "quilted",
+    "insulated", "thermal", "fleece", "parka", "coat", "overcoat", "peacoat", "snowsuit", "snow",
+    "ski", "sweater", "jumper", "knit", "knitted", "cardigan", "turtleneck", "rollneck", "scarf",
+    "beanie", "gloves", "mittens", "earmuffs", "balaclava", "boots", "warm", "cozy", "cosy", "cold",
+    "colder", "shearling", "fur", "flannel", "corduroy", "velvet", "christmas",
+  ],
+  autumn: [
+    "autumn", "fall", "jacket", "coat", "trench", "raincoat", "rain", "waterproof", "windbreaker",
+    "parka", "sweater", "jumper", "knit", "knitted", "cardigan", "hoodie", "sweatshirt",
+    "turtleneck", "flannel", "corduroy", "wool", "tweed", "jeans", "boots", "wellies",
+    "gumboots", "scarf", "beanie", "gloves", "layering", "colder", "cozy", "cosy", "warm", "plaid",
+    "tartan", "halloween",
+  ],
+  spring: [
+    "spring", "jacket", "raincoat", "rain", "waterproof", "windbreaker", "trench", "jeans",
+    "cardigan", "hoodie", "sweatshirt", "sneakers", "trainers", "canvas", "linen", "chinos", "blouse",
+    "shirt", "layering", "floral", "pastel", "wellies", "gumboots", "easter",
+  ],
+  summer: [
+    "summer", "tshirt", "tee", "tank", "shorts", "skirt", "dress", "sundress", "sandals", "flipflops",
+    "slides", "espadrilles", "swimsuit", "swimwear", "bikini", "trunks", "sunglasses", "sunhat",
+    "sun", "linen", "breathable", "lightweight", "sleeveless", "straw", "crochet", "poncho",
+    "floral", "midsummer",
+  ],
+};
+
+// Words people type for each season, in English and Finnish ("kesä" -> "kesa"),
+// including holidays that fall in it.
+const SEASON_ALIASES = new Map(
+  Object.entries({
+    winter: ["winter", "wintertime", "wintry", "talvi", "talvinen", "talvella", "kaamos", "christmas", "xmas", "joulu"],
+    autumn: ["autumn", "autumnal", "fall", "syksy", "syksyinen", "syksylla", "ruska", "halloween"],
+    spring: ["spring", "springtime", "kevat", "kevainen", "kevaalla", "vappu", "easter", "paasiainen"],
+    summer: ["summer", "summertime", "summery", "kesa", "kesainen", "kesalla", "juhannus", "midsummer"],
+  }).flatMap(([season, words]) => words.map((w) => [w, season]))
+);
+
+// Ways people describe condition, mapped to the listing condition values
+// they mean. These filter strictly: "like new jacket" is jackets in like-new
+// condition. Finnish arrives translated ("hyvä kunto" -> good condition).
+const CONDITION_PHRASES = Object.entries({
+  "like-new": [
+    "like new", "as new", "brand new", "new", "mint", "unused", "unworn", "never worn", "never used",
+    "excellent", "perfect", "pristine", "flawless", "nwt", "new with tags", "tags on",
+  ],
+  "like-new,gently-used": ["good", "very good", "great"],
+  "gently-used": [
+    "gently used", "gently worn", "gently", "lightly used", "lightly worn", "barely used", "barely worn",
+    "slightly used", "little used", "hardly used", "hardly worn",
+  ],
+  "well-used": ["well used", "fair", "ok", "okay", "decent", "average", "moderately used"],
+  "heavily-used": [
+    "heavily used", "heavily worn", "heavily", "well worn", "worn", "worn out", "very worn", "very used",
+    "poor", "damaged", "faded", "for parts",
+  ],
+  "gently-used,well-used,heavily-used": [
+    "used", "secondhand", "second hand", "preloved", "pre loved", "preowned", "pre owned", "previously owned",
+  ],
+})
+  .flatMap(([values, phrases]) => phrases.map((p) => [p.split(" "), values.split(",")]))
+  // Longest first, so "like new" wins over "new" and "well worn" over "worn".
+  .sort((a, b) => b[0].length - a[0].length);
+
+const CONDITION_WORDS = new Set([...CONDITION_PHRASES.flatMap(([words]) => words), "condition"]);
+
+// Words naming who an item is for, mapped to the listing category. These
+// filter strictly too: "kids shoes" is shoes in the kids category, never
+// men's boots. Finnish arrives translated ("lasten" -> kids).
+const CATEGORY_WORDS = new Map(
+  Object.entries({
+    women: ["women", "womens", "woman", "ladies", "lady", "female", "females"],
+    men: ["men", "mens", "man", "male", "males", "gents", "gentlemen", "gentleman"],
+    kids: [
+      "kids", "kid", "children", "childrens", "child", "baby", "babies", "toddler", "toddlers", "boy", "boys",
+      "girl", "girls", "junior", "juniors", "youth", "infant", "infants", "teen", "teens",
+    ],
+  }).flatMap(([category, words]) => words.map((w) => [w, category]))
+);
+
+// Pull category words out of the query: { categories: Set, rest: words[] }.
+function splitCategory(words) {
+  const categories = new Set();
+  const rest = [];
+  for (const word of words) {
+    if (CATEGORY_WORDS.has(word)) categories.add(CATEGORY_WORDS.get(word));
+    else rest.push(word);
+  }
+  return { categories, rest };
+}
+
+/**
+ * Pull condition phrases out of the query words. Returns the condition values
+ * they mean (several phrases are alternatives) and the remaining words. A
+ * "condition" right after a phrase is dropped: "good condition".
+ */
+function splitCondition(words) {
+  const conditions = new Set();
+  const rest = [];
+  for (let i = 0; i < words.length; ) {
+    const hit = CONDITION_PHRASES.find(([phrase]) => phrase.every((w, j) => words[i + j] === w));
+    if (!hit) {
+      rest.push(words[i++]);
+      continue;
+    }
+    hit[1].forEach((value) => conditions.add(value));
+    i += hit[0].length;
+    if (words[i] === "condition") i++;
+  }
+  return { conditions, rest };
+}
+
+const { translate, FINNISH_WORDS, ENGLISH_WORDS } = require("./finnish");
+
 const SYNONYMS = new Map();
-SYNONYM_GROUPS.forEach((group) =>
+[...SYNONYM_GROUPS, ...MATERIAL_GROUPS].forEach((group) =>
   group.forEach((word) => SYNONYMS.set(word, group.filter((w) => w !== word)))
 );
+
+// Words the search understands even though no listing contains them, so
+// "Did you mean" leaves them alone.
+const VOCABULARY = new Set([
+  ...SYNONYMS.keys(),
+  ...SEASON_ALIASES.keys(),
+  ...GENERIC_WORDS,
+  ...ENGLISH_WORDS,
+  ...CONDITION_WORDS,
+]);
 
 // Other names people type for a place (Swedish names, abbreviations), mapped
 // to the spelling used in listing addresses.
@@ -158,10 +406,19 @@ function termScore(query, word, allowed = maxEdits(query), partial = true) {
   return 0;
 }
 
+// A listing field's searchable text. Descriptions end with a photo credit
+// ("Photo by Old Youth (https://…)") that says nothing about the item, and
+// would otherwise make "kids" match a photographer called Youth.
+function fieldText(listing, field) {
+  const text = listing[field];
+  if (field !== "description" || !text) return text;
+  return String(text).replace(/\s*Photo by .*$/s, "");
+}
+
 function indexListing(listing) {
   const fields = {};
   Object.keys(FIELD_WEIGHTS).forEach((field) => {
-    const words = indexWords(listing[field]);
+    const words = indexWords(fieldText(listing, field));
     if (words.length) fields[field] = field === "street" ? withJoined(words) : words;
   });
   return { listing, fields, title: normalize(listing.title) };
@@ -180,28 +437,77 @@ function bestFieldScore(doc, word, allowed = maxEdits(word), partial = true) {
   return best;
 }
 
-function parseQuery(keywords) {
-  const all = tokenize(keywords).map((w) => LOCATION_ALIASES.get(w) || w);
-  const words = all.filter((w) => !STOPWORDS.has(w));
-  return { words: words.length ? words : all, phrase: normalize(keywords) };
+// Finnish words become their English translations ("musta nahkatakki" ->
+// black leather jacket). Words that are already English (in some listing, or
+// understood by the search and not Finnish) are kept, so "stretch" stays "stretch".
+function toEnglish(words, known) {
+  return words.flatMap((w) => {
+    if (LOCATION_ALIASES.has(w)) return [LOCATION_ALIASES.get(w)];
+    if (known.has(w) || (VOCABULARY.has(w) && !FINNISH_WORDS.has(w))) return [w];
+    return translate(w) || [w];
+  });
 }
 
-function scoreListing(doc, { words, phrase, partial }) {
+// Every word indexed for the given listings.
+const knownWords = (docs) => new Set(docs.flatMap((doc) => Object.values(doc.fields).flat()));
+
+function parseQuery(keywords, known = new Set()) {
+  const all = toEnglish(tokenize(keywords), known);
+  const words = all.filter((w) => !STOPWORDS.has(w) && !GENERIC_WORDS.has(w));
+  // Only generic words ("clothes") means everything; only stopwords searches them as typed.
+  const fallback = all.some((w) => GENERIC_WORDS.has(w)) ? [] : all;
+  return { words: words.length ? words : fallback, phrase: normalize(keywords) };
+}
+
+// The season a query word names, allowing a typo in the longer season words
+// ("autum", "wintr") unless the word itself appears in some listing.
+function seasonOf(word, known) {
+  if (SEASON_ALIASES.has(word)) return SEASON_ALIASES.get(word);
+  if (word.length < 5 || known.has(word)) return null;
+  for (const [alias, season] of SEASON_ALIASES) {
+    if (alias.length >= 6 && editDistance(word, alias, maxEdits(word)) <= maxEdits(word)) return season;
+  }
+  return null;
+}
+
+// What a query word also matches, as [word, factor] pairs: synonyms and
+// narrower materials count a little less than the word itself, items worn in
+// a season a little less again.
+function expand(word, known) {
+  const season = seasonOf(word, known);
+  return {
+    word,
+    expansions: [
+      ...(SYNONYMS.get(word) || []).map((w) => [w, 0.8]),
+      ...(NARROWER.get(word) || []).map((w) => [w, 0.8]),
+      ...(season ? SEASON_TERMS[season].map((w) => [w, 0.7]) : []),
+    ],
+    // Materials and seasons describe the item, so in "cotton tie" a tie made of
+    // something else ranks above a cotton shirt.
+    weight: season || MATERIAL_WORDS.has(word) ? 0.6 : 1,
+  };
+}
+
+const isDescriptor = (word) => SEASON_ALIASES.has(word) || MATERIAL_WORDS.has(word);
+
+function scoreListing(doc, { terms, phrase, partial }) {
   let total = 0;
   let matched = 0;
 
-  for (const word of words) {
-    let score = bestFieldScore(doc, word, maxEdits(word), partial.has(word));
-    // A synonym hit counts, but a little less than the word itself.
-    for (const synonym of SYNONYMS.get(word) || []) {
-      score = Math.max(score, bestFieldScore(doc, synonym, 0) * 0.8);
+  for (const { word, expansions, weight } of terms) {
+    // A known material or season word is spelled right: "linen" is not a typo of "lining".
+    let score = VOCABULARY.has(word)
+      ? bestFieldScore(doc, word, 0, false)
+      : bestFieldScore(doc, word, maxEdits(word), partial.has(word));
+    for (const [other, factor] of expansions) {
+      score = Math.max(score, bestFieldScore(doc, other, 0, false) * factor);
     }
     if (score > 0) matched++;
-    total += score;
+    total += score * weight;
   }
 
-  const coverage = matched / words.length;
-  const phraseBonus = words.length > 1 && doc.title.includes(phrase) ? 2 : 0;
+  const coverage = matched / terms.length;
+  const phraseBonus = terms.length > 1 && doc.title.includes(phrase) ? 2 : 0;
   return { coverage, score: total + phraseBonus };
 }
 
@@ -263,7 +569,8 @@ function splitLocation(docs, words) {
       continue;
     }
 
-    const { field, isLocation } = classify(docs, words[i]);
+    // Materials and seasons are never places, even when one is close to a street name.
+    const { field, isLocation } = isDescriptor(words[i]) ? {} : classify(docs, words[i]);
     if (isLocation) add(field, words[i]);
     else rest.push(words[i]);
   }
@@ -277,17 +584,25 @@ const inLocation = (doc, constraints) =>
 
 /**
  * Rank listings against free-text keywords.
- * Location words (postcode, city, street, country) filter strictly: a query of
- * only a place returns everything there. The remaining words are ranked: one
+ * Category words ("kids", "women"), condition phrases ("like new", "used") and
+ * location words (postcode, city, street, country) filter strictly: a query of
+ * only those returns everything matching them. The remaining words are ranked: one
  * word must match; longer queries need at least half their words to match,
  * and listings matching more words always rank first.
  */
 function searchListings(listings, keywords) {
-  const query = parseQuery(keywords);
+  let docs = listings.map(indexListing);
+  const known = knownWords(docs);
+  const query = parseQuery(keywords, known);
   if (!query.words.length) return listings;
 
-  let docs = listings.map(indexListing);
-  const { constraints, rest } = splitLocation(docs, query.words);
+  const { categories, rest: uncategorized } = splitCategory(query.words);
+  if (categories.size) docs = docs.filter((doc) => categories.has(doc.listing.category));
+
+  const { conditions, rest: unconditioned } = splitCondition(uncategorized);
+  if (conditions.size) docs = docs.filter((doc) => conditions.has(doc.listing.condition));
+
+  const { constraints, rest } = splitLocation(docs, unconditioned);
   if (constraints.size) docs = docs.filter((doc) => inLocation(doc, constraints));
   if (!rest.length) return docs.map((doc) => doc.listing);
 
@@ -296,7 +611,7 @@ function searchListings(listings, keywords) {
   const partial = new Set(
     rest.filter((w) => !docs.some((doc) => bestFieldScore(doc, w, maxEdits(w), false) > 0))
   );
-  const itemQuery = { words: rest, phrase: rest.join(" "), partial };
+  const itemQuery = { terms: rest.map((w) => expand(w, known)), phrase: rest.join(" "), partial };
   const minCoverage = rest.length === 1 ? 1 : 0.5;
 
   return docs
@@ -309,13 +624,15 @@ function searchListings(listings, keywords) {
 /**
  * "Did you mean" for the query, built from words that actually appear in the
  * listings. Returns null when every word is already spelled like a real one.
+ * With `typing`, the last word may still be half-typed, so it is left alone
+ * while it is the start of a real word ("jack" on the way to "jacket").
  */
-function suggestKeywords(listings, keywords) {
+function suggestKeywords(listings, keywords, { typing = false } = {}) {
   const frequency = new Map();
   const places = new Set();
   listings.forEach((listing) =>
     Object.keys(FIELD_WEIGHTS).forEach((field) =>
-      indexWords(listing[field]).forEach((w) => {
+      indexWords(fieldText(listing, field)).forEach((w) => {
         frequency.set(w, (frequency.get(w) || 0) + 1);
         if (LOCATION_FIELDS.includes(field)) places.add(w);
       })
@@ -329,10 +646,31 @@ function suggestKeywords(listings, keywords) {
     return places.has(candidate) ? locationEdits(word) : maxEdits(word);
   };
 
+  const words = tokenize(keywords);
+  const startsKnownWord = (word) =>
+    word.length >= minPrefix(word) &&
+    [...frequency.keys(), ...VOCABULARY, ...FINNISH_WORDS].some((known) => known.startsWith(word));
+
   let changed = false;
-  const corrected = tokenize(keywords).map((word) => {
-    // Aliases ("esbo") are other names for a place, not misspellings.
-    if (frequency.has(word) || STOPWORDS.has(word) || LOCATION_ALIASES.has(word)) return word;
+  const corrected = words.map((word, i) => {
+    if (typing && i === words.length - 1 && startsKnownWord(word)) return word;
+    // Aliases ("esbo") are other names for a place, and materials and seasons
+    // are understood even when no listing uses the word: not misspellings.
+    if (
+      frequency.has(word) ||
+      STOPWORDS.has(word) ||
+      LOCATION_ALIASES.has(word) ||
+      VOCABULARY.has(word) ||
+      translate(word)
+    ) {
+      return word;
+    }
+    // A typo of a season ("autum") is corrected to it.
+    const season = seasonOf(word, frequency);
+    if (season) {
+      changed = true;
+      return season;
+    }
 
     let best = null;
     for (const [candidate, count] of frequency) {
@@ -357,9 +695,10 @@ const AUTOCOMPLETE_PLACES = 5;
 // Kinds of place offered while typing, in display order.
 const PLACE_KINDS = ["city", "postcode", "street"];
 
-// What the user has typed so far: finished words plus the word still being typed.
-function parseTyped(text) {
-  const words = tokenize(text).map((w) => LOCATION_ALIASES.get(w) || w);
+// What the user has typed so far: finished words plus the word still being
+// typed, Finnish translated to English ("musta takk" -> black jacket).
+function parseTyped(text, known = new Set()) {
+  const words = toEnglish(tokenize(text), known);
   return { phrase: words.join(" "), done: words.slice(0, -1), last: words[words.length - 1] };
 }
 
@@ -392,7 +731,10 @@ function rankWithFallback(values, typed, allowedFor) {
  * "helsn" still offers Helsinki.
  */
 function autocomplete(listings, text) {
-  const typed = parseTyped(text);
+  const known = new Set(
+    listings.flatMap((l) => Object.keys(FIELD_WEIGHTS).flatMap((f) => indexWords(fieldText(l, f))))
+  );
+  const typed = parseTyped(text, known);
   if (!typed.last) return { items: [], places: [] };
 
   const multiWord = typed.done.length > 0;
@@ -437,7 +779,7 @@ function autocomplete(listings, text) {
   let placeMatches = rankWithFallback(placeValues, typed, locationEdits);
   let before = "";
   if (!placeMatches.length && multiWord) {
-    placeMatches = rankWithFallback(placeValues, parseTyped(typed.last), locationEdits);
+    placeMatches = rankWithFallback(placeValues, parseTyped(typed.last, known), locationEdits);
     before = String(text).trim().split(/\s+/).slice(0, -1).join(" ");
   }
 
