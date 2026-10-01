@@ -1,0 +1,2336 @@
+[
+  {
+    "key": "w01",
+    "photo": {
+      "url": "https://cdn.stocksnap.io/img-thumbs/960w/D0XA0TXYQA.jpg",
+      "creator": "Alex Holyoake",
+      "source": "StockSnap",
+      "license": "CC0",
+      "page": "https://stocksnap.io/photo/clothing-brown-D0XA0TXYQA"
+    },
+    "title": "Black wool winter coat M",
+    "description": "Long black wool coat with a warm lining, perfect for Finnish winters. Two front pockets and a classic collar. Photo by Alex Holyoake on StockSnap (https://stocksnap.io/photo/clothing-brown-D0XA0TXYQA)",
+    "price": {
+      "amount": 6500,
+      "currency": "EUR"
+    },
+    "geolocation": {
+      "lat": 60.451,
+      "lng": 22.267
+    },
+    "publicData": {
+      "listingType": "sell-used-products",
+      "transactionProcessAlias": "default-purchase/release-1",
+      "unitType": "item",
+      "categoryLevel1": "women",
+      "categoryLevel2": "women-tops",
+      "color": "black",
+      "material": "80% wool, 20% polyamide",
+      "brand": "Ivana Helsinki",
+      "condition": "heavily-used",
+      "size": "m",
+      "location": {
+        "address": "Yliopistonkatu 20, 20100 Turku, Finland",
+        "building": ""
+      },
+      "pickupEnabled": true,
+      "shippingEnabled": true,
+      "shippingPriceInSubunitsOneItem": 590,
+      "petFreeHome": "no",
+      "smokeFreeHome": "yes"
+    }
+  },
+  {
+    "key": "w02",
+    "photo": {
+      "url": "https://cdn.stocksnap.io/img-thumbs/960w/X7BBEK50WK.jpg",
+      "creator": "Matthew Henry",
+      "source": "StockSnap",
+      "license": "CC0",
+      "page": "https://stocksnap.io/photo/cold-weather-X7BBEK50WK"
+    },
+    "title": "Black down puffer jacket S",
+    "description": "Black puffer jacket with down filling and a hood. Very warm and light. Photo by Matthew Henry on StockSnap (https://stocksnap.io/photo/cold-weather-X7BBEK50WK)",
+    "price": {
+      "amount": 5500,
+      "currency": "EUR"
+    },
+    "geolocation": {
+      "lat": 60.172,
+      "lng": 24.937
+    },
+    "publicData": {
+      "listingType": "sell-used-products",
+      "transactionProcessAlias": "default-purchase/release-1",
+      "unitType": "item",
+      "categoryLevel1": "women",
+      "categoryLevel2": "women-tops",
+      "color": "black",
+      "material": "Nylon shell, down filling",
+      "brand": "Luhta",
+      "condition": "gently-used",
+      "size": "s",
+      "location": {
+        "address": "Mannerheimintie 22, 00100 Helsinki, Finland",
+        "building": ""
+      },
+      "pickupEnabled": true,
+      "shippingEnabled": true,
+      "shippingPriceInSubunitsOneItem": 590,
+      "petFreeHome": "no",
+      "smokeFreeHome": "yes"
+    }
+  },
+  {
+    "key": "w03",
+    "photo": {
+      "url": "https://cdn.stocksnap.io/img-thumbs/960w/OA0AFM3HYZ.jpg",
+      "creator": "Michal Kulesza",
+      "source": "StockSnap",
+      "license": "CC0",
+      "page": "https://stocksnap.io/photo/clothes-sweaters-OA0AFM3HYZ"
+    },
+    "title": "Grey knitted merino sweater M",
+    "description": "Soft chunky knit sweater in merino wool. Great for layering in autumn and winter. Photo by Michal Kulesza on StockSnap (https://stocksnap.io/photo/clothes-sweaters-OA0AFM3HYZ)",
+    "price": {
+      "amount": 3200,
+      "currency": "EUR"
+    },
+    "geolocation": {
+      "lat": 60.261,
+      "lng": 24.854
+    },
+    "publicData": {
+      "listingType": "sell-used-products",
+      "transactionProcessAlias": "default-purchase/release-1",
+      "unitType": "item",
+      "categoryLevel1": "women",
+      "categoryLevel2": "women-tops",
+      "color": "grey",
+      "material": "100% merino wool",
+      "brand": "Arket",
+      "condition": "heavily-used",
+      "size": "m",
+      "location": {
+        "address": "Myyrmäentie 2, 01600 Vantaa, Finland",
+        "building": ""
+      },
+      "pickupEnabled": true,
+      "shippingEnabled": true,
+      "shippingPriceInSubunitsOneItem": 690,
+      "petFreeHome": "yes",
+      "smokeFreeHome": "yes"
+    }
+  },
+  {
+    "key": "w04",
+    "photo": {
+      "url": "https://cdn.stocksnap.io/img-thumbs/960w/1S2764QP9W.jpg",
+      "creator": "Jandro Martinez",
+      "source": "StockSnap",
+      "license": "CC0",
+      "page": "https://stocksnap.io/photo/girl-woman-1S2764QP9W"
+    },
+    "title": "Floral linen summer skirt S",
+    "description": "Light and breathable floral print skirt in linen. Perfect for summer bike rides. Photo by Jandro Martinez on StockSnap (https://stocksnap.io/photo/girl-woman-1S2764QP9W)",
+    "price": {
+      "amount": 1800,
+      "currency": "EUR"
+    },
+    "geolocation": {
+      "lat": 60.292,
+      "lng": 25.04
+    },
+    "publicData": {
+      "listingType": "sell-used-products",
+      "transactionProcessAlias": "default-purchase/release-1",
+      "unitType": "item",
+      "categoryLevel1": "women",
+      "categoryLevel2": "women-bottoms",
+      "color": "multicolor",
+      "material": "100% linen",
+      "condition": "like-new",
+      "size": "s",
+      "location": {
+        "address": "Tikkurilantie 10, 01300 Vantaa, Finland",
+        "building": ""
+      },
+      "pickupEnabled": false,
+      "shippingEnabled": true,
+      "shippingPriceInSubunitsOneItem": 590,
+      "petFreeHome": "yes",
+      "smokeFreeHome": "yes"
+    }
+  },
+  {
+    "key": "w05",
+    "photo": {
+      "url": "https://cdn.stocksnap.io/img-thumbs/960w/2G3VPGYPBQ.jpg",
+      "creator": "Seacoast Sage",
+      "source": "StockSnap",
+      "license": "CC0",
+      "page": "https://stocksnap.io/photo/sari-fabric-2G3VPGYPBQ"
+    },
+    "title": "Colourful silk scarf",
+    "description": "Large colourful silk scarf with a paisley print. Wear it as a scarf, headscarf or wrap. Photo by Seacoast Sage on StockSnap (https://stocksnap.io/photo/sari-fabric-2G3VPGYPBQ)",
+    "price": {
+      "amount": 2200,
+      "currency": "EUR"
+    },
+    "geolocation": {
+      "lat": 60.21,
+      "lng": 25.08
+    },
+    "publicData": {
+      "listingType": "sell-used-products",
+      "transactionProcessAlias": "default-purchase/release-1",
+      "unitType": "item",
+      "categoryLevel1": "women",
+      "categoryLevel2": "women-accessories",
+      "color": "multicolor",
+      "material": "100% silk",
+      "condition": "well-used",
+      "location": {
+        "address": "Itäkatu 1, 00930 Helsinki, Finland",
+        "building": ""
+      },
+      "pickupEnabled": false,
+      "shippingEnabled": true,
+      "shippingPriceInSubunitsOneItem": 690,
+      "petFreeHome": "no",
+      "smokeFreeHome": "yes"
+    }
+  },
+  {
+    "key": "w06",
+    "photo": {
+      "url": "https://cdn.stocksnap.io/img-thumbs/960w/X0SYSO6OXF.jpg",
+      "creator": "Joseph Young",
+      "source": "StockSnap",
+      "license": "CC0",
+      "page": "https://stocksnap.io/photo/girl-woman-X0SYSO6OXF"
+    },
+    "title": "Striped wool-cashmere sweater L",
+    "description": "Cosy brown and cream striped sweater in a wool-cashmere blend. Warm for autumn hikes. Photo by Joseph Young on StockSnap (https://stocksnap.io/photo/girl-woman-X0SYSO6OXF)",
+    "price": {
+      "amount": 4500,
+      "currency": "EUR"
+    },
+    "geolocation": {
+      "lat": 61.498,
+      "lng": 23.761
+    },
+    "publicData": {
+      "listingType": "sell-used-products",
+      "transactionProcessAlias": "default-purchase/release-1",
+      "unitType": "item",
+      "categoryLevel1": "women",
+      "categoryLevel2": "women-tops",
+      "color": "brown",
+      "material": "Wool, cashmere",
+      "condition": "gently-used",
+      "size": "l",
+      "location": {
+        "address": "Hämeenkatu 10, 33100 Tampere, Finland",
+        "building": ""
+      },
+      "pickupEnabled": true,
+      "shippingEnabled": true,
+      "shippingPriceInSubunitsOneItem": 690,
+      "petFreeHome": "yes",
+      "smokeFreeHome": "yes"
+    }
+  },
+  {
+    "key": "w07",
+    "photo": {
+      "url": "https://cdn.stocksnap.io/img-thumbs/960w/G9O9E7E1PC.jpg",
+      "creator": "Freestocks.org",
+      "source": "StockSnap",
+      "license": "CC0",
+      "page": "https://stocksnap.io/photo/girl-woman-G9O9E7E1PC"
+    },
+    "title": "Black satin midi skirt M",
+    "description": "Elegant black satin midi skirt with an elastic waist. Works for parties and the office. Photo by Freestocks.org on StockSnap (https://stocksnap.io/photo/girl-woman-G9O9E7E1PC)",
+    "price": {
+      "amount": 2400,
+      "currency": "EUR"
+    },
+    "geolocation": {
+      "lat": 60.165,
+      "lng": 24.939
+    },
+    "publicData": {
+      "listingType": "sell-used-products",
+      "transactionProcessAlias": "default-purchase/release-1",
+      "unitType": "item",
+      "categoryLevel1": "women",
+      "categoryLevel2": "women-bottoms",
+      "color": "black",
+      "material": "Polyester satin",
+      "condition": "well-used",
+      "size": "m",
+      "location": {
+        "address": "Bulevardi 5, 00120 Helsinki, Finland",
+        "building": ""
+      },
+      "pickupEnabled": true,
+      "shippingEnabled": true,
+      "shippingPriceInSubunitsOneItem": 690,
+      "petFreeHome": "yes",
+      "smokeFreeHome": "yes"
+    }
+  },
+  {
+    "key": "w08",
+    "photo": {
+      "url": "https://cdn.stocksnap.io/img-thumbs/960w/BCRQWOTPWM.jpg",
+      "creator": "Seacoast Sage",
+      "source": "StockSnap",
+      "license": "CC0",
+      "page": "https://stocksnap.io/photo/blue-jeans-BCRQWOTPWM"
+    },
+    "title": "High-waist blue Levi's jeans S",
+    "description": "Classic high-waisted blue jeans with a straight leg. Medium wash. Photo by Seacoast Sage on StockSnap (https://stocksnap.io/photo/blue-jeans-BCRQWOTPWM)",
+    "price": {
+      "amount": 3500,
+      "currency": "EUR"
+    },
+    "geolocation": {
+      "lat": 60.219,
+      "lng": 24.813
+    },
+    "publicData": {
+      "listingType": "sell-used-products",
+      "transactionProcessAlias": "default-purchase/release-1",
+      "unitType": "item",
+      "categoryLevel1": "women",
+      "categoryLevel2": "women-bottoms",
+      "color": "blue",
+      "material": "99% cotton, 1% elastane",
+      "brand": "Levi's",
+      "condition": "gently-used",
+      "size": "s",
+      "location": {
+        "address": "Leppävaarankatu 4, 02600 Espoo, Finland",
+        "building": ""
+      },
+      "pickupEnabled": true,
+      "shippingEnabled": true,
+      "shippingPriceInSubunitsOneItem": 390,
+      "petFreeHome": "yes",
+      "smokeFreeHome": "yes"
+    }
+  },
+  {
+    "key": "w09",
+    "photo": {
+      "url": "https://cdn.stocksnap.io/img-thumbs/960w/SMYLMGY8OG.jpg",
+      "creator": "JESHOOTS.com",
+      "source": "StockSnap",
+      "license": "CC0",
+      "page": "https://stocksnap.io/photo/woman-jeans-SMYLMGY8OG"
+    },
+    "title": "Light blue denim shorts M",
+    "description": "Light blue high-waisted denim shorts with frayed hems. Summer essential. Photo by JESHOOTS.com on StockSnap (https://stocksnap.io/photo/woman-jeans-SMYLMGY8OG)",
+    "price": {
+      "amount": 2800,
+      "currency": "EUR"
+    },
+    "geolocation": {
+      "lat": 60.451,
+      "lng": 22.267
+    },
+    "publicData": {
+      "listingType": "sell-used-products",
+      "transactionProcessAlias": "default-purchase/release-1",
+      "unitType": "item",
+      "categoryLevel1": "women",
+      "categoryLevel2": "women-bottoms",
+      "color": "blue",
+      "material": "100% cotton denim",
+      "condition": "well-used",
+      "size": "m",
+      "location": {
+        "address": "Yliopistonkatu 20, 20100 Turku, Finland",
+        "building": ""
+      },
+      "pickupEnabled": true,
+      "shippingEnabled": true,
+      "shippingPriceInSubunitsOneItem": 390,
+      "petFreeHome": "no",
+      "smokeFreeHome": "yes"
+    }
+  },
+  {
+    "key": "w10",
+    "photo": {
+      "url": "https://cdn.stocksnap.io/img-thumbs/960w/D85KN9KIDN.jpg",
+      "creator": "Zeny Rosalina",
+      "source": "StockSnap",
+      "license": "CC0",
+      "page": "https://stocksnap.io/photo/people-woman-D85KN9KIDN"
+    },
+    "title": "Red pleated mini skirt S",
+    "description": "Red pleated mini skirt in a warm wool blend. Cute with tights and boots in autumn. Photo by Zeny Rosalina on StockSnap (https://stocksnap.io/photo/people-woman-D85KN9KIDN)",
+    "price": {
+      "amount": 2000,
+      "currency": "EUR"
+    },
+    "geolocation": {
+      "lat": 60.451,
+      "lng": 22.267
+    },
+    "publicData": {
+      "listingType": "sell-used-products",
+      "transactionProcessAlias": "default-purchase/release-1",
+      "unitType": "item",
+      "categoryLevel1": "women",
+      "categoryLevel2": "women-bottoms",
+      "color": "red",
+      "material": "Wool blend",
+      "condition": "like-new",
+      "size": "s",
+      "location": {
+        "address": "Yliopistonkatu 20, 20100 Turku, Finland",
+        "building": ""
+      },
+      "pickupEnabled": true,
+      "shippingEnabled": true,
+      "shippingPriceInSubunitsOneItem": 490,
+      "petFreeHome": "yes",
+      "smokeFreeHome": "yes"
+    }
+  },
+  {
+    "key": "w11",
+    "photo": {
+      "url": "https://cdn.stocksnap.io/img-thumbs/960w/27CF7F9FB3.jpg",
+      "creator": "Alex Jones",
+      "source": "StockSnap",
+      "license": "CC0",
+      "page": "https://stocksnap.io/photo/boots-laces-27CF7F9FB3"
+    },
+    "title": "Black leather lace-up boots, size 39",
+    "description": "Black leather lace-up boots with a sturdy rubber sole. Great for autumn and winter. Photo by Alex Jones on StockSnap (https://stocksnap.io/photo/boots-laces-27CF7F9FB3)",
+    "price": {
+      "amount": 7000,
+      "currency": "EUR"
+    },
+    "geolocation": {
+      "lat": 62.242,
+      "lng": 25.748
+    },
+    "publicData": {
+      "listingType": "sell-used-products",
+      "transactionProcessAlias": "default-purchase/release-1",
+      "unitType": "item",
+      "categoryLevel1": "women",
+      "categoryLevel2": "women-shoes",
+      "color": "black",
+      "material": "Leather",
+      "brand": "Dr. Martens",
+      "condition": "like-new",
+      "shoeSize": "39",
+      "location": {
+        "address": "Kauppakatu 8, 40100 Jyväskylä, Finland",
+        "building": ""
+      },
+      "pickupEnabled": true,
+      "shippingEnabled": true,
+      "shippingPriceInSubunitsOneItem": 590,
+      "petFreeHome": "no",
+      "smokeFreeHome": "yes"
+    }
+  },
+  {
+    "key": "w12",
+    "photo": {
+      "url": "https://cdn.stocksnap.io/img-thumbs/960w/DPNQ3PEKA0.jpg",
+      "creator": "Daria Nepriakhina",
+      "source": "StockSnap",
+      "license": "CC0",
+      "page": "https://stocksnap.io/photo/shoes-sneakers-DPNQ3PEKA0"
+    },
+    "title": "White canvas sneakers, size 38",
+    "description": "Low-top white canvas sneakers. Comfortable everyday shoes for spring and summer. Photo by Daria Nepriakhina on StockSnap (https://stocksnap.io/photo/shoes-sneakers-DPNQ3PEKA0)",
+    "price": {
+      "amount": 2500,
+      "currency": "EUR"
+    },
+    "geolocation": {
+      "lat": 60.186,
+      "lng": 24.951
+    },
+    "publicData": {
+      "listingType": "sell-used-products",
+      "transactionProcessAlias": "default-purchase/release-1",
+      "unitType": "item",
+      "categoryLevel1": "women",
+      "categoryLevel2": "women-shoes",
+      "color": "white",
+      "material": "Canvas and rubber",
+      "brand": "Converse",
+      "condition": "gently-used",
+      "shoeSize": "38",
+      "location": {
+        "address": "Hämeentie 30, 00530 Helsinki, Finland",
+        "building": ""
+      },
+      "pickupEnabled": false,
+      "shippingEnabled": true,
+      "shippingPriceInSubunitsOneItem": 690,
+      "petFreeHome": "no",
+      "smokeFreeHome": "yes"
+    }
+  },
+  {
+    "key": "w13",
+    "photo": {
+      "url": "https://cdn.stocksnap.io/img-thumbs/960w/NY1J54I4RB.jpg",
+      "creator": "Freestocks.org",
+      "source": "StockSnap",
+      "license": "CC0",
+      "page": "https://stocksnap.io/photo/boots-shoes-NY1J54I4RB"
+    },
+    "title": "Brown leather knee-high boots, size 40",
+    "description": "Tall brown leather boots with a low heel. Warm and stylish for autumn and winter. Photo by Freestocks.org on StockSnap (https://stocksnap.io/photo/boots-shoes-NY1J54I4RB)",
+    "price": {
+      "amount": 4000,
+      "currency": "EUR"
+    },
+    "geolocation": {
+      "lat": 60.219,
+      "lng": 24.813
+    },
+    "publicData": {
+      "listingType": "sell-used-products",
+      "transactionProcessAlias": "default-purchase/release-1",
+      "unitType": "item",
+      "categoryLevel1": "women",
+      "categoryLevel2": "women-shoes",
+      "color": "brown",
+      "material": "Leather",
+      "condition": "well-used",
+      "shoeSize": "40",
+      "location": {
+        "address": "Leppävaarankatu 4, 02600 Espoo, Finland",
+        "building": ""
+      },
+      "pickupEnabled": false,
+      "shippingEnabled": true,
+      "shippingPriceInSubunitsOneItem": 690,
+      "petFreeHome": "no",
+      "smokeFreeHome": "yes"
+    }
+  },
+  {
+    "key": "w14",
+    "photo": {
+      "url": "https://cdn.stocksnap.io/img-thumbs/960w/OTIRIRP4UR.jpg",
+      "creator": "Kristin Hardwick",
+      "source": "StockSnap",
+      "license": "CC0",
+      "page": "https://stocksnap.io/photo/red-heels-OTIRIRP4UR"
+    },
+    "title": "Red high heels, size 37",
+    "description": "Glossy red high heels for parties and celebrations. Worn a few times. Photo by Kristin Hardwick on StockSnap (https://stocksnap.io/photo/red-heels-OTIRIRP4UR)",
+    "price": {
+      "amount": 3000,
+      "currency": "EUR"
+    },
+    "geolocation": {
+      "lat": 60.1755,
+      "lng": 24.805
+    },
+    "publicData": {
+      "listingType": "sell-used-products",
+      "transactionProcessAlias": "default-purchase/release-1",
+      "unitType": "item",
+      "categoryLevel1": "women",
+      "categoryLevel2": "women-shoes",
+      "color": "red",
+      "material": "Patent synthetic",
+      "condition": "like-new",
+      "shoeSize": "37",
+      "location": {
+        "address": "Tapiontori 3, 02100 Espoo, Finland",
+        "building": ""
+      },
+      "pickupEnabled": true,
+      "shippingEnabled": true,
+      "shippingPriceInSubunitsOneItem": 390,
+      "petFreeHome": "no",
+      "smokeFreeHome": "yes"
+    }
+  },
+  {
+    "key": "w15",
+    "photo": {
+      "url": "https://cdn.stocksnap.io/img-thumbs/960w/Z9ESJO45V5.jpg",
+      "creator": "Harsh Jadav",
+      "source": "StockSnap",
+      "license": "CC0",
+      "page": "https://stocksnap.io/photo/handbag-leather-Z9ESJO45V5"
+    },
+    "title": "Brown leather weekend bag",
+    "description": "Spacious brown leather weekend bag with two handles and a shoulder strap. Lovely patina. Photo by Harsh Jadav on StockSnap (https://stocksnap.io/photo/handbag-leather-Z9ESJO45V5)",
+    "price": {
+      "amount": 4500,
+      "currency": "EUR"
+    },
+    "geolocation": {
+      "lat": 60.451,
+      "lng": 22.267
+    },
+    "publicData": {
+      "listingType": "sell-used-products",
+      "transactionProcessAlias": "default-purchase/release-1",
+      "unitType": "item",
+      "categoryLevel1": "women",
+      "categoryLevel2": "women-accessories",
+      "color": "brown",
+      "material": "Leather",
+      "condition": "like-new",
+      "location": {
+        "address": "Yliopistonkatu 20, 20100 Turku, Finland",
+        "building": ""
+      },
+      "pickupEnabled": true,
+      "shippingEnabled": true,
+      "shippingPriceInSubunitsOneItem": 590,
+      "petFreeHome": "yes",
+      "smokeFreeHome": "yes"
+    }
+  },
+  {
+    "key": "w16",
+    "photo": {
+      "url": "https://cdn.stocksnap.io/img-thumbs/960w/LQZSN13S95.jpg",
+      "creator": "Kelly Sikkema",
+      "source": "StockSnap",
+      "license": "CC0",
+      "page": "https://stocksnap.io/photo/blanket-scarf-LQZSN13S95"
+    },
+    "title": "Chunky knitted wool scarves, set of 2",
+    "description": "Two chunky hand-knitted wool scarves, one green and one grey. Warm for winter. Photo by Kelly Sikkema on StockSnap (https://stocksnap.io/photo/blanket-scarf-LQZSN13S95)",
+    "price": {
+      "amount": 1500,
+      "currency": "EUR"
+    },
+    "geolocation": {
+      "lat": 65.013,
+      "lng": 25.471
+    },
+    "publicData": {
+      "listingType": "sell-used-products",
+      "transactionProcessAlias": "default-purchase/release-1",
+      "unitType": "item",
+      "categoryLevel1": "women",
+      "categoryLevel2": "women-accessories",
+      "color": "green",
+      "material": "100% wool",
+      "condition": "gently-used",
+      "location": {
+        "address": "Kirkkokatu 15, 90100 Oulu, Finland",
+        "building": ""
+      },
+      "pickupEnabled": true,
+      "shippingEnabled": true,
+      "shippingPriceInSubunitsOneItem": 490,
+      "petFreeHome": "no",
+      "smokeFreeHome": "yes"
+    }
+  },
+  {
+    "key": "w17",
+    "photo": {
+      "url": "https://cdn.stocksnap.io/img-thumbs/960w/R27ZN6PJ4S.jpg",
+      "creator": "Alex%20Bl%u0103jan",
+      "source": "StockSnap",
+      "license": "CC0",
+      "page": "https://stocksnap.io/photo/straw-hat-R27ZN6PJ4S"
+    },
+    "title": "Straw sun hat",
+    "description": "Wide-brimmed straw sun hat with a black ribbon. A summer must-have. Photo by Alex%20Bl%u0103jan on StockSnap (https://stocksnap.io/photo/straw-hat-R27ZN6PJ4S)",
+    "price": {
+      "amount": 1200,
+      "currency": "EUR"
+    },
+    "geolocation": {
+      "lat": 60.219,
+      "lng": 24.813
+    },
+    "publicData": {
+      "listingType": "sell-used-products",
+      "transactionProcessAlias": "default-purchase/release-1",
+      "unitType": "item",
+      "categoryLevel1": "women",
+      "categoryLevel2": "women-accessories",
+      "color": "yellow",
+      "material": "Straw",
+      "condition": "like-new",
+      "location": {
+        "address": "Leppävaarankatu 4, 02600 Espoo, Finland",
+        "building": ""
+      },
+      "pickupEnabled": false,
+      "shippingEnabled": true,
+      "shippingPriceInSubunitsOneItem": 490,
+      "petFreeHome": "yes",
+      "smokeFreeHome": "yes"
+    }
+  },
+  {
+    "key": "w18",
+    "photo": {
+      "url": "https://cdn.stocksnap.io/img-thumbs/960w/B3FWPBJURM.jpg",
+      "creator": "Snufkin",
+      "source": "StockSnap",
+      "license": "CC0",
+      "page": "https://stocksnap.io/photo/necklace-chain-B3FWPBJURM"
+    },
+    "title": "Silver necklace with green pendant",
+    "description": "Delicate silver chain necklace with a green stone pendant. Great for parties. Photo by Snufkin on StockSnap (https://stocksnap.io/photo/necklace-chain-B3FWPBJURM)",
+    "price": {
+      "amount": 1400,
+      "currency": "EUR"
+    },
+    "geolocation": {
+      "lat": 61.498,
+      "lng": 23.761
+    },
+    "publicData": {
+      "listingType": "sell-used-products",
+      "transactionProcessAlias": "default-purchase/release-1",
+      "unitType": "item",
+      "categoryLevel1": "women",
+      "categoryLevel2": "women-accessories",
+      "color": "silver",
+      "material": "Metal",
+      "condition": "gently-used",
+      "location": {
+        "address": "Hämeenkatu 10, 33100 Tampere, Finland",
+        "building": ""
+      },
+      "pickupEnabled": true,
+      "shippingEnabled": true,
+      "shippingPriceInSubunitsOneItem": 490,
+      "petFreeHome": "yes",
+      "smokeFreeHome": "yes"
+    }
+  },
+  {
+    "key": "w19",
+    "photo": {
+      "url": "https://cdn.stocksnap.io/img-thumbs/960w/0TGREM1T78.jpg",
+      "creator": "Charisse Kenion",
+      "source": "StockSnap",
+      "license": "CC0",
+      "page": "https://stocksnap.io/photo/dress-white-0TGREM1T78"
+    },
+    "title": "Party dress bundle - two white dresses",
+    "description": "Bundle of two white dresses with lace details, size S. Perfect for summer parties and midsummer. Photo by Charisse Kenion on StockSnap (https://stocksnap.io/photo/dress-white-0TGREM1T78)",
+    "price": {
+      "amount": 4000,
+      "currency": "EUR"
+    },
+    "geolocation": {
+      "lat": 60.186,
+      "lng": 24.951
+    },
+    "publicData": {
+      "listingType": "sell-used-products",
+      "transactionProcessAlias": "default-purchase/release-1",
+      "unitType": "item",
+      "categoryLevel1": "women",
+      "categoryLevel2": "women-bundles",
+      "color": "white",
+      "material": "Cotton, lace",
+      "conditionDetails": "One dress worn once, the other has a small mark on the hem.",
+      "location": {
+        "address": "Hämeentie 30, 00530 Helsinki, Finland",
+        "building": ""
+      },
+      "pickupEnabled": true,
+      "shippingEnabled": true,
+      "shippingPriceInSubunitsOneItem": 690,
+      "petFreeHome": "yes",
+      "smokeFreeHome": "yes"
+    }
+  },
+  {
+    "key": "w20",
+    "photo": null,
+    "title": "Looking for a black winter parka, size M",
+    "description": "In search of a warm black winter parka with a hood, women's size M. Down or synthetic filling both fine.",
+    "price": null,
+    "geolocation": null,
+    "publicData": {
+      "listingType": "in-search-of-clothing",
+      "transactionProcessAlias": "default-negotiation/release-1",
+      "unitType": "request",
+      "categoryLevel1": "women",
+      "categoryLevel2": "women-tops",
+      "color": "black",
+      "material": "Down",
+      "condition": "gently-used",
+      "size": "m",
+      "cardStyle": "grey"
+    }
+  },
+  {
+    "key": "m01",
+    "photo": {
+      "url": "https://cdn.stocksnap.io/img-thumbs/960w/XO53SBWVMF.jpg",
+      "creator": "Brodie Vissers",
+      "source": "StockSnap",
+      "license": "CC0",
+      "page": "https://stocksnap.io/photo/people-men-XO53SBWVMF"
+    },
+    "title": "Black winter parka L",
+    "description": "Warm black winter parka with a padded lining. Made for Finnish winters. Photo by Brodie Vissers on StockSnap (https://stocksnap.io/photo/people-men-XO53SBWVMF)",
+    "price": {
+      "amount": 9000,
+      "currency": "EUR"
+    },
+    "geolocation": {
+      "lat": 60.292,
+      "lng": 25.04
+    },
+    "publicData": {
+      "listingType": "sell-used-products",
+      "transactionProcessAlias": "default-purchase/release-1",
+      "unitType": "item",
+      "categoryLevel1": "men",
+      "categoryLevel2": "men-tops",
+      "color": "black",
+      "material": "Polyester shell, down filling",
+      "brand": "Fjällräven",
+      "condition": "heavily-used",
+      "size": "l",
+      "location": {
+        "address": "Tikkurilantie 10, 01300 Vantaa, Finland",
+        "building": ""
+      },
+      "pickupEnabled": true,
+      "shippingEnabled": true,
+      "shippingPriceInSubunitsOneItem": 690,
+      "petFreeHome": "yes",
+      "smokeFreeHome": "yes"
+    }
+  },
+  {
+    "key": "m02",
+    "photo": {
+      "url": "https://cdn.stocksnap.io/img-thumbs/960w/DK118BUX57.jpg",
+      "creator": "Robbie Noble",
+      "source": "StockSnap",
+      "license": "CC0",
+      "page": "https://stocksnap.io/photo/leather-jacket-DK118BUX57"
+    },
+    "title": "Black leather jacket M",
+    "description": "Classic black leather jacket with zip pockets. Soft leather that has aged beautifully. Photo by Robbie Noble on StockSnap (https://stocksnap.io/photo/leather-jacket-DK118BUX57)",
+    "price": {
+      "amount": 8500,
+      "currency": "EUR"
+    },
+    "geolocation": {
+      "lat": 61.498,
+      "lng": 23.761
+    },
+    "publicData": {
+      "listingType": "sell-used-products",
+      "transactionProcessAlias": "default-purchase/release-1",
+      "unitType": "item",
+      "categoryLevel1": "men",
+      "categoryLevel2": "men-tops",
+      "color": "black",
+      "material": "Leather",
+      "condition": "well-used",
+      "size": "m",
+      "location": {
+        "address": "Hämeenkatu 10, 33100 Tampere, Finland",
+        "building": ""
+      },
+      "pickupEnabled": false,
+      "shippingEnabled": true,
+      "shippingPriceInSubunitsOneItem": 490,
+      "petFreeHome": "yes",
+      "smokeFreeHome": "yes"
+    }
+  },
+  {
+    "key": "m03",
+    "photo": {
+      "url": "https://cdn.stocksnap.io/img-thumbs/960w/018JCKYVRZ.jpg",
+      "creator": "Sander Smeekes",
+      "source": "StockSnap",
+      "license": "CC0",
+      "page": "https://stocksnap.io/photo/lyingdown-hoodie-018JCKYVRZ"
+    },
+    "title": "Grey merino wool hoodie L",
+    "description": "Grey hoodie made from merino wool. Warm, breathable and great for hiking. Photo by Sander Smeekes on StockSnap (https://stocksnap.io/photo/lyingdown-hoodie-018JCKYVRZ)",
+    "price": {
+      "amount": 4000,
+      "currency": "EUR"
+    },
+    "geolocation": {
+      "lat": 60.292,
+      "lng": 25.04
+    },
+    "publicData": {
+      "listingType": "sell-used-products",
+      "transactionProcessAlias": "default-purchase/release-1",
+      "unitType": "item",
+      "categoryLevel1": "men",
+      "categoryLevel2": "men-tops",
+      "color": "grey",
+      "material": "Merino wool",
+      "condition": "gently-used",
+      "size": "l",
+      "location": {
+        "address": "Tikkurilantie 10, 01300 Vantaa, Finland",
+        "building": ""
+      },
+      "pickupEnabled": true,
+      "shippingEnabled": true,
+      "shippingPriceInSubunitsOneItem": 390,
+      "petFreeHome": "no",
+      "smokeFreeHome": "yes"
+    }
+  },
+  {
+    "key": "m04",
+    "photo": {
+      "url": "https://cdn.stocksnap.io/img-thumbs/960w/4Q1S53WMQ6.jpg",
+      "creator": "Matt Moloney",
+      "source": "StockSnap",
+      "license": "CC0",
+      "page": "https://stocksnap.io/photo/confident-business-4Q1S53WMQ6"
+    },
+    "title": "White linen shirt M",
+    "description": "Crisp white linen shirt with long sleeves. Light and cool for summer. Photo by Matt Moloney on StockSnap (https://stocksnap.io/photo/confident-business-4Q1S53WMQ6)",
+    "price": {
+      "amount": 2200,
+      "currency": "EUR"
+    },
+    "geolocation": {
+      "lat": 61.498,
+      "lng": 23.761
+    },
+    "publicData": {
+      "listingType": "sell-used-products",
+      "transactionProcessAlias": "default-purchase/release-1",
+      "unitType": "item",
+      "categoryLevel1": "men",
+      "categoryLevel2": "men-tops",
+      "color": "white",
+      "material": "100% linen",
+      "condition": "like-new",
+      "size": "m",
+      "location": {
+        "address": "Hämeenkatu 10, 33100 Tampere, Finland",
+        "building": ""
+      },
+      "pickupEnabled": true,
+      "shippingEnabled": true,
+      "shippingPriceInSubunitsOneItem": 690,
+      "petFreeHome": "yes",
+      "smokeFreeHome": "yes"
+    }
+  },
+  {
+    "key": "m05",
+    "photo": {
+      "url": "https://cdn.stocksnap.io/img-thumbs/960w/FC7YQDXNLZ.jpg",
+      "creator": "Louis Blythe",
+      "source": "StockSnap",
+      "license": "CC0",
+      "page": "https://stocksnap.io/photo/people-man-FC7YQDXNLZ"
+    },
+    "title": "Red checked flannel shirt XL",
+    "description": "Soft red and black checked flannel shirt. Cosy autumn layer. Photo by Louis Blythe on StockSnap (https://stocksnap.io/photo/people-man-FC7YQDXNLZ)",
+    "price": {
+      "amount": 1800,
+      "currency": "EUR"
+    },
+    "geolocation": {
+      "lat": 60.1755,
+      "lng": 24.805
+    },
+    "publicData": {
+      "listingType": "sell-used-products",
+      "transactionProcessAlias": "default-purchase/release-1",
+      "unitType": "item",
+      "categoryLevel1": "men",
+      "categoryLevel2": "men-tops",
+      "color": "red",
+      "material": "100% cotton flannel",
+      "condition": "like-new",
+      "size": "xl",
+      "location": {
+        "address": "Tapiontori 3, 02100 Espoo, Finland",
+        "building": ""
+      },
+      "pickupEnabled": true,
+      "shippingEnabled": true,
+      "shippingPriceInSubunitsOneItem": 590,
+      "petFreeHome": "yes",
+      "smokeFreeHome": "yes"
+    }
+  },
+  {
+    "key": "m06",
+    "photo": {
+      "url": "https://cdn.stocksnap.io/img-thumbs/960w/9Y2FBEHLCT.jpg",
+      "creator": "Dan Gold",
+      "source": "StockSnap",
+      "license": "CC0",
+      "page": "https://stocksnap.io/photo/red-jacket-9Y2FBEHLCT"
+    },
+    "title": "Orange waterproof rain jacket L",
+    "description": "Lightweight orange rain jacket with taped seams and a hood. Easy to spot on rainy days. Photo by Dan Gold on StockSnap (https://stocksnap.io/photo/red-jacket-9Y2FBEHLCT)",
+    "price": {
+      "amount": 4500,
+      "currency": "EUR"
+    },
+    "geolocation": {
+      "lat": 61.498,
+      "lng": 23.761
+    },
+    "publicData": {
+      "listingType": "sell-used-products",
+      "transactionProcessAlias": "default-purchase/release-1",
+      "unitType": "item",
+      "categoryLevel1": "men",
+      "categoryLevel2": "men-tops",
+      "color": "orange",
+      "material": "Polyester, waterproof membrane",
+      "brand": "Halti",
+      "condition": "like-new",
+      "size": "l",
+      "location": {
+        "address": "Hämeenkatu 10, 33100 Tampere, Finland",
+        "building": ""
+      },
+      "pickupEnabled": false,
+      "shippingEnabled": true,
+      "shippingPriceInSubunitsOneItem": 490,
+      "petFreeHome": "yes",
+      "smokeFreeHome": "yes"
+    }
+  },
+  {
+    "key": "m07",
+    "photo": {
+      "url": "https://cdn.stocksnap.io/img-thumbs/960w/OERP9XI9YB.jpg",
+      "creator": "Michal Kulesza",
+      "source": "StockSnap",
+      "license": "CC0",
+      "page": "https://stocksnap.io/photo/suit-tie-OERP9XI9YB"
+    },
+    "title": "Navy wool blazer M",
+    "description": "Tailored navy wool blazer with two buttons. Smart for weddings and work. Photo by Michal Kulesza on StockSnap (https://stocksnap.io/photo/suit-tie-OERP9XI9YB)",
+    "price": {
+      "amount": 5000,
+      "currency": "EUR"
+    },
+    "geolocation": {
+      "lat": 62.242,
+      "lng": 25.748
+    },
+    "publicData": {
+      "listingType": "sell-used-products",
+      "transactionProcessAlias": "default-purchase/release-1",
+      "unitType": "item",
+      "categoryLevel1": "men",
+      "categoryLevel2": "men-tops",
+      "color": "blue",
+      "material": "Wool blend",
+      "condition": "like-new",
+      "size": "m",
+      "location": {
+        "address": "Kauppakatu 8, 40100 Jyväskylä, Finland",
+        "building": ""
+      },
+      "pickupEnabled": true,
+      "shippingEnabled": true,
+      "shippingPriceInSubunitsOneItem": 390,
+      "petFreeHome": "yes",
+      "smokeFreeHome": "yes"
+    }
+  },
+  {
+    "key": "m08",
+    "photo": {
+      "url": "https://cdn.stocksnap.io/img-thumbs/960w/MGUGNKOEG2.jpg",
+      "creator": "Jonathan Pendleton",
+      "source": "StockSnap",
+      "license": "CC0",
+      "page": "https://stocksnap.io/photo/shoes-pants-MGUGNKOEG2"
+    },
+    "title": "Beige chinos M",
+    "description": "Slim-fit beige chinos with a bit of stretch. Easy to dress up or down. Photo by Jonathan Pendleton on StockSnap (https://stocksnap.io/photo/shoes-pants-MGUGNKOEG2)",
+    "price": {
+      "amount": 2000,
+      "currency": "EUR"
+    },
+    "geolocation": {
+      "lat": 60.292,
+      "lng": 25.04
+    },
+    "publicData": {
+      "listingType": "sell-used-products",
+      "transactionProcessAlias": "default-purchase/release-1",
+      "unitType": "item",
+      "categoryLevel1": "men",
+      "categoryLevel2": "men-bottoms",
+      "color": "brown",
+      "material": "98% cotton, 2% elastane",
+      "condition": "gently-used",
+      "size": "m",
+      "location": {
+        "address": "Tikkurilantie 10, 01300 Vantaa, Finland",
+        "building": ""
+      },
+      "pickupEnabled": true,
+      "shippingEnabled": true,
+      "shippingPriceInSubunitsOneItem": 590,
+      "petFreeHome": "yes",
+      "smokeFreeHome": "yes"
+    }
+  },
+  {
+    "key": "m09",
+    "photo": {
+      "url": "https://cdn.stocksnap.io/img-thumbs/960w/WTLBU65VI8.jpg",
+      "creator": "Daria Shevtsova",
+      "source": "StockSnap",
+      "license": "CC0",
+      "page": "https://stocksnap.io/photo/fashion-clothes-WTLBU65VI8"
+    },
+    "title": "Dark blue slim jeans L",
+    "description": "Dark blue slim-fit denim jeans. Everyday staple. Photo by Daria Shevtsova on StockSnap (https://stocksnap.io/photo/fashion-clothes-WTLBU65VI8)",
+    "price": {
+      "amount": 2500,
+      "currency": "EUR"
+    },
+    "geolocation": {
+      "lat": 60.172,
+      "lng": 24.937
+    },
+    "publicData": {
+      "listingType": "sell-used-products",
+      "transactionProcessAlias": "default-purchase/release-1",
+      "unitType": "item",
+      "categoryLevel1": "men",
+      "categoryLevel2": "men-bottoms",
+      "color": "blue",
+      "material": "Denim",
+      "condition": "heavily-used",
+      "size": "l",
+      "location": {
+        "address": "Mannerheimintie 22, 00100 Helsinki, Finland",
+        "building": ""
+      },
+      "pickupEnabled": false,
+      "shippingEnabled": true,
+      "shippingPriceInSubunitsOneItem": 690,
+      "petFreeHome": "yes",
+      "smokeFreeHome": "yes"
+    }
+  },
+  {
+    "key": "m10",
+    "photo": {
+      "url": "https://cdn.stocksnap.io/img-thumbs/960w/2A7FC8F1BF.jpg",
+      "creator": "Ryan McGuire",
+      "source": "StockSnap",
+      "license": "CC0",
+      "page": "https://stocksnap.io/photo/men-suites-2A7FC8F1BF"
+    },
+    "title": "Black wool suit trousers L",
+    "description": "Black wool suit trousers with a pressed crease. Smart for weddings and the office. Photo by Ryan McGuire on StockSnap (https://stocksnap.io/photo/men-suites-2A7FC8F1BF)",
+    "price": {
+      "amount": 3000,
+      "currency": "EUR"
+    },
+    "geolocation": {
+      "lat": 60.261,
+      "lng": 24.854
+    },
+    "publicData": {
+      "listingType": "sell-used-products",
+      "transactionProcessAlias": "default-purchase/release-1",
+      "unitType": "item",
+      "categoryLevel1": "men",
+      "categoryLevel2": "men-bottoms",
+      "color": "black",
+      "material": "Wool",
+      "condition": "well-used",
+      "size": "l",
+      "location": {
+        "address": "Myyrmäentie 2, 01600 Vantaa, Finland",
+        "building": ""
+      },
+      "pickupEnabled": true,
+      "shippingEnabled": true,
+      "shippingPriceInSubunitsOneItem": 690,
+      "petFreeHome": "yes",
+      "smokeFreeHome": "yes"
+    }
+  },
+  {
+    "key": "m11",
+    "photo": {
+      "url": "https://cdn.stocksnap.io/img-thumbs/960w/DUBVVL8SAE.jpg",
+      "creator": "The Lazy Artist Gallery",
+      "source": "StockSnap",
+      "license": "CC0",
+      "page": "https://stocksnap.io/photo/man-shorts-DUBVVL8SAE"
+    },
+    "title": "Black swim trunks M",
+    "description": "Black swim trunks for the beach and lake swims after sauna. Quick-drying. Photo by The Lazy Artist Gallery on StockSnap (https://stocksnap.io/photo/man-shorts-DUBVVL8SAE)",
+    "price": {
+      "amount": 1200,
+      "currency": "EUR"
+    },
+    "geolocation": {
+      "lat": 60.172,
+      "lng": 24.937
+    },
+    "publicData": {
+      "listingType": "sell-used-products",
+      "transactionProcessAlias": "default-purchase/release-1",
+      "unitType": "item",
+      "categoryLevel1": "men",
+      "categoryLevel2": "men-bottoms",
+      "color": "black",
+      "material": "Polyester",
+      "condition": "like-new",
+      "size": "m",
+      "location": {
+        "address": "Mannerheimintie 22, 00100 Helsinki, Finland",
+        "building": ""
+      },
+      "pickupEnabled": true,
+      "shippingEnabled": true,
+      "shippingPriceInSubunitsOneItem": 590,
+      "petFreeHome": "yes",
+      "smokeFreeHome": "yes"
+    }
+  },
+  {
+    "key": "m12",
+    "photo": {
+      "url": "https://cdn.stocksnap.io/img-thumbs/960w/T5ZR7KSJZQ.jpg",
+      "creator": "Nathan Walker",
+      "source": "StockSnap",
+      "license": "CC0",
+      "page": "https://stocksnap.io/photo/wedding-marriage-T5ZR7KSJZQ"
+    },
+    "title": "Brown leather dress shoes, size 43",
+    "description": "Polished brown leather Oxford dress shoes. Great for formal occasions. Photo by Nathan Walker on StockSnap (https://stocksnap.io/photo/wedding-marriage-T5ZR7KSJZQ)",
+    "price": {
+      "amount": 4500,
+      "currency": "EUR"
+    },
+    "geolocation": {
+      "lat": 65.013,
+      "lng": 25.471
+    },
+    "publicData": {
+      "listingType": "sell-used-products",
+      "transactionProcessAlias": "default-purchase/release-1",
+      "unitType": "item",
+      "categoryLevel1": "men",
+      "categoryLevel2": "men-shoes",
+      "color": "brown",
+      "material": "Leather",
+      "condition": "like-new",
+      "shoeSize": "43",
+      "location": {
+        "address": "Kirkkokatu 15, 90100 Oulu, Finland",
+        "building": ""
+      },
+      "pickupEnabled": true,
+      "shippingEnabled": true,
+      "shippingPriceInSubunitsOneItem": 590,
+      "petFreeHome": "yes",
+      "smokeFreeHome": "yes"
+    }
+  },
+  {
+    "key": "m13",
+    "photo": {
+      "url": "https://cdn.stocksnap.io/img-thumbs/960w/39WZRNB80Q.jpg",
+      "creator": "Robert Nelson",
+      "source": "StockSnap",
+      "license": "CC0",
+      "page": "https://stocksnap.io/photo/leg-winter-39WZRNB80Q"
+    },
+    "title": "Brown winter duck boots, size 44",
+    "description": "Waterproof duck boots with a rubber base and leather upper. Warm lining for snowy streets. Photo by Robert Nelson on StockSnap (https://stocksnap.io/photo/leg-winter-39WZRNB80Q)",
+    "price": {
+      "amount": 5500,
+      "currency": "EUR"
+    },
+    "geolocation": {
+      "lat": 60.292,
+      "lng": 25.04
+    },
+    "publicData": {
+      "listingType": "sell-used-products",
+      "transactionProcessAlias": "default-purchase/release-1",
+      "unitType": "item",
+      "categoryLevel1": "men",
+      "categoryLevel2": "men-shoes",
+      "color": "brown",
+      "material": "Leather, rubber",
+      "condition": "well-used",
+      "shoeSize": "44",
+      "location": {
+        "address": "Tikkurilantie 10, 01300 Vantaa, Finland",
+        "building": ""
+      },
+      "pickupEnabled": true,
+      "shippingEnabled": true,
+      "shippingPriceInSubunitsOneItem": 590,
+      "petFreeHome": "yes",
+      "smokeFreeHome": "yes"
+    }
+  },
+  {
+    "key": "m14",
+    "photo": {
+      "url": "https://cdn.stocksnap.io/img-thumbs/960w/BVJ82E1ILO.jpg",
+      "creator": "Joseph Barrientos",
+      "source": "StockSnap",
+      "license": "CC0",
+      "page": "https://stocksnap.io/photo/shoes-sneakers-BVJ82E1ILO"
+    },
+    "title": "Grey Nike running shoes, size 42",
+    "description": "Grey Nike running shoes with good cushioning. Used for light jogging. Photo by Joseph Barrientos on StockSnap (https://stocksnap.io/photo/shoes-sneakers-BVJ82E1ILO)",
+    "price": {
+      "amount": 3500,
+      "currency": "EUR"
+    },
+    "geolocation": {
+      "lat": 60.219,
+      "lng": 24.813
+    },
+    "publicData": {
+      "listingType": "sell-used-products",
+      "transactionProcessAlias": "default-purchase/release-1",
+      "unitType": "item",
+      "categoryLevel1": "men",
+      "categoryLevel2": "men-shoes",
+      "color": "grey",
+      "material": "Mesh, rubber",
+      "brand": "Nike",
+      "condition": "gently-used",
+      "shoeSize": "42",
+      "location": {
+        "address": "Leppävaarankatu 4, 02600 Espoo, Finland",
+        "building": ""
+      },
+      "pickupEnabled": true,
+      "shippingEnabled": true,
+      "shippingPriceInSubunitsOneItem": 590,
+      "petFreeHome": "no",
+      "smokeFreeHome": "yes"
+    }
+  },
+  {
+    "key": "m15",
+    "photo": {
+      "url": "https://cdn.stocksnap.io/img-thumbs/960w/DFDGN6Q757.jpg",
+      "creator": "Piotr Lohunko",
+      "source": "StockSnap",
+      "license": "CC0",
+      "page": "https://stocksnap.io/photo/brown-leather-DFDGN6Q757"
+    },
+    "title": "Brown leather belt",
+    "description": "Brown full-grain leather belt with a silver buckle. Fits waist 85-100 cm. Photo by Piotr Lohunko on StockSnap (https://stocksnap.io/photo/brown-leather-DFDGN6Q757)",
+    "price": {
+      "amount": 1500,
+      "currency": "EUR"
+    },
+    "geolocation": {
+      "lat": 60.172,
+      "lng": 24.937
+    },
+    "publicData": {
+      "listingType": "sell-used-products",
+      "transactionProcessAlias": "default-purchase/release-1",
+      "unitType": "item",
+      "categoryLevel1": "men",
+      "categoryLevel2": "men-accessories",
+      "color": "brown",
+      "material": "Full-grain leather",
+      "condition": "like-new",
+      "location": {
+        "address": "Mannerheimintie 22, 00100 Helsinki, Finland",
+        "building": ""
+      },
+      "pickupEnabled": true,
+      "shippingEnabled": true,
+      "shippingPriceInSubunitsOneItem": 690,
+      "petFreeHome": "yes",
+      "smokeFreeHome": "yes"
+    }
+  },
+  {
+    "key": "m16",
+    "photo": {
+      "url": "https://cdn.stocksnap.io/img-thumbs/960w/AE44BFC757.jpg",
+      "creator": "Forrest Cavale",
+      "source": "StockSnap",
+      "license": "CC0",
+      "page": "https://stocksnap.io/photo/guy-man-AE44BFC757"
+    },
+    "title": "Black knitted beanie",
+    "description": "Warm black knitted beanie. Essential for winter. Photo by Forrest Cavale on StockSnap (https://stocksnap.io/photo/guy-man-AE44BFC757)",
+    "price": {
+      "amount": 1000,
+      "currency": "EUR"
+    },
+    "geolocation": {
+      "lat": 60.261,
+      "lng": 24.854
+    },
+    "publicData": {
+      "listingType": "sell-used-products",
+      "transactionProcessAlias": "default-purchase/release-1",
+      "unitType": "item",
+      "categoryLevel1": "men",
+      "categoryLevel2": "men-accessories",
+      "color": "black",
+      "material": "Acrylic, wool",
+      "condition": "gently-used",
+      "location": {
+        "address": "Myyrmäentie 2, 01600 Vantaa, Finland",
+        "building": ""
+      },
+      "pickupEnabled": true,
+      "shippingEnabled": true,
+      "shippingPriceInSubunitsOneItem": 590,
+      "petFreeHome": "yes",
+      "smokeFreeHome": "yes"
+    }
+  },
+  {
+    "key": "m17",
+    "photo": {
+      "url": "https://cdn.stocksnap.io/img-thumbs/960w/XP2R14DJ20.jpg",
+      "creator": "Patryk Dziejma",
+      "source": "StockSnap",
+      "license": "CC0",
+      "page": "https://stocksnap.io/photo/tie-fashion-XP2R14DJ20"
+    },
+    "title": "Burgundy patterned silk tie",
+    "description": "Burgundy silk tie with a small pattern. Perfect for weddings and the office. Photo by Patryk Dziejma on StockSnap (https://stocksnap.io/photo/tie-fashion-XP2R14DJ20)",
+    "price": {
+      "amount": 1000,
+      "currency": "EUR"
+    },
+    "geolocation": {
+      "lat": 61.498,
+      "lng": 23.761
+    },
+    "publicData": {
+      "listingType": "sell-used-products",
+      "transactionProcessAlias": "default-purchase/release-1",
+      "unitType": "item",
+      "categoryLevel1": "men",
+      "categoryLevel2": "men-accessories",
+      "color": "red",
+      "material": "100% silk",
+      "condition": "heavily-used",
+      "location": {
+        "address": "Hämeenkatu 10, 33100 Tampere, Finland",
+        "building": ""
+      },
+      "pickupEnabled": true,
+      "shippingEnabled": true,
+      "shippingPriceInSubunitsOneItem": 590,
+      "petFreeHome": "yes",
+      "smokeFreeHome": "yes"
+    }
+  },
+  {
+    "key": "m18",
+    "photo": {
+      "url": "https://cdn.stocksnap.io/img-thumbs/960w/W50PW8YI9U.jpg",
+      "creator": "Kristin Hardwick",
+      "source": "StockSnap",
+      "license": "CC0",
+      "page": "https://stocksnap.io/photo/backpacking-trip-W50PW8YI9U"
+    },
+    "title": "Grey and brown canvas backpack",
+    "description": "Roomy canvas backpack with leather straps and a laptop sleeve. Great for travel and hiking. Photo by Kristin Hardwick on StockSnap (https://stocksnap.io/photo/backpacking-trip-W50PW8YI9U)",
+    "price": {
+      "amount": 5000,
+      "currency": "EUR"
+    },
+    "geolocation": {
+      "lat": 60.219,
+      "lng": 24.813
+    },
+    "publicData": {
+      "listingType": "sell-used-products",
+      "transactionProcessAlias": "default-purchase/release-1",
+      "unitType": "item",
+      "categoryLevel1": "men",
+      "categoryLevel2": "men-accessories",
+      "color": "grey",
+      "material": "Canvas, leather trims",
+      "condition": "heavily-used",
+      "location": {
+        "address": "Leppävaarankatu 4, 02600 Espoo, Finland",
+        "building": ""
+      },
+      "pickupEnabled": true,
+      "shippingEnabled": true,
+      "shippingPriceInSubunitsOneItem": 690,
+      "petFreeHome": "yes",
+      "smokeFreeHome": "yes"
+    }
+  },
+  {
+    "key": "m19",
+    "photo": {
+      "url": "https://cdn.stocksnap.io/img-thumbs/960w/BD2F94946C.jpg",
+      "creator": "Jay Mantri",
+      "source": "StockSnap",
+      "license": "CC0",
+      "page": "https://stocksnap.io/photo/clothes-shirts-BD2F94946C"
+    },
+    "title": "Shirt bundle - three summer shirts, M",
+    "description": "Bundle of three summer shirts in light blue, white and pink, all size M. Photo by Jay Mantri on StockSnap (https://stocksnap.io/photo/clothes-shirts-BD2F94946C)",
+    "price": {
+      "amount": 3000,
+      "currency": "EUR"
+    },
+    "geolocation": {
+      "lat": 60.172,
+      "lng": 24.937
+    },
+    "publicData": {
+      "listingType": "sell-used-products",
+      "transactionProcessAlias": "default-purchase/release-1",
+      "unitType": "item",
+      "categoryLevel1": "men",
+      "categoryLevel2": "men-bundles",
+      "color": "multicolor",
+      "material": "Cotton, linen",
+      "conditionDetails": "All shirts lightly worn, one has a loose button.",
+      "location": {
+        "address": "Mannerheimintie 22, 00100 Helsinki, Finland",
+        "building": ""
+      },
+      "pickupEnabled": false,
+      "shippingEnabled": true,
+      "shippingPriceInSubunitsOneItem": 390,
+      "petFreeHome": "yes",
+      "smokeFreeHome": "yes"
+    }
+  },
+  {
+    "key": "m20",
+    "photo": null,
+    "title": "Looking for a men's wool winter coat, size L",
+    "description": "In search of a warm men's wool coat for winter, size L. Dark colours preferred.",
+    "price": null,
+    "geolocation": null,
+    "publicData": {
+      "listingType": "in-search-of-clothing",
+      "transactionProcessAlias": "default-negotiation/release-1",
+      "unitType": "request",
+      "categoryLevel1": "men",
+      "categoryLevel2": "men-tops",
+      "color": "grey",
+      "material": "Wool",
+      "condition": "well-used",
+      "size": "l",
+      "cardStyle": "grey"
+    }
+  },
+  {
+    "key": "k01",
+    "photo": {
+      "url": "https://cdn.stocksnap.io/img-thumbs/960w/TFOAKS2PEX.jpg",
+      "creator": "Josh Willink",
+      "source": "StockSnap",
+      "license": "CC0",
+      "page": "https://stocksnap.io/photo/family-child-TFOAKS2PEX"
+    },
+    "title": "Kids padded winter jacket, 4y",
+    "description": "Warm padded winter jacket for a 4-year-old. Waterproof with reflectors, ready for snow play. Photo by Josh Willink on StockSnap (https://stocksnap.io/photo/family-child-TFOAKS2PEX)",
+    "price": {
+      "amount": 4000,
+      "currency": "EUR"
+    },
+    "geolocation": {
+      "lat": 60.451,
+      "lng": 22.267
+    },
+    "publicData": {
+      "listingType": "sell-used-products",
+      "transactionProcessAlias": "default-purchase/release-1",
+      "unitType": "item",
+      "categoryLevel1": "kids",
+      "categoryLevel2": "kids-tops",
+      "color": "blue",
+      "material": "Polyester, padded",
+      "brand": "Reima",
+      "condition": "heavily-used",
+      "kidsSize": "4y",
+      "location": {
+        "address": "Yliopistonkatu 20, 20100 Turku, Finland",
+        "building": ""
+      },
+      "pickupEnabled": false,
+      "shippingEnabled": true,
+      "shippingPriceInSubunitsOneItem": 690,
+      "petFreeHome": "yes",
+      "smokeFreeHome": "yes"
+    }
+  },
+  {
+    "key": "k02",
+    "photo": {
+      "url": "https://cdn.stocksnap.io/img-thumbs/960w/LJNMBCWPLM.jpg",
+      "creator": "Family First",
+      "source": "StockSnap",
+      "license": "CC0",
+      "page": "https://stocksnap.io/photo/black-family-LJNMBCWPLM"
+    },
+    "title": "Yellow kids rain jacket, 6y",
+    "description": "Bright yellow rain jacket for kids with a hood. Keeps them dry on rainy autumn days. Photo by Family First on StockSnap (https://stocksnap.io/photo/black-family-LJNMBCWPLM)",
+    "price": {
+      "amount": 1500,
+      "currency": "EUR"
+    },
+    "geolocation": {
+      "lat": 60.165,
+      "lng": 24.939
+    },
+    "publicData": {
+      "listingType": "sell-used-products",
+      "transactionProcessAlias": "default-purchase/release-1",
+      "unitType": "item",
+      "categoryLevel1": "kids",
+      "categoryLevel2": "kids-tops",
+      "color": "yellow",
+      "material": "Polyurethane",
+      "condition": "gently-used",
+      "kidsSize": "6y",
+      "location": {
+        "address": "Bulevardi 5, 00120 Helsinki, Finland",
+        "building": ""
+      },
+      "pickupEnabled": true,
+      "shippingEnabled": true,
+      "shippingPriceInSubunitsOneItem": 390,
+      "petFreeHome": "yes",
+      "smokeFreeHome": "yes"
+    }
+  },
+  {
+    "key": "k03",
+    "photo": {
+      "url": "https://cdn.stocksnap.io/img-thumbs/960w/Y2SMG2V4PV.jpg",
+      "creator": "Kelly Sikkema",
+      "source": "StockSnap",
+      "license": "CC0",
+      "page": "https://stocksnap.io/photo/people-kid-Y2SMG2V4PV"
+    },
+    "title": "Navy striped long-sleeve top, 3y",
+    "description": "Soft navy striped cotton long-sleeve top for a 3-year-old. Photo by Kelly Sikkema on StockSnap (https://stocksnap.io/photo/people-kid-Y2SMG2V4PV)",
+    "price": {
+      "amount": 500,
+      "currency": "EUR"
+    },
+    "geolocation": {
+      "lat": 60.186,
+      "lng": 24.951
+    },
+    "publicData": {
+      "listingType": "sell-used-products",
+      "transactionProcessAlias": "default-purchase/release-1",
+      "unitType": "item",
+      "categoryLevel1": "kids",
+      "categoryLevel2": "kids-tops",
+      "color": "blue",
+      "material": "100% cotton",
+      "condition": "heavily-used",
+      "kidsSize": "3y",
+      "location": {
+        "address": "Hämeentie 30, 00530 Helsinki, Finland",
+        "building": ""
+      },
+      "pickupEnabled": true,
+      "shippingEnabled": true,
+      "shippingPriceInSubunitsOneItem": 590,
+      "petFreeHome": "yes",
+      "smokeFreeHome": "yes"
+    }
+  },
+  {
+    "key": "k04",
+    "photo": {
+      "url": "https://cdn.stocksnap.io/img-thumbs/960w/D5VVUIQNDL.jpg",
+      "creator": "Direct Media",
+      "source": "StockSnap",
+      "license": "CC0",
+      "page": "https://stocksnap.io/photo/child-toddler-D5VVUIQNDL"
+    },
+    "title": "Rust knitted sweater, 2y",
+    "description": "Hand-knitted rust-coloured sweater with buttons for a toddler. Warm and cosy. Photo by Direct Media on StockSnap (https://stocksnap.io/photo/child-toddler-D5VVUIQNDL)",
+    "price": {
+      "amount": 1200,
+      "currency": "EUR"
+    },
+    "geolocation": {
+      "lat": 60.21,
+      "lng": 25.08
+    },
+    "publicData": {
+      "listingType": "sell-used-products",
+      "transactionProcessAlias": "default-purchase/release-1",
+      "unitType": "item",
+      "categoryLevel1": "kids",
+      "categoryLevel2": "kids-tops",
+      "color": "brown",
+      "material": "Wool blend",
+      "condition": "like-new",
+      "kidsSize": "2y",
+      "location": {
+        "address": "Itäkatu 1, 00930 Helsinki, Finland",
+        "building": ""
+      },
+      "pickupEnabled": true,
+      "shippingEnabled": true,
+      "shippingPriceInSubunitsOneItem": 590,
+      "petFreeHome": "no",
+      "smokeFreeHome": "yes"
+    }
+  },
+  {
+    "key": "k05",
+    "photo": {
+      "url": "https://cdn.stocksnap.io/img-thumbs/960w/QH6TQHR7WI.jpg",
+      "creator": "Family First",
+      "source": "StockSnap",
+      "license": "CC0",
+      "page": "https://stocksnap.io/photo/little-girl-QH6TQHR7WI"
+    },
+    "title": "Pink pyjama set, 5y",
+    "description": "Soft pink cotton pyjama set for a 5-year-old. Long sleeves and trousers. Photo by Family First on StockSnap (https://stocksnap.io/photo/little-girl-QH6TQHR7WI)",
+    "price": {
+      "amount": 1000,
+      "currency": "EUR"
+    },
+    "geolocation": {
+      "lat": 60.172,
+      "lng": 24.937
+    },
+    "publicData": {
+      "listingType": "sell-used-products",
+      "transactionProcessAlias": "default-purchase/release-1",
+      "unitType": "item",
+      "categoryLevel1": "kids",
+      "categoryLevel2": "kids-tops",
+      "color": "pink",
+      "material": "Cotton",
+      "condition": "well-used",
+      "kidsSize": "5y",
+      "location": {
+        "address": "Mannerheimintie 22, 00100 Helsinki, Finland",
+        "building": ""
+      },
+      "pickupEnabled": true,
+      "shippingEnabled": true,
+      "shippingPriceInSubunitsOneItem": 690,
+      "petFreeHome": "yes",
+      "smokeFreeHome": "yes"
+    }
+  },
+  {
+    "key": "k06",
+    "photo": {
+      "url": "https://cdn.stocksnap.io/img-thumbs/960w/5Y2TVGW2D1.jpg",
+      "creator": "Rhendi Rukmana",
+      "source": "StockSnap",
+      "license": "CC0",
+      "page": "https://stocksnap.io/photo/rain-drops-5Y2TVGW2D1"
+    },
+    "title": "Teal hooded kids jacket, 8y",
+    "description": "Teal hooded jacket with a fleece lining for an 8-year-old. Great for spring and autumn. Photo by Rhendi Rukmana on StockSnap (https://stocksnap.io/photo/rain-drops-5Y2TVGW2D1)",
+    "price": {
+      "amount": 1200,
+      "currency": "EUR"
+    },
+    "geolocation": {
+      "lat": 61.498,
+      "lng": 23.761
+    },
+    "publicData": {
+      "listingType": "sell-used-products",
+      "transactionProcessAlias": "default-purchase/release-1",
+      "unitType": "item",
+      "categoryLevel1": "kids",
+      "categoryLevel2": "kids-tops",
+      "color": "green",
+      "material": "Fleece-lined polyester",
+      "condition": "well-used",
+      "kidsSize": "8y",
+      "location": {
+        "address": "Hämeenkatu 10, 33100 Tampere, Finland",
+        "building": ""
+      },
+      "pickupEnabled": true,
+      "shippingEnabled": true,
+      "shippingPriceInSubunitsOneItem": 390,
+      "petFreeHome": "yes",
+      "smokeFreeHome": "yes"
+    }
+  },
+  {
+    "key": "k07",
+    "photo": {
+      "url": "https://cdn.stocksnap.io/img-thumbs/960w/R0C7A5M4WB.jpg",
+      "creator": "Leeroy",
+      "source": "StockSnap",
+      "license": "CC0",
+      "page": "https://stocksnap.io/photo/boy-child-R0C7A5M4WB"
+    },
+    "title": "Kids denim jacket, 7y",
+    "description": "Blue denim jacket for a 7-year-old. A timeless layer for spring. Photo by Leeroy on StockSnap (https://stocksnap.io/photo/boy-child-R0C7A5M4WB)",
+    "price": {
+      "amount": 1000,
+      "currency": "EUR"
+    },
+    "geolocation": {
+      "lat": 60.172,
+      "lng": 24.937
+    },
+    "publicData": {
+      "listingType": "sell-used-products",
+      "transactionProcessAlias": "default-purchase/release-1",
+      "unitType": "item",
+      "categoryLevel1": "kids",
+      "categoryLevel2": "kids-tops",
+      "color": "blue",
+      "material": "Denim",
+      "condition": "gently-used",
+      "kidsSize": "7y",
+      "location": {
+        "address": "Mannerheimintie 22, 00100 Helsinki, Finland",
+        "building": ""
+      },
+      "pickupEnabled": true,
+      "shippingEnabled": true,
+      "shippingPriceInSubunitsOneItem": 690,
+      "petFreeHome": "no",
+      "smokeFreeHome": "yes"
+    }
+  },
+  {
+    "key": "k08",
+    "photo": {
+      "url": "https://cdn.stocksnap.io/img-thumbs/960w/PWETXD9EFI.jpg",
+      "creator": "Matthew Henry",
+      "source": "StockSnap",
+      "license": "CC0",
+      "page": "https://stocksnap.io/photo/people-father-PWETXD9EFI"
+    },
+    "title": "Girls' denim skirt, 6y",
+    "description": "Blue denim skirt for a 6-year-old girl with an adjustable waist. Photo by Matthew Henry on StockSnap (https://stocksnap.io/photo/people-father-PWETXD9EFI)",
+    "price": {
+      "amount": 600,
+      "currency": "EUR"
+    },
+    "geolocation": {
+      "lat": 60.21,
+      "lng": 25.08
+    },
+    "publicData": {
+      "listingType": "sell-used-products",
+      "transactionProcessAlias": "default-purchase/release-1",
+      "unitType": "item",
+      "categoryLevel1": "kids",
+      "categoryLevel2": "kids-bottoms",
+      "color": "blue",
+      "material": "Denim",
+      "condition": "heavily-used",
+      "kidsSize": "6y",
+      "location": {
+        "address": "Itäkatu 1, 00930 Helsinki, Finland",
+        "building": ""
+      },
+      "pickupEnabled": false,
+      "shippingEnabled": true,
+      "shippingPriceInSubunitsOneItem": 690,
+      "petFreeHome": "no",
+      "smokeFreeHome": "yes"
+    }
+  },
+  {
+    "key": "k09",
+    "photo": {
+      "url": "https://cdn.stocksnap.io/img-thumbs/960w/E8Q0JA63FR.jpg",
+      "creator": "Jesse Orrico",
+      "source": "StockSnap",
+      "license": "CC0",
+      "page": "https://stocksnap.io/photo/people-kids-E8Q0JA63FR"
+    },
+    "title": "Kids waterproof snow pants, 5y",
+    "description": "Waterproof navy winter pants with braces for a 5-year-old. Built for snow days. Photo by Jesse Orrico on StockSnap (https://stocksnap.io/photo/people-kids-E8Q0JA63FR)",
+    "price": {
+      "amount": 1800,
+      "currency": "EUR"
+    },
+    "geolocation": {
+      "lat": 60.261,
+      "lng": 24.854
+    },
+    "publicData": {
+      "listingType": "sell-used-products",
+      "transactionProcessAlias": "default-purchase/release-1",
+      "unitType": "item",
+      "categoryLevel1": "kids",
+      "categoryLevel2": "kids-bottoms",
+      "color": "blue",
+      "material": "Polyester, waterproof",
+      "condition": "gently-used",
+      "kidsSize": "5y",
+      "location": {
+        "address": "Myyrmäentie 2, 01600 Vantaa, Finland",
+        "building": ""
+      },
+      "pickupEnabled": true,
+      "shippingEnabled": true,
+      "shippingPriceInSubunitsOneItem": 390,
+      "petFreeHome": "no",
+      "smokeFreeHome": "yes"
+    }
+  },
+  {
+    "key": "k10",
+    "photo": {
+      "url": "https://cdn.stocksnap.io/img-thumbs/960w/V39Y0V1IZA.jpg",
+      "creator": "Diana Feil",
+      "source": "StockSnap",
+      "license": "CC0",
+      "page": "https://stocksnap.io/photo/people-kids-V39Y0V1IZA"
+    },
+    "title": "Pink tutu skirt, 4y",
+    "description": "Fluffy pink tulle tutu skirt for a 4-year-old. Ideal for parties and dress-up. Photo by Diana Feil on StockSnap (https://stocksnap.io/photo/people-kids-V39Y0V1IZA)",
+    "price": {
+      "amount": 800,
+      "currency": "EUR"
+    },
+    "geolocation": {
+      "lat": 65.013,
+      "lng": 25.471
+    },
+    "publicData": {
+      "listingType": "sell-used-products",
+      "transactionProcessAlias": "default-purchase/release-1",
+      "unitType": "item",
+      "categoryLevel1": "kids",
+      "categoryLevel2": "kids-bottoms",
+      "color": "pink",
+      "material": "Tulle",
+      "condition": "gently-used",
+      "kidsSize": "4y",
+      "location": {
+        "address": "Kirkkokatu 15, 90100 Oulu, Finland",
+        "building": ""
+      },
+      "pickupEnabled": true,
+      "shippingEnabled": true,
+      "shippingPriceInSubunitsOneItem": 390,
+      "petFreeHome": "no",
+      "smokeFreeHome": "yes"
+    }
+  },
+  {
+    "key": "k11",
+    "photo": {
+      "url": "https://cdn.stocksnap.io/img-thumbs/960w/IO0UJ7FYCA.jpg",
+      "creator": "Olu Eletu",
+      "source": "StockSnap",
+      "license": "CC0",
+      "page": "https://stocksnap.io/photo/bluesky-boots-IO0UJ7FYCA"
+    },
+    "title": "Brown kids hiking boots, size 28",
+    "description": "Sturdy brown leather boots for kids. Good grip for forest walks and autumn puddles. Photo by Olu Eletu on StockSnap (https://stocksnap.io/photo/bluesky-boots-IO0UJ7FYCA)",
+    "price": {
+      "amount": 1000,
+      "currency": "EUR"
+    },
+    "geolocation": {
+      "lat": 61.498,
+      "lng": 23.761
+    },
+    "publicData": {
+      "listingType": "sell-used-products",
+      "transactionProcessAlias": "default-purchase/release-1",
+      "unitType": "item",
+      "categoryLevel1": "kids",
+      "categoryLevel2": "kids-shoes",
+      "color": "brown",
+      "material": "Leather",
+      "condition": "well-used",
+      "shoeSize": "28",
+      "location": {
+        "address": "Hämeenkatu 10, 33100 Tampere, Finland",
+        "building": ""
+      },
+      "pickupEnabled": true,
+      "shippingEnabled": true,
+      "shippingPriceInSubunitsOneItem": 590,
+      "petFreeHome": "no",
+      "smokeFreeHome": "yes"
+    }
+  },
+  {
+    "key": "k12",
+    "photo": {
+      "url": "https://cdn.stocksnap.io/img-thumbs/960w/84NQDCMJNE.jpg",
+      "creator": "Family Moments",
+      "source": "StockSnap",
+      "license": "CC0",
+      "page": "https://stocksnap.io/photo/kids-playing-84NQDCMJNE"
+    },
+    "title": "White kids t-shirts, 2-pack, 8y",
+    "description": "Two plain white cotton t-shirts for an 8-year-old. Perfect for school and summer play. Photo by Family Moments on StockSnap (https://stocksnap.io/photo/kids-playing-84NQDCMJNE)",
+    "price": {
+      "amount": 3000,
+      "currency": "EUR"
+    },
+    "geolocation": {
+      "lat": 60.172,
+      "lng": 24.937
+    },
+    "publicData": {
+      "listingType": "sell-used-products",
+      "transactionProcessAlias": "default-purchase/release-1",
+      "unitType": "item",
+      "categoryLevel1": "kids",
+      "categoryLevel2": "kids-tops",
+      "color": "white",
+      "material": "100% cotton",
+      "condition": "like-new",
+      "kidsSize": "8y",
+      "location": {
+        "address": "Mannerheimintie 22, 00100 Helsinki, Finland",
+        "building": ""
+      },
+      "pickupEnabled": false,
+      "shippingEnabled": true,
+      "shippingPriceInSubunitsOneItem": 590,
+      "petFreeHome": "yes",
+      "smokeFreeHome": "yes"
+    }
+  },
+  {
+    "key": "k13",
+    "photo": {
+      "url": "https://cdn.stocksnap.io/img-thumbs/960w/H5DGO1ELXN.jpg",
+      "creator": "Matt Bango",
+      "source": "StockSnap",
+      "license": "CC0",
+      "page": "https://stocksnap.io/photo/toddler-standing-H5DGO1ELXN"
+    },
+    "title": "Pink kids sneakers, size 26",
+    "description": "Pink sneakers for a toddler. Light and comfy. Photo by Matt Bango on StockSnap (https://stocksnap.io/photo/toddler-standing-H5DGO1ELXN)",
+    "price": {
+      "amount": 1500,
+      "currency": "EUR"
+    },
+    "geolocation": {
+      "lat": 60.451,
+      "lng": 22.267
+    },
+    "publicData": {
+      "listingType": "sell-used-products",
+      "transactionProcessAlias": "default-purchase/release-1",
+      "unitType": "item",
+      "categoryLevel1": "kids",
+      "categoryLevel2": "kids-shoes",
+      "color": "pink",
+      "material": "Synthetic",
+      "condition": "gently-used",
+      "shoeSize": "26",
+      "location": {
+        "address": "Yliopistonkatu 20, 20100 Turku, Finland",
+        "building": ""
+      },
+      "pickupEnabled": true,
+      "shippingEnabled": true,
+      "shippingPriceInSubunitsOneItem": 690,
+      "petFreeHome": "yes",
+      "smokeFreeHome": "yes"
+    }
+  },
+  {
+    "key": "k14",
+    "photo": {
+      "url": "https://cdn.stocksnap.io/img-thumbs/960w/EB50522D23.jpg",
+      "creator": "Thomas Martinsen",
+      "source": "StockSnap",
+      "license": "CC0",
+      "page": "https://stocksnap.io/photo/sandals-flipflops-EB50522D23"
+    },
+    "title": "Brown leather sandals, size 30",
+    "description": "Brown leather summer sandals with velcro straps for kids. Photo by Thomas Martinsen on StockSnap (https://stocksnap.io/photo/sandals-flipflops-EB50522D23)",
+    "price": {
+      "amount": 1000,
+      "currency": "EUR"
+    },
+    "geolocation": {
+      "lat": 60.292,
+      "lng": 25.04
+    },
+    "publicData": {
+      "listingType": "sell-used-products",
+      "transactionProcessAlias": "default-purchase/release-1",
+      "unitType": "item",
+      "categoryLevel1": "kids",
+      "categoryLevel2": "kids-shoes",
+      "color": "brown",
+      "material": "Leather",
+      "condition": "gently-used",
+      "shoeSize": "30",
+      "location": {
+        "address": "Tikkurilantie 10, 01300 Vantaa, Finland",
+        "building": ""
+      },
+      "pickupEnabled": true,
+      "shippingEnabled": true,
+      "shippingPriceInSubunitsOneItem": 390,
+      "petFreeHome": "yes",
+      "smokeFreeHome": "yes"
+    }
+  },
+  {
+    "key": "k15",
+    "photo": {
+      "url": "https://cdn.stocksnap.io/img-thumbs/960w/XC9DW4IKVT.jpg",
+      "creator": "PICSELI",
+      "source": "StockSnap",
+      "license": "CC0",
+      "page": "https://stocksnap.io/photo/coffee-steam-XC9DW4IKVT"
+    },
+    "title": "Grey knitted wool mittens",
+    "description": "Warm grey knitted wool mittens for kids aged 3-6. Hand-made. Photo by PICSELI on StockSnap (https://stocksnap.io/photo/coffee-steam-XC9DW4IKVT)",
+    "price": {
+      "amount": 800,
+      "currency": "EUR"
+    },
+    "geolocation": {
+      "lat": 60.292,
+      "lng": 25.04
+    },
+    "publicData": {
+      "listingType": "sell-used-products",
+      "transactionProcessAlias": "default-purchase/release-1",
+      "unitType": "item",
+      "categoryLevel1": "kids",
+      "categoryLevel2": "kids-accessories",
+      "color": "grey",
+      "material": "Wool",
+      "condition": "well-used",
+      "location": {
+        "address": "Tikkurilantie 10, 01300 Vantaa, Finland",
+        "building": ""
+      },
+      "pickupEnabled": false,
+      "shippingEnabled": true,
+      "shippingPriceInSubunitsOneItem": 690,
+      "petFreeHome": "yes",
+      "smokeFreeHome": "yes"
+    }
+  },
+  {
+    "key": "k16",
+    "photo": {
+      "url": "https://cdn.stocksnap.io/img-thumbs/960w/4MT4167LN3.jpg",
+      "creator": "Lukasz Kowalewski",
+      "source": "StockSnap",
+      "license": "CC0",
+      "page": "https://stocksnap.io/photo/backpack-gear-4MT4167LN3"
+    },
+    "title": "Red and black school backpack",
+    "description": "Kids' school backpack in red and black with padded straps. Photo by Lukasz Kowalewski on StockSnap (https://stocksnap.io/photo/backpack-gear-4MT4167LN3)",
+    "price": {
+      "amount": 1200,
+      "currency": "EUR"
+    },
+    "geolocation": {
+      "lat": 60.292,
+      "lng": 25.04
+    },
+    "publicData": {
+      "listingType": "sell-used-products",
+      "transactionProcessAlias": "default-purchase/release-1",
+      "unitType": "item",
+      "categoryLevel1": "kids",
+      "categoryLevel2": "kids-accessories",
+      "color": "red",
+      "material": "Polyester",
+      "condition": "like-new",
+      "location": {
+        "address": "Tikkurilantie 10, 01300 Vantaa, Finland",
+        "building": ""
+      },
+      "pickupEnabled": true,
+      "shippingEnabled": true,
+      "shippingPriceInSubunitsOneItem": 690,
+      "petFreeHome": "yes",
+      "smokeFreeHome": "yes"
+    }
+  },
+  {
+    "key": "k17",
+    "photo": {
+      "url": "https://cdn.stocksnap.io/img-thumbs/960w/JJCJAOOABC.jpg",
+      "creator": "World Travel Adventures",
+      "source": "StockSnap",
+      "license": "CC0",
+      "page": "https://stocksnap.io/photo/straw-hat-JJCJAOOABC"
+    },
+    "title": "Beige sun hat",
+    "description": "Wide-brimmed beige sun hat for kids. Summer sun protection. Photo by World Travel Adventures on StockSnap (https://stocksnap.io/photo/straw-hat-JJCJAOOABC)",
+    "price": {
+      "amount": 500,
+      "currency": "EUR"
+    },
+    "geolocation": {
+      "lat": 60.451,
+      "lng": 22.267
+    },
+    "publicData": {
+      "listingType": "sell-used-products",
+      "transactionProcessAlias": "default-purchase/release-1",
+      "unitType": "item",
+      "categoryLevel1": "kids",
+      "categoryLevel2": "kids-accessories",
+      "color": "white",
+      "material": "Cotton, straw",
+      "condition": "like-new",
+      "location": {
+        "address": "Yliopistonkatu 20, 20100 Turku, Finland",
+        "building": ""
+      },
+      "pickupEnabled": true,
+      "shippingEnabled": true,
+      "shippingPriceInSubunitsOneItem": 690,
+      "petFreeHome": "yes",
+      "smokeFreeHome": "yes"
+    }
+  },
+  {
+    "key": "k18",
+    "photo": {
+      "url": "https://cdn.stocksnap.io/img-thumbs/960w/Q2NLOOVQBU.jpg",
+      "creator": "Matt Bango",
+      "source": "StockSnap",
+      "license": "CC0",
+      "page": "https://stocksnap.io/photo/baby-clothes-Q2NLOOVQBU"
+    },
+    "title": "Baby clothes bundle, 6m",
+    "description": "Bundle of baby clothes for 6 months: bodysuits, leggings and a soft hat. Photo by Matt Bango on StockSnap (https://stocksnap.io/photo/baby-clothes-Q2NLOOVQBU)",
+    "price": {
+      "amount": 2000,
+      "currency": "EUR"
+    },
+    "geolocation": {
+      "lat": 60.172,
+      "lng": 24.937
+    },
+    "publicData": {
+      "listingType": "sell-used-products",
+      "transactionProcessAlias": "default-purchase/release-1",
+      "unitType": "item",
+      "categoryLevel1": "kids",
+      "categoryLevel2": "kids-bundles",
+      "color": "white",
+      "material": "Cotton",
+      "conditionDetails": "Bodysuits gently washed many times, leggings like new.",
+      "location": {
+        "address": "Mannerheimintie 22, 00100 Helsinki, Finland",
+        "building": ""
+      },
+      "pickupEnabled": true,
+      "shippingEnabled": true,
+      "shippingPriceInSubunitsOneItem": 590,
+      "petFreeHome": "yes",
+      "smokeFreeHome": "yes"
+    }
+  },
+  {
+    "key": "k19",
+    "photo": {
+      "url": "https://cdn.stocksnap.io/img-thumbs/960w/V78R0IL55L.jpg",
+      "creator": "Jason Rosewell",
+      "source": "StockSnap",
+      "license": "CC0",
+      "page": "https://stocksnap.io/photo/people-kid-V78R0IL55L"
+    },
+    "title": "Kids winter accessories bundle - hat, scarf & gloves",
+    "description": "Winter bundle for a 6-year-old: knitted hat, scarf and gloves in matching colours. Photo by Jason Rosewell on StockSnap (https://stocksnap.io/photo/people-kid-V78R0IL55L)",
+    "price": {
+      "amount": 1500,
+      "currency": "EUR"
+    },
+    "geolocation": {
+      "lat": 60.186,
+      "lng": 24.951
+    },
+    "publicData": {
+      "listingType": "sell-used-products",
+      "transactionProcessAlias": "default-purchase/release-1",
+      "unitType": "item",
+      "categoryLevel1": "kids",
+      "categoryLevel2": "kids-bundles",
+      "color": "multicolor",
+      "material": "Wool, acrylic",
+      "conditionDetails": "Hat and scarf in good shape, gloves have slight pilling.",
+      "location": {
+        "address": "Hämeentie 30, 00530 Helsinki, Finland",
+        "building": ""
+      },
+      "pickupEnabled": false,
+      "shippingEnabled": true,
+      "shippingPriceInSubunitsOneItem": 390,
+      "petFreeHome": "yes",
+      "smokeFreeHome": "yes"
+    }
+  },
+  {
+    "key": "k20",
+    "photo": null,
+    "title": "Looking for kids winter overalls, 3y",
+    "description": "In search of warm winter overalls for a 3-year-old. Any colour, must be waterproof.",
+    "price": null,
+    "geolocation": null,
+    "publicData": {
+      "listingType": "in-search-of-clothing",
+      "transactionProcessAlias": "default-negotiation/release-1",
+      "unitType": "request",
+      "categoryLevel1": "kids",
+      "categoryLevel2": "kids-tops",
+      "color": "multicolor",
+      "material": "Polyester",
+      "condition": "well-used",
+      "kidsSize": "3y",
+      "cardStyle": "grey"
+    }
+  }
+]
