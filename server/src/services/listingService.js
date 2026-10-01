@@ -335,10 +335,13 @@ async function getListing(id) {
   return toListing(data, includedById);
 }
 
-// Search-bar suggestions: matching listings (slimmed down) and places.
+// Search-bar suggestions: matching listings (slimmed down), places, and a
+// spelling correction for what has been typed so far.
 async function getAutocomplete({ q, category } = {}) {
-  const { items, places } = autocomplete(await getCandidates({ category }), q || "");
+  const candidates = await getCandidates({ category });
+  const { items, places } = autocomplete(candidates, q || "");
   return {
+    suggestion: q ? suggestKeywords(candidates, q, { typing: true }) : null,
     items: items.map((l) => ({
       id: l.id,
       title: l.title,

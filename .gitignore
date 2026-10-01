@@ -6,3 +6,5 @@ node_modules/
 dist/
 .DS_Store
 .vscode/
+# Hackathon materials (the credentials PDF contains secrets)
+*.pdf
