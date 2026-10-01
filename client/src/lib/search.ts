@@ -36,6 +36,8 @@ export const AI_KEYS = ["q", "ai", "relaxed", "nopicks", "ids"] as const;
 export function browseUrl(current: URLSearchParams, changes: Partial<SearchParams> = {}) {
   const next = new URLSearchParams(current);
   if (!("page" in changes)) next.delete("page");
+  // Any other change (a filter, a new search) closes the item popup.
+  if (!("item" in changes)) next.delete("item");
   // Paging or re-sorting keeps the AI banner; changing any filter means the
   // shopper is refining by hand, so the AI summary no longer describes the results.
   if (Object.keys(changes).some((key) => key !== "page" && key !== "sort")) {

@@ -132,8 +132,9 @@ export default function SearchBar({
       setText(option.text);
       search(option.text);
     }
-    // No item pages: picking an item searches for it on the page.
-    else if (option.kind === "item") search(option.item.title);
+    // Picking an item opens its details popup over the current page.
+    else if (option.kind === "item")
+      navigate(browseUrl(current, { item: option.item.id }), { preventScrollReset: true, state: { openedItem: true } });
     else if (option.kind === "place") search(option.place.query);
     else searchTyped();
   };

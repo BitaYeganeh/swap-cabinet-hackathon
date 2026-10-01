@@ -83,7 +83,7 @@ function useTiles(category: string) {
 }
 
 const linkClass = (link: MenuLink) =>
-  `block py-[5px] text-[17px] uppercase no-underline transition hover:text-accent hover:underline hover:underline-offset-4 ${
+  `block py-1 text-sm tracking-wide uppercase no-underline transition hover:text-accent hover:underline hover:underline-offset-4 ${
     link.highlight ? "text-warm" : "text-ink"
   } ${link.strong ? "font-semibold text-accent" : ""}`;
 
@@ -95,7 +95,7 @@ export default function CategoryMenu({ category }: { category: string }) {
 
   return (
     <div className="grid grid-cols-[1fr_minmax(0,340px)] gap-10 px-10 pt-9 pb-12">
-      <nav aria-label={`${label} categories`} className="grid content-start gap-10">
+      <nav aria-label={`${label} categories`} className="grid content-start gap-7">
         {groupsFor(category).map((group, i) => (
           <ul key={i}>
             {group.map((link) => (

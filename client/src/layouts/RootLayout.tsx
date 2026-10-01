@@ -1,6 +1,8 @@
 import { LuLeaf } from "react-icons/lu";
 import { Outlet, ScrollRestoration } from "react-router";
+import { BasketDrawer } from "../components/Basket";
 import Footer from "../components/Footer";
+import { SavedDrawer } from "../components/Saved";
 import Navbar from "../components/Navbar";
 
 export default function RootLayout() {
@@ -18,6 +20,8 @@ export default function RootLayout() {
       </main>
 
       <Footer />
+      <BasketDrawer />
+      <SavedDrawer />
       <ScrollRestoration />
     </div>
   );

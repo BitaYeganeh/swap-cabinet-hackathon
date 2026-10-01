@@ -38,11 +38,8 @@ export default function Hero() {
       />
       <div className="absolute inset-0 -z-10 bg-linear-to-b from-white from-45% via-white/80 via-70% to-white/10 lg:bg-linear-to-r lg:from-white lg:from-30% lg:via-white/85 lg:via-50% lg:to-transparent lg:to-75%" />
 
-      <div className="mx-auto flex min-h-0 w-full max-w-7xl flex-1 overflow-y-auto px-4 pt-8 pb-40 sm:px-6 sm:pb-48 lg:items-center lg:pt-6 lg:pb-10">
+      <div className="mx-auto flex min-h-0 w-full max-w-7xl flex-1 overflow-y-auto px-4 pt-8 pb-40 sm:px-6 sm:pb-48 lg:items-end lg:pt-6 lg:pb-14">
         <div className="max-w-[680px] animate-fade-up">
-          <p className="mb-4 text-[13px] font-bold tracking-[0.18em] text-accent uppercase">
-            Second-hand marketplace
-          </p>
           <h1 className="font-hero text-[clamp(34px,4.8vw,68px)] leading-[1.05] font-extrabold tracking-[-0.03em] text-ink">
             Pre-loved style,
             <br />
