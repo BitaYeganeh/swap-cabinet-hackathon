@@ -19,6 +19,9 @@ export type PhotoGroupKey = "same" | "exact" | "close" | "other" | "closest";
 export type PhotoSearchResponse = {
   success: boolean;
   labels: PhotoLabels | null;
+  /** Every item seen in the photo (main one first); `labels` is items[selected]. */
+  items: PhotoLabels[];
+  selected: number;
   /** Labelling failed: one list ordered by looks only. */
   fallback: boolean;
   noClothing: boolean;
@@ -37,8 +40,10 @@ export const GROUP_TITLES: Record<PhotoGroupKey, string> = {
   closest: "Closest matches",
 };
 
-export async function photoSearch(file: File, signal?: AbortSignal): Promise<PhotoSearchResponse> {
+// `item` picks which item seen in the photo to search for (0 = the main one).
+export async function photoSearch(file: File, item = 0, signal?: AbortSignal): Promise<PhotoSearchResponse> {
   const body = new FormData();
+  body.append("item", String(item));
   body.append("photo", file);
 
   let response: Response;

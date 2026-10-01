@@ -31,7 +31,9 @@ router.post(
   async (req, res) => {
     if (!req.file) return res.status(400).json({ success: false, message: "Add a photo to search with" });
     try {
-      res.json({ success: true, ...(await searchByPhoto(req.file.buffer, req.file.mimetype)) });
+      // Optional form field "item": which item seen in the photo to search for.
+      const item = Number.parseInt(req.body?.item, 10) || 0;
+      res.json({ success: true, ...(await searchByPhoto(req.file.buffer, req.file.mimetype, item)) });
     } catch (error) {
       if (error instanceof ImageSearchError) return res.status(error.status).json({ success: false, message: error.message });
       console.error("Photo search failed:", error);

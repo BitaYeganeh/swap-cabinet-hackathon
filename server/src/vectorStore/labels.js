@@ -72,15 +72,19 @@ async function labelListing(listing) {
   return callClaude(content);
 }
 
+// A photo often shows a whole outfit, so we return every item we see and let
+// the shopper switch if our first guess isn't the one they meant.
+const MAX_PHOTO_ITEMS = 5;
+
 async function labelPhoto(buffer, mediaType) {
   const items = await callClaude([
     { type: "image", source: { type: "base64", media_type: mediaType, data: buffer.toString("base64") } },
     {
       type: "text",
-      text: "A shopper photographed an item they want. Return exactly one item: the main clothing item (largest, most central). If there is no clothing item, return no items.",
+      text: `A shopper photographed an item they want. Return the clothing items you can see, at most ${MAX_PHOTO_ITEMS}. Put first the item the photo is mainly about (largest, most central, most in focus). If there is no clothing item, return no items.`,
     },
   ]);
-  return items.slice(0, 1);
+  return items.slice(0, MAX_PHOTO_ITEMS);
 }
 
 module.exports = { labelListing, labelPhoto };

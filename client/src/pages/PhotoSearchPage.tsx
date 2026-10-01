@@ -39,6 +39,8 @@ function PhotoPreview({ file }: { file: File }) {
 
 function PhotoResults({ file }: { file?: File }) {
   const [state, setState] = useState<State>({ status: file ? "loading" : "idle" });
+  // Which item seen in the photo we search for; the shopper can switch.
+  const [selected, setSelected] = useState(0);
   // The popup is opened here, not through the URL: a navigation would remount
   // this page and search the photo again.
   const [opened, setOpened] = useState<Listing | null>(null);
@@ -46,13 +48,19 @@ function PhotoResults({ file }: { file?: File }) {
   useEffect(() => {
     if (!file) return;
     const controller = new AbortController();
-    photoSearch(file, controller.signal)
+    photoSearch(file, selected, controller.signal)
       .then((result) => setState({ status: "done", result }))
       .catch((error) => {
         if (error.name !== "AbortError") setState({ status: "error", message: error.message });
       });
     return () => controller.abort();
-  }, [file]);
+  }, [file, selected]);
+
+  const choose = (index: number) => {
+    if (index === selected) return;
+    setState({ status: "loading" });
+    setSelected(index);
+  };
 
   return (
     <div className="mx-auto max-w-7xl px-4 pt-5 pb-16 sm:px-6 sm:pt-8">
@@ -66,13 +74,36 @@ function PhotoResults({ file }: { file?: File }) {
             {state.status === "idle" && "Take or upload a photo of an item you like."}
             {state.status === "loading" && "Looking at your photo…"}
             {state.status === "error" && state.message}
-            {state.status === "done" && state.result.labels && <>We see: <strong className="text-ink">{describe(state.result.labels)}</strong></>}
+            {state.status === "done" && state.result.labels && state.result.items.length <= 1 && (
+              <>We see: <strong className="text-ink">{describe(state.result.labels)}</strong></>
+            )}
+            {state.status === "done" && state.result.items.length > 1 && "We see more than one item. Which one do you want?"}
             {state.status === "done" && state.result.fallback && "Showing the items that look most alike."}
             {state.status === "done" && state.result.noClothing && "We can't see a clothing item in this photo. Try another photo."}
           </p>
         </div>
         <PhotoSearchButton className="border border-line" />
       </div>
+
+      {state.status === "done" && state.result.items.length > 1 && (
+        <div className="-mt-3 mb-6 flex flex-wrap gap-2" role="group" aria-label="Item to search for">
+          {state.result.items.map((item, index) => (
+            <button
+              key={index}
+              type="button"
+              onClick={() => choose(index)}
+              aria-pressed={index === selected}
+              className={`rounded-full border px-4 py-1.5 text-sm transition ${
+                index === selected
+                  ? "border-ink bg-ink text-white"
+                  : "border-line bg-surface text-ink-2 hover:border-ink-3"
+              }`}
+            >
+              {describe(item)}
+            </button>
+          ))}
+        </div>
+      )}
 
       {state.status === "loading" && (
         <div className="grid place-items-center py-16 text-ink-3">
