@@ -7,7 +7,7 @@ import {
   type ReactNode,
   type SubmitEvent,
 } from "react";
-import { LuMapPin, LuSearch, LuX } from "react-icons/lu";
+import { LuMapPin, LuSearch, LuSparkles, LuX } from "react-icons/lu";
 import { PiCoatHanger } from "react-icons/pi";
 import { useNavigate } from "react-router";
 import {
@@ -23,6 +23,7 @@ const DEBOUNCE_MS = 150;
 const EMPTY: AutocompleteResponse = { items: [], places: [] };
 
 type Option =
+  | { kind: "suggestion"; text: string }
   | { kind: "item"; item: AutocompleteItem }
   | { kind: "place"; place: AutocompletePlace }
   | { kind: "search" };
@@ -89,10 +90,11 @@ export default function SearchBar({
   const [text, setText] = useState(initial);
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState(-1);
-  const { items, places } = useAutocomplete(text, category);
+  const { items, places, suggestion } = useAutocomplete(text, category);
 
   const q = text.trim();
   const options: Option[] = [
+    ...(suggestion ? [{ kind: "suggestion" as const, text: suggestion }] : []),
     ...items.map((item) => ({ kind: "item" as const, item })),
     ...places.map((place) => ({ kind: "place" as const, place })),
     ...(q ? [{ kind: "search" as const }] : []),
@@ -107,7 +109,10 @@ export default function SearchBar({
 
   const choose = (option: Option) => {
     setOpen(false);
-    if (option.kind === "item") navigate(`/listings/${option.item.id}`);
+    if (option.kind === "suggestion") {
+      setText(option.text);
+      search(option.text);
+    } else if (option.kind === "item") navigate(`/listings/${option.item.id}`);
     else if (option.kind === "place") search(option.place.query);
     else search(text);
   };
@@ -152,7 +157,23 @@ export default function SearchBar({
   });
 
   let index = 0;
-  const section = (title: string, rows: ReactNode[]) =>
+
+  const suggestionRow = suggestion && (
+    <li role="presentation" className="border-b border-line pb-1">
+      <ul role="group" aria-label="Spelling suggestion">
+        <li {...rowProps(index++)}>
+          <span className="grid size-10 shrink-0 place-items-center rounded-lg bg-accent-soft text-accent">
+            <LuSparkles className="size-5" />
+          </span>
+          <span className="truncate text-sm text-ink-2">
+            Did you mean <strong className="font-semibold text-accent">“{suggestion}”</strong>?
+          </span>
+        </li>
+      </ul>
+    </li>
+  );
+
+  const section =(title: string, rows: ReactNode[]) =>
     rows.length > 0 && (
       <li role="presentation">
         <p className="px-4 pt-3 pb-1 text-xs font-semibold tracking-wider text-ink-3 uppercase">{title}</p>
@@ -267,6 +288,7 @@ export default function SearchBar({
           aria-label="Search suggestions"
           className="absolute inset-x-0 top-full z-30 mt-2 max-h-[min(70vh,520px)] overflow-y-auto rounded-2xl border border-line bg-surface pb-2 shadow-float"
         >
+          {suggestionRow}
           {section("Items", itemRows)}
           {section("Locations", placeRows)}
           <li role="presentation" className="mt-1 border-t border-line pt-1">

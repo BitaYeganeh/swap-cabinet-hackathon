@@ -60,8 +60,8 @@ router.get("/", async (req, res) => {
 // Declared before /:id so "autocomplete" isn't taken for a listing id.
 router.get("/autocomplete", async (req, res) => {
   try {
-    const { items, places } = await getAutocomplete(req.query);
-    res.json({ success: true, items, places });
+    const { items, places, suggestion } = await getAutocomplete(req.query);
+    res.json({ success: true, items, places, suggestion });
   } catch (error) {
     logSharetribeError(error);
     res.status(500).json({ success: false, message: "Failed to fetch suggestions" });
