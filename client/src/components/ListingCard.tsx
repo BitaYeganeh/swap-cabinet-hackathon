@@ -1,9 +1,7 @@
 import type { ReactNode } from "react";
-import { LuHeart, LuMapPin, LuTruck } from "react-icons/lu";
+import { LuMapPin, LuTruck } from "react-icons/lu";
 import { PiCoatHanger } from "react-icons/pi";
-import { Link } from "react-router";
 import type { Listing } from "../lib/api";
-import { toggleFavorite, useFavorites } from "../lib/favorites";
 import {
   categoryLabel,
   conditionLabel,
@@ -17,14 +15,13 @@ import { formatSize, useSizeSystem } from "../lib/sizes";
 const chip = "rounded-md bg-surface-2 px-1.5 py-px text-[11px] font-medium text-ink-2 sm:text-xs";
 
 export default function ListingCard({ listing }: { listing: Listing }) {
-  const favorite = !!useFavorites()[listing.id];
   const image = listing.images[0];
   const wanted = isWanted(listing);
   const size = formatSize(listing.size, listing.category, useSizeSystem());
 
   return (
     <article className="group relative flex min-w-0 flex-col overflow-hidden rounded-xl border border-line bg-surface shadow-xs transition duration-200 hover:-translate-y-0.5 hover:shadow-card">
-      <Link to={`/listings/${listing.id}`} className="flex flex-1 flex-col no-underline" aria-label={listing.title}>
+      <div className="flex flex-1 flex-col">
         <div className="relative aspect-square overflow-hidden bg-surface-2">
           {image ? (
             <img
@@ -96,19 +93,7 @@ export default function ListingCard({ listing }: { listing: Listing }) {
             </span>
           </div>
         </div>
-      </Link>
-
-      <button
-        type="button"
-        onClick={() => toggleFavorite(listing)}
-        aria-pressed={favorite}
-        aria-label={favorite ? "Remove from favourites" : "Add to favourites"}
-        className={`absolute top-2 right-2 grid size-8 place-items-center rounded-full bg-white/90 shadow-xs transition hover:scale-110 ${
-          favorite ? "text-warm" : "text-ink"
-        }`}
-      >
-        <LuHeart className={`size-4 ${favorite ? "fill-current" : ""}`} />
-      </button>
+      </div>
     </article>
   );
 }

@@ -104,7 +104,7 @@ export default function SearchBar({
 
   const search = (keywords: string) => {
     setOpen(false);
-    navigate(browseUrl(category, current, { keywords: keywords.trim() }));
+    navigate(browseUrl(current, { keywords: keywords.trim() }));
   };
 
   const choose = (option: Option) => {
@@ -112,7 +112,9 @@ export default function SearchBar({
     if (option.kind === "suggestion") {
       setText(option.text);
       search(option.text);
-    } else if (option.kind === "item") navigate(`/listings/${option.item.id}`);
+    }
+    // No item pages: picking an item searches for it on the page.
+    else if (option.kind === "item") search(option.item.title);
     else if (option.kind === "place") search(option.place.query);
     else search(text);
   };
@@ -237,7 +239,7 @@ export default function SearchBar({
       onBlur={(e) => {
         if (!e.currentTarget.contains(e.relatedTarget as Node | null)) setOpen(false);
       }}
-      className="relative order-3 flex h-12 flex-[1_1_100%] items-center rounded-full border-[1.5px] border-line bg-surface py-1 pr-1 pl-12 shadow-xs transition focus-within:border-accent focus-within:ring-4 focus-within:ring-accent-soft sm:order-none sm:h-[52px] sm:max-w-[680px] sm:flex-1"
+      className="relative order-3 flex h-12 flex-[1_1_100%] items-center rounded-full border-[1.5px] border-line bg-surface py-1 pr-1 pl-12 shadow-xs transition focus-within:border-accent focus-within:ring-4 focus-within:ring-accent-soft sm:order-none sm:h-[52px] sm:flex-[0_1_680px]"
     >
       <LuSearch className="absolute left-[18px] size-5 text-ink-3" />
       <input
