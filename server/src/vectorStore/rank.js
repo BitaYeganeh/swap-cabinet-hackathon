@@ -1,4 +1,4 @@
-const { isOtherKind, WANTED_TYPE } = require("./vocabulary");
+const { kindsMatch, WANTED_TYPE } = require("./vocabulary");
 
 const GROUP_ORDER = ["same", "exact", "close", "other"];
 
@@ -9,7 +9,7 @@ const LABEL_WEIGHT = 0.3;
 const dot = (a, b) => a.reduce((sum, x, i) => sum + x * (b[i] ?? 0), 0);
 
 function groupOfItem(q, item) {
-  const sameKind = q.kind === item.kind && !isOtherKind(q.kind);
+  const sameKind = kindsMatch(q.kind, item.kind);
   if (sameKind && q.brand && q.model && q.brand === item.brand && q.model === item.model) return "same";
   if (sameKind) return "exact";
   if (q.group === item.group) return "close";

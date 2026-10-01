@@ -68,3 +68,8 @@ test("fallback without labels gives one list by similarity", () => {
   assert.deepEqual(groups.map((g) => g.key), ["closest"]);
   assert.deepEqual(groups[0].ids.map((x) => x.id), ["b", "a"]);
 });
+
+test("a general kind in the photo finds the specific kind in a listing as exact", () => {
+  assert.equal(groupFor(item({ kind: "boot" }), [item({ kind: "work boot" })]), "exact");
+  assert.equal(groupFor(item({ kind: "work boot" }), [item({ kind: "ankle boot" })]), "close");
+});

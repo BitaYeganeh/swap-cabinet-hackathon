@@ -25,3 +25,24 @@ test("examples land in the expected group", () => {
   assert.equal(V.groupOf("bomber jacket"), "outerwear");
   assert.equal(V.groupOf("jeans"), "bottoms");
 });
+
+test("a general kind matches its specific kinds, but specific kinds don't match each other", () => {
+  assert.equal(V.kindsMatch("boot", "work boot"), true);
+  assert.equal(V.kindsMatch("ankle boot", "boot"), true);
+  assert.equal(V.kindsMatch("jacket", "bomber jacket"), true);
+  assert.equal(V.kindsMatch("shorts", "denim shorts"), true);
+  assert.equal(V.kindsMatch("dress", "shirt dress"), true);
+  assert.equal(V.kindsMatch("boot", "boot"), true);
+  assert.equal(V.kindsMatch("work boot", "ankle boot"), false);
+  assert.equal(V.kindsMatch("denim jacket", "bomber jacket"), false);
+  assert.equal(V.kindsMatch("boot", "hi-top sneaker"), false);
+  assert.equal(V.kindsMatch("other-shoes", "other-shoes"), false);
+});
+
+test("every parent kind and child kind is a real kind", () => {
+  for (const [child, parent] of Object.entries(V.PARENT_KIND)) {
+    assert.ok(V.KINDS.includes(child), child);
+    assert.ok(V.KINDS.includes(parent), parent);
+    assert.equal(V.groupOf(child), V.groupOf(parent), child);
+  }
+});

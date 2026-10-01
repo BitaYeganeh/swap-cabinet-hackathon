@@ -28,7 +28,36 @@ const PATTERNS = ["plain", "striped", "checked", "floral", "printed", "other"];
 
 const WANTED_TYPE = "in-search-of-clothing";
 
+// Specific kind -> its general kind. A photo often only shows "boot" while the
+// seller's text says "work boot"; both are the same kind of item. Two specific
+// kinds (work boot vs ankle boot) stay different.
+const PARENT_KIND = {
+  "ankle boot": "boot",
+  "work boot": "boot",
+  "denim jacket": "jacket",
+  "bomber jacket": "jacket",
+  "leather jacket": "jacket",
+  "winter jacket": "jacket",
+  "denim shorts": "shorts",
+  "shirt dress": "dress",
+};
+
 const groupOf = (kind) => KIND_TO_GROUP.get(kind);
 const isOtherKind = (kind) => kind.startsWith("other-");
 
-module.exports = { GROUPS, KINDS, KINDS_BY_GROUP, STYLES, MATERIALS, PATTERNS, WANTED_TYPE, groupOf, isOtherKind };
+const kindsMatch = (a, b) =>
+  !isOtherKind(a) && !isOtherKind(b) && (a === b || PARENT_KIND[a] === b || PARENT_KIND[b] === a);
+
+module.exports = {
+  GROUPS,
+  KINDS,
+  KINDS_BY_GROUP,
+  STYLES,
+  MATERIALS,
+  PATTERNS,
+  WANTED_TYPE,
+  PARENT_KIND,
+  groupOf,
+  isOtherKind,
+  kindsMatch,
+};
