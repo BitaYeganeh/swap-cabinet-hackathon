@@ -1,8 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router";
-import heroPhoto from "../assets/hero-rack.jpg";
 import { getListings, type Listing, type SearchParams } from "../lib/api";
-import { CONDITIONS, GENDERS, TYPES, categoryLabel } from "../lib/format";
+import { CONDITIONS, GENDERS, TYPES, categoryLabel, isWanted } from "../lib/format";
 import { browseUrl } from "../lib/search";
 
 // Menu links start a fresh search, like a store's department menu.
@@ -37,47 +36,65 @@ function groupsFor(category: string): MenuLink[][] {
   return [featured, ...products, conditions];
 }
 
-// Newest listings with photos per category, kept for the session so
-// re-opening a menu doesn't refetch.
-const picksCache = new Map<string, Listing[]>();
+type Tile = { key: string; src: string; label: string; to: string };
 
-function usePicks(category: string) {
-  const [picks, setPicks] = useState(() => picksCache.get(category) ?? null);
+// One photo per product type (plus the newest arrival), so each tile shows what
+// it links to — the Men menu shows men's tops, shoes… Kept for the session so
+// re-opening a menu doesn't refetch.
+const tilesCache = new Map<string, Tile[]>();
+
+// Shimmer squares shown while the tile photos load.
+const PLACEHOLDER_TILES: Tile[] = [1, 2, 3, 4, 5, 6].map((n) => ({ key: `loading-${n}`, src: "", label: "", to: "" }));
+
+const photoOf = (listing?: Listing) => listing?.images[0] && (listing.images[0].url || listing.images[0].url2x);
+
+function useTiles(category: string) {
+  const [tiles, setTiles] = useState(() => tilesCache.get(category) ?? null);
 
   useEffect(() => {
-    if (picksCache.has(category)) return;
+    if (tilesCache.has(category)) return;
     const controller = new AbortController();
-    getListings({ category, sort: "newest" }, controller.signal)
-      .then(({ listings }) => {
-        const withPhotos = listings.filter((l) => l.images[0]).slice(0, 2);
-        picksCache.set(category, withPhotos);
-        setPicks(withPhotos);
+    const withPhotos = (params: Partial<SearchParams>) =>
+      getListings({ category, ...params }, controller.signal).then(({ listings }) =>
+        listings.filter((l) => photoOf(l) && !isWanted(l))
+      );
+
+    Promise.all([
+      ...TYPES.map((t) => withPhotos({ type: t.value }).then((ls) => ({ ...t, listing: ls[0], changes: { type: t.value } }))),
+      withPhotos({ sort: "newest" }),
+    ])
+      .then((all) => {
+        const byType = all.slice(0, TYPES.length) as { value: string; label: string; listing?: Listing; changes: Partial<SearchParams> }[];
+        // "New in" uses the newest item whose photo isn't already on another tile.
+        const shown = new Set(byType.map((r) => r.listing?.id));
+        const newest = (all[TYPES.length] as Listing[]).find((l) => !shown.has(l.id));
+        const results = [...byType, { value: "new", label: "New in", listing: newest, changes: { sort: "newest" } }];
+        const next = results
+          .filter((r) => r.listing)
+          .map((r) => ({ key: r.value, src: photoOf(r.listing)!, label: r.label, to: linkTo(category, r.changes) }));
+        tilesCache.set(category, next);
+        setTiles(next);
       })
       .catch(() => {});
     return () => controller.abort();
   }, [category]);
 
-  return picks;
+  return tiles;
 }
 
 const linkClass = (link: MenuLink) =>
-  `block py-[5px] text-[17px] uppercase no-underline transition hover:underline hover:underline-offset-4 ${
+  `block py-[5px] text-[17px] uppercase no-underline transition hover:text-accent hover:underline hover:underline-offset-4 ${
     link.highlight ? "text-warm" : "text-ink"
-  } ${link.strong ? "font-semibold" : ""}`;
+  } ${link.strong ? "font-semibold text-accent" : ""}`;
 
 // Contents of the left-hand flyout opened from a category tab, H&M style:
-// grouped links on the left, photo tiles on the right.
+// grouped links on the left, a grid of small photo tiles (one per type) on the right.
 export default function CategoryMenu({ category }: { category: string }) {
   const label = categoryLabel(category);
-  const picks = usePicks(category);
-
-  const tiles =
-    picks && picks.length > 0
-      ? picks.map((l) => ({ key: l.id, src: l.images[0].url2x || l.images[0].url, title: l.title, to: linkTo(category, { keywords: l.title }) }))
-      : [{ key: "hero", src: heroPhoto, title: "New in", to: linkTo(category, { sort: "newest" }) }];
+  const tiles = useTiles(category);
 
   return (
-    <div className="grid grid-cols-[1fr_minmax(0,300px)] gap-10 px-10 pt-9 pb-12">
+    <div className="grid grid-cols-[1fr_minmax(0,340px)] gap-10 px-10 pt-9 pb-12">
       <nav aria-label={`${label} categories`} className="grid content-start gap-10">
         {groupsFor(category).map((group, i) => (
           <ul key={i}>
@@ -92,20 +109,29 @@ export default function CategoryMenu({ category }: { category: string }) {
         ))}
       </nav>
 
-      <div className="grid content-start gap-8">
-        {tiles.map((tile) => (
-          <Link key={tile.key} to={tile.to} className="group block no-underline">
-            <div className="aspect-[2/3] overflow-hidden bg-surface-2">
-              <img
-                src={tile.src}
-                alt=""
-                className="size-full object-cover transition duration-500 group-hover:scale-[1.03]"
-              />
+      <div className="grid content-start grid-cols-2 gap-x-3 gap-y-4">
+        {(tiles ?? PLACEHOLDER_TILES).map((tile) =>
+          tile.src ? (
+            <Link key={tile.key} to={tile.to} className="group block no-underline">
+              <div className="aspect-square overflow-hidden rounded-xl bg-surface-2">
+                <img
+                  src={tile.src}
+                  alt=""
+                  loading="lazy"
+                  className="size-full object-cover transition duration-500 group-hover:scale-105"
+                />
+              </div>
+              <p className="mt-2 text-[13px] font-semibold tracking-wide text-ink uppercase group-hover:text-accent">
+                {tile.label}
+              </p>
+            </Link>
+          ) : (
+            <div key={tile.key} aria-hidden="true">
+              <div className="shimmer aspect-square rounded-xl" />
+              <div className="shimmer mt-2 h-3 w-1/2 rounded" />
             </div>
-            <p className="mt-3 line-clamp-1 text-[17px] text-ink uppercase">{tile.title}</p>
-            <p className="text-sm text-ink-2 uppercase">{label}</p>
-          </Link>
-        ))}
+          )
+        )}
       </div>
     </div>
   );

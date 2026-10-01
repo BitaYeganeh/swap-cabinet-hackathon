@@ -17,6 +17,7 @@ import {
   type AutocompleteResponse,
 } from "../lib/api";
 import { formatMoney, WANTED_TYPE } from "../lib/format";
+import { useTypedExample } from "../lib/aiExamples";
 import { cancelAiSearch, runAiSearch, useAiSearchPending } from "../lib/aiSearch";
 import { browseUrl, shouldUseAi } from "../lib/search";
 
@@ -91,6 +92,9 @@ export default function SearchBar({
   const [text, setText] = useState(initial);
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState(-1);
+  const [focused, setFocused] = useState(false);
+  // The empty, idle box types out AI examples as its placeholder.
+  const typedExample = useTypedExample(!focused && !text);
   const { items, places, suggestion } = useAutocomplete(text, category);
   const pending = useAiSearchPending();
   const thinking = pending !== null;
@@ -275,9 +279,13 @@ export default function SearchBar({
           setOpen(true);
           setActive(-1);
         }}
-        onFocus={() => setOpen(true)}
+        onFocus={() => {
+          setOpen(true);
+          setFocused(true);
+        }}
+        onBlur={() => setFocused(false)}
         onKeyDown={onKeyDown}
-        placeholder="Search, or describe what you need…"
+        placeholder={typedExample ?? "Search, or describe what you need…"}
         aria-label="Search listings"
         role="combobox"
         aria-autocomplete="list"

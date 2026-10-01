@@ -3,6 +3,7 @@
 @theme {
   --font-sans: "Inter", system-ui, "Segoe UI", Roboto, sans-serif;
   --font-display: "Fraunces", Georgia, "Times New Roman", serif;
+  --font-hero: "Plus Jakarta Sans", "Inter", system-ui, sans-serif;
 
   --color-bg: #faf8f4;
   --color-surface: #ffffff;
