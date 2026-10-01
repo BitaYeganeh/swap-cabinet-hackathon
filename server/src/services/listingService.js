@@ -1,5 +1,6 @@
 const sharetribe = require("../config/sharetribe");
 const { searchListings, suggestKeywords, autocomplete } = require("./fuzzySearch");
+const { similarIds, labelsById } = require("../vectorStore/semantic");
 const { CATEGORIES, GENDERS, TYPES } = require("../config/catalog");
 
 const PER_PAGE = 12;
@@ -299,6 +300,14 @@ async function searchByKeywords(params) {
   // Nothing matched as typed, but a corrected spelling does: search that instead.
   if (!matches.length && suggestion) matches = searchListings(candidates, suggestion);
 
+  // Add listings that match by meaning ("warm" -> wool sweater). Only added
+  // after the keyword matches, never instead of them; filters still apply
+  // because only candidates can be added.
+  const found = new Set(matches.map((l) => l.id));
+  const byId = new Map(candidates.map((l) => [l.id, l]));
+  const extra = (await similarIds(keywords)).filter((id) => !found.has(id) && byId.has(id)).map((id) => byId.get(id));
+  matches = [...matches, ...extra];
+
   if (IN_MEMORY_SORTS[params.sort]) matches = [...matches].sort(IN_MEMORY_SORTS[params.sort]);
 
   const totalItems = matches.length;
@@ -347,15 +356,28 @@ async function getListing(id) {
   return toListing(data, includedById);
 }
 
-// Up to 100 buyable listings matching the filters (keywords ignored), for the
-// AI to choose from. "Wanted" requests are left out: they aren't for sale.
-async function getAiCandidates(params = {}) {
-  const query = { ...buildQuery({ ...params, keywords: "", ids: "" }), page: 1, perPage: FETCH_PER_PAGE };
-  const { listings } = mapResponse(await sharetribe.listings.query(query));
+const AI_CANDIDATES = 30;
 
-  return listings
+// Buyable listings matching the filters (keywords ignored), for the AI to
+// choose from. "Wanted" requests are left out: they aren't for sale.
+// With a query, only the closest by meaning, so the prompt stays small as the
+// marketplace grows; each comes with our labels so Claude knows more.
+async function getAiCandidates(params = {}, query = null) {
+  const all = (await getCandidates({ ...params, keywords: "", ids: "" }))
     .filter((listing) => listing.listingType !== WANTED_TYPE)
     .filter(matchesFilters(localFilters(params)));
+
+  let chosen = all;
+  if (query) {
+    const order = await similarIds(query, { limit: AI_CANDIDATES * 3, minScore: 0 });
+    const byId = new Map(all.map((l) => [l.id, l]));
+    const ranked = order.map((id) => byId.get(id)).filter(Boolean);
+    // Store empty or behind: fall back to the first listings, as before.
+    chosen = (ranked.length ? ranked : all).slice(0, AI_CANDIDATES);
+  }
+
+  const labels = await labelsById(chosen.map((l) => l.id));
+  return chosen.map((listing) => ({ ...listing, labels: labels.get(listing.id) || null }));
 }
 
 // Search-bar suggestions: matching listings (slimmed down), places, and a
