@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { Link, useLocation, useSearchParams } from "react-router";
 import { CATEGORIES, GENDERS, TYPES, categoryLabel } from "../lib/format";
+import { cancelAiSearch, useAiSearchPending } from "../lib/aiSearch";
 import { browseUrl, readSearch } from "../lib/search";
 import CategoryMenu from "./CategoryMenu";
 import Logo from "./Logo";
@@ -11,6 +12,14 @@ export default function Navbar() {
   const location = useLocation();
   const [searchParams] = useSearchParams();
   const { category, keywords = "" } = readSearch(searchParams);
+
+  // After an AI search, show the shopper's own words rather than the AI's keywords.
+  const shownSearch = searchParams.get("q") ?? keywords;
+  const aiPending = useAiSearchPending() !== null;
+
+  // Moving to another page while an AI search runs cancels it, so a late
+  // answer can't pull the shopper away from where they went.
+  useEffect(() => cancelAiSearch(), [location.key]);
 
   // Desktop flyout: hovering (or focusing) a category tab slides its menu in
   // from the left, just below the tab row. Touch screens use the tabs directly.
@@ -46,8 +55,8 @@ export default function Navbar() {
 
         {/* Remount when the URL keywords change so the input mirrors the URL. */}
         <SearchBar
-          key={keywords}
-          initial={keywords}
+          key={shownSearch}
+          initial={shownSearch}
           category={category}
           current={searchParams}
         />
@@ -105,6 +114,12 @@ export default function Navbar() {
         )}
 
       {category && <SubcategoryNav category={category} current={searchParams} />}
+
+      {aiPending && (
+        <div className="absolute inset-x-0 -bottom-px h-0.5 overflow-hidden bg-accent-soft" aria-hidden="true">
+          <div className="h-full w-1/3 animate-progress rounded-full bg-accent" />
+        </div>
+      )}
     </header>
   );
 }

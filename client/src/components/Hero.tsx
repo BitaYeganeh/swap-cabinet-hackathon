@@ -1,6 +1,7 @@
-import { LuShieldCheck, LuTruck } from "react-icons/lu";
-import { Link } from "react-router";
+import { LuShieldCheck, LuSparkles, LuTruck } from "react-icons/lu";
+import { Link, useNavigate } from "react-router";
 import heroPhoto from "../assets/hero-rack.jpg";
+import { runAiSearch, useAiSearchPending } from "../lib/aiSearch";
 import { CATEGORIES } from "../lib/format";
 import { browseUrl } from "../lib/search";
 import { useHeaderHeight } from "../lib/useHeaderHeight";
@@ -9,10 +10,20 @@ import { btn } from "../lib/ui";
 // Height of the green announcement strip above the header.
 const BANNER_HEIGHT = 33;
 
+// Example searches that show off the AI: a plain request, a need, and filters in words.
+const EXAMPLES = [
+  "Shoes for kids",
+  "Something to keep me dry in the rain",
+  "Warm clothes for my son this winter",
+  "Outfit for a job interview",
+];
+
 // Full-width black-and-white photo filling the screen below the header; a white
 // fade gives the copy a clean "white side" (from the left on desktop, the top on phones).
 export default function Hero() {
   const headerHeight = useHeaderHeight();
+  const navigate = useNavigate();
+  const pending = useAiSearchPending();
 
   return (
     <section
@@ -62,6 +73,31 @@ export default function Hero() {
             <span className="inline-flex items-center gap-2">
               <LuShieldCheck className="size-[18px] text-accent" /> Condition checked
             </span>
+          </div>
+
+          <div className="mt-6 sm:mt-7">
+            <p className="mb-2.5 inline-flex items-center gap-1.5 text-sm font-semibold text-ink">
+              <LuSparkles className="size-4 text-accent" /> Try asking
+            </p>
+            <div className="flex flex-wrap gap-2">
+              {EXAMPLES.map((example) => (
+                <button
+                  type="button"
+                  key={example}
+                  disabled={pending !== null}
+                  onClick={() =>
+                    runAiSearch(example, navigate, `/?keywords=${encodeURIComponent(example)}`)
+                  }
+                  className={`rounded-full border px-3.5 py-1.5 text-left text-sm transition disabled:cursor-wait ${
+                    pending === example
+                      ? "border-accent bg-accent-soft text-accent"
+                      : "border-line bg-surface text-ink-2 hover:border-accent hover:text-accent disabled:opacity-60"
+                  }`}
+                >
+                  {example}
+                </button>
+              ))}
+            </div>
           </div>
         </div>
       </div>

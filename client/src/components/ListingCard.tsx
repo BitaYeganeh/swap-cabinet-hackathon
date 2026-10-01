@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { LuMapPin, LuTruck } from "react-icons/lu";
+import { LuMapPin, LuSparkles, LuTruck } from "react-icons/lu";
 import { PiCoatHanger } from "react-icons/pi";
 import type { Listing } from "../lib/api";
 import {
@@ -14,7 +14,7 @@ import { formatSize, useSizeSystem } from "../lib/sizes";
 
 const chip = "rounded-md bg-surface-2 px-1.5 py-px text-[11px] font-medium text-ink-2 sm:text-xs";
 
-export default function ListingCard({ listing }: { listing: Listing }) {
+export default function ListingCard({ listing, reason }: { listing: Listing; reason?: string }) {
   const image = listing.images[0];
   const wanted = isWanted(listing);
   const size = formatSize(listing.size, listing.category, useSizeSystem());
@@ -59,6 +59,13 @@ export default function ListingCard({ listing }: { listing: Listing }) {
             {listing.subcategory && <> · {subcategoryLabel(listing.subcategory)}</>}
           </p>
           <h3 className="line-clamp-2 text-[13px] leading-snug font-semibold sm:text-sm">{listing.title}</h3>
+
+          {reason && (
+            <p className="flex gap-1 rounded-md bg-accent-soft px-1.5 py-1 text-[11px] leading-snug text-accent sm:text-xs">
+              <LuSparkles className="mt-px size-3 shrink-0" aria-label="Why the AI picked this" />
+              {reason}
+            </p>
+          )}
 
           <div className="flex flex-wrap gap-1">
             {listing.condition && listing.condition !== "like-new" && (

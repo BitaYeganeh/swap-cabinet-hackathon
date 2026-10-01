@@ -1,5 +1,6 @@
 const sharetribe = require("../config/sharetribe");
 const { searchListings, suggestKeywords, autocomplete } = require("./fuzzySearch");
+const { CATEGORIES, GENDERS, TYPES } = require("../config/catalog");
 
 const PER_PAGE = 12;
 
@@ -24,11 +25,6 @@ const INCLUDES = {
   "fields.user": ["profile.displayName"],
 };
 
-// Subcategory types, stored in Sharetribe as categoryLevel2 = "<category>-<type>".
-const TYPES = ["tops", "bottoms", "shoes", "accessories", "bundles"];
-
-const GENDERS = ["boys", "girls"];
-
 // Size filter values: "m" (clothing), "shoe-38" (EU shoe size) or "kids-5y" (kids' age).
 function applySize(query, size) {
   if (!size) return;
@@ -37,16 +33,25 @@ function applySize(query, size) {
   else query.pub_size = size;
 }
 
-function buildQuery({ keywords, category, type, size, condition, color, minPrice, maxPrice, sort, page }) {
+const WANTED_TYPE = "in-search-of-clothing";
+
+function buildQuery({ keywords, category, type, size, condition, color, minPrice, maxPrice, sort, page, ids }) {
   const query = {
     perPage: PER_PAGE,
     page: Math.max(1, parseInt(page, 10) || 1),
     ...INCLUDES,
   };
 
+  // Specific listings, e.g. the AI's picks. Order is restored in getListings.
+  if (ids) query.ids = ids;
   if (keywords && keywords.trim()) query.keywords = keywords.trim();
   if (category) query.pub_categoryLevel1 = category;
-  if (category && TYPES.includes(type)) query.pub_categoryLevel2 = `${category}-${type}`;
+  // Types are stored per category ("kids-shoes"); without a category, match any of them.
+  if (TYPES.includes(type)) {
+    query.pub_categoryLevel2 = category
+      ? `${category}-${type}`
+      : CATEGORIES.map((c) => `${c}-${type}`).join(",");
+  }
   applySize(query, size);
   if (condition) query.pub_condition = condition;
   if (color) query.pub_color = color;
@@ -308,12 +313,19 @@ async function searchByKeywords(params) {
 }
 
 async function getListings(params = {}) {
-  if (params.keywords && params.keywords.trim()) return searchByKeywords(params);
+  // AI picks are an exact list of ids, so they skip the keyword search.
+  if (!params.ids && params.keywords && params.keywords.trim()) return searchByKeywords(params);
 
   const filters = localFilters(params);
   if (filters.brand || filters.gender) return getListingsFiltered(buildQuery(params), filters);
 
   const { listings, meta } = mapResponse(await sharetribe.listings.query(buildQuery(params)));
+
+  // Sharetribe ignores the order of `ids`; keep the order we asked for (the AI's ranking).
+  if (params.ids) {
+    const rank = params.ids.split(",");
+    listings.sort((a, b) => rank.indexOf(a.id) - rank.indexOf(b.id));
+  }
 
   return {
     listings,
@@ -333,6 +345,17 @@ async function getListing(id) {
   const includedById = Object.fromEntries(included.map((item) => [item.id.uuid, item]));
 
   return toListing(data, includedById);
+}
+
+// Up to 100 buyable listings matching the filters (keywords ignored), for the
+// AI to choose from. "Wanted" requests are left out: they aren't for sale.
+async function getAiCandidates(params = {}) {
+  const query = { ...buildQuery({ ...params, keywords: "", ids: "" }), page: 1, perPage: FETCH_PER_PAGE };
+  const { listings } = mapResponse(await sharetribe.listings.query(query));
+
+  return listings
+    .filter((listing) => listing.listingType !== WANTED_TYPE)
+    .filter(matchesFilters(localFilters(params)));
 }
 
 // Search-bar suggestions: matching listings (slimmed down), places, and a
@@ -359,4 +382,5 @@ module.exports = {
   getListing,
   getAutocomplete,
   getBrands,
+  getAiCandidates,
 };

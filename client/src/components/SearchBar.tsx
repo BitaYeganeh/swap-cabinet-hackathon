@@ -7,7 +7,7 @@ import {
   type ReactNode,
   type SubmitEvent,
 } from "react";
-import { LuMapPin, LuSearch, LuSparkles, LuX } from "react-icons/lu";
+import { LuLoaderCircle, LuMapPin, LuSearch, LuSparkles, LuX } from "react-icons/lu";
 import { PiCoatHanger } from "react-icons/pi";
 import { useNavigate } from "react-router";
 import {
@@ -17,7 +17,8 @@ import {
   type AutocompleteResponse,
 } from "../lib/api";
 import { formatMoney, WANTED_TYPE } from "../lib/format";
-import { browseUrl } from "../lib/search";
+import { cancelAiSearch, runAiSearch, useAiSearchPending } from "../lib/aiSearch";
+import { browseUrl, shouldUseAi } from "../lib/search";
 
 const DEBOUNCE_MS = 150;
 const EMPTY: AutocompleteResponse = { items: [], places: [] };
@@ -91,6 +92,11 @@ export default function SearchBar({
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState(-1);
   const { items, places, suggestion } = useAutocomplete(text, category);
+  const pending = useAiSearchPending();
+  const thinking = pending !== null;
+  // While an AI search runs (possibly started from an example chip), show its words.
+  const shown = pending ?? text;
+  const useAi = shouldUseAi(shown);
 
   const q = text.trim();
   const options: Option[] = [
@@ -107,6 +113,15 @@ export default function SearchBar({
     navigate(browseUrl(current, { keywords: keywords.trim() }));
   };
 
+  // Typed searches of two or more words go to the AI; the keyword search is the
+  // fallback when the AI is unavailable, slow or confused.
+  const searchTyped = () => {
+    const query = text.trim();
+    if (!shouldUseAi(query)) return search(query);
+    setOpen(false);
+    runAiSearch(query, navigate, browseUrl(current, { keywords: query }));
+  };
+
   const choose = (option: Option) => {
     setOpen(false);
     if (option.kind === "suggestion") {
@@ -116,13 +131,14 @@ export default function SearchBar({
     // No item pages: picking an item searches for it on the page.
     else if (option.kind === "item") search(option.item.title);
     else if (option.kind === "place") search(option.place.query);
-    else search(text);
+    else searchTyped();
   };
 
   const submit = (e: SubmitEvent) => {
     e.preventDefault();
+    if (thinking) return;
     if (expanded && active >= 0 && options[active]) choose(options[active]);
-    else search(text);
+    else searchTyped();
   };
 
   const onKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
@@ -239,12 +255,21 @@ export default function SearchBar({
       onBlur={(e) => {
         if (!e.currentTarget.contains(e.relatedTarget as Node | null)) setOpen(false);
       }}
+      aria-busy={thinking}
       className="relative order-3 flex h-12 flex-[1_1_100%] items-center rounded-full border-[1.5px] border-line bg-surface py-1 pr-1 pl-12 shadow-xs transition focus-within:border-accent focus-within:ring-4 focus-within:ring-accent-soft sm:order-none sm:h-[52px] sm:flex-[0_1_680px]"
     >
-      <LuSearch className="absolute left-[18px] size-5 text-ink-3" />
+      {useAi ? (
+        <LuSparkles className="absolute left-[18px] size-5 text-accent" aria-label="AI search" />
+      ) : (
+        <LuSearch className="absolute left-[18px] size-5 text-ink-3" />
+      )}
+      <span className="sr-only" aria-live="polite">
+        {thinking ? "Searching with AI…" : ""}
+      </span>
       <input
         type="search"
-        value={text}
+        value={shown}
+        readOnly={thinking}
         onChange={(e) => {
           setText(e.target.value);
           setOpen(true);
@@ -252,7 +277,7 @@ export default function SearchBar({
         }}
         onFocus={() => setOpen(true)}
         onKeyDown={onKeyDown}
-        placeholder="Search items, cities or postcodes…"
+        placeholder="Search, or describe what you need…"
         aria-label="Search listings"
         role="combobox"
         aria-autocomplete="list"
@@ -262,14 +287,16 @@ export default function SearchBar({
         autoComplete="off"
         className="h-full min-w-0 flex-1 bg-transparent outline-none placeholder:text-ink-3"
       />
-      {text && (
+      {shown && (
         <button
           type="button"
           onClick={() => {
+            if (thinking) return cancelAiSearch();
             setText("");
             setActive(-1);
           }}
-          aria-label="Clear search text"
+          aria-label={thinking ? "Cancel AI search" : "Clear search text"}
+          title={thinking ? "Cancel" : undefined}
           className="mr-1 grid size-8 place-items-center rounded-full bg-surface-2 text-ink-2"
         >
           <LuX className="size-4" />
@@ -277,13 +304,18 @@ export default function SearchBar({
       )}
       <button
         type="submit"
-        className="inline-flex h-[42px] w-[42px] shrink-0 items-center justify-center gap-2 rounded-full bg-accent font-semibold text-white transition hover:bg-accent-hover active:scale-[0.98] sm:w-auto sm:px-[22px]"
+        disabled={thinking}
+        className="inline-flex h-[42px] w-[42px] shrink-0 items-center justify-center gap-2 rounded-full bg-accent font-semibold text-white transition hover:bg-accent-hover active:scale-[0.98] disabled:cursor-wait disabled:opacity-90 sm:w-auto sm:px-[22px]"
       >
-        <LuSearch className="size-[18px]" />
-        <span className="hidden sm:inline">Search</span>
+        {thinking ? (
+          <LuLoaderCircle className="size-[18px] animate-spin" />
+        ) : (
+          <LuSearch className="size-[18px]" />
+        )}
+        <span className="hidden sm:inline">{thinking ? "Thinking…" : "Search"}</span>
       </button>
 
-      {expanded && (
+      {expanded && !thinking && (
         <ul
           id={listboxId}
           role="listbox"

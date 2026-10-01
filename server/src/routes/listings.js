@@ -32,7 +32,7 @@ router.get("/brands", async (req, res) => {
   }
 });
 
-// GET /api/listings?keywords=&category=&type=&gender=&size=&condition=&color=&brand=&minPrice=&maxPrice=&sort=&page=
+// GET /api/listings?keywords=&category=&type=&gender=&size=&condition=&color=&brand=&minPrice=&maxPrice=&sort=&page=&ids=
 router.get("/", async (req, res) => {
   try {
     const { listings, pagination, suggestion } = await getListings(req.query);
