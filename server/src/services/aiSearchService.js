@@ -11,6 +11,7 @@ const {
   TYPES,
 } = require("../config/catalog");
 const { getCandidates, getListings } = require("./listingService");
+const usage = require("./aiUsage");
 
 // Reads ANTHROPIC_API_KEY from the environment.
 const client = new Anthropic({ timeout: 20_000, maxRetries: 1 });
@@ -70,10 +71,30 @@ const normalize = (query) => query.trim().replace(/\s+/g, " ").toLowerCase();
 const cache = new Map();
 const CACHE_SIZE = 500;
 
+// Least-recently-used: a hit moves the entry to the back, the oldest is evicted.
 function remember(key, value) {
+  cache.delete(key);
   if (cache.size >= CACHE_SIZE) cache.delete(cache.keys().next().value);
   cache.set(key, value);
 }
+
+// Identical requests arriving at the same time share one Claude call.
+const inflight = new Map();
+
+function shared(key, work) {
+  if (!inflight.has(key)) {
+    inflight.set(key, work().finally(() => inflight.delete(key)));
+  }
+  return inflight.get(key);
+}
+
+function checkBudget() {
+  if (usage.overBudget()) {
+    throw new AiSearchError("AI search has reached today's budget", 503);
+  }
+}
+
+const formatCost = (usd) => `$${usd.toFixed(4)}`;
 
 class AiSearchError extends Error {
   constructor(message, status) {
@@ -130,8 +151,16 @@ async function relaxUntilFound(filters) {
 // interpretation doesn't depend on what is in stock.
 async function understand(query) {
   const key = normalize(query);
-  if (cache.has(key)) return { ...cache.get(key), cached: true };
+  if (cache.has(key)) {
+    const hit = cache.get(key);
+    remember(key, hit);
+    return { ...hit, cached: true };
+  }
+  return shared(`understand|${key}`, () => callUnderstand(query, key));
+}
 
+async function callUnderstand(query, key) {
+  checkBudget();
   const started = Date.now();
   const response = await client.beta.messages.parse({
     model: MODEL,
@@ -157,9 +186,10 @@ async function understand(query) {
     summary: intent.summary,
   };
 
+  const cost = usage.recordCall("understand", response.usage);
   console.log(
     `AI search "${query}" -> ${JSON.stringify(result.filters)}${intent.isNeed ? " (need)" : ""}`,
-    `[${response.usage.input_tokens} in / ${response.usage.output_tokens} out, ${Date.now() - started}ms]`
+    `[${response.usage.input_tokens} in / ${response.usage.output_tokens} out, ${Date.now() - started}ms, ~${formatCost(cost)}]`
   );
 
   remember(key, result);
@@ -204,7 +234,11 @@ async function pickForNeed(query, filters) {
   const key = `${normalize(query)}|${JSON.stringify(narrowing)}`;
   const hit = pickCache.get(key);
   if (hit && Date.now() - hit.at < PICK_TTL) return hit.picks;
+  return shared(`pick|${key}`, () => callPick(query, narrowing, key));
+}
 
+async function callPick(query, narrowing, key) {
+  checkBudget();
   const candidates = await getCandidates(narrowing);
   if (candidates.length === 0) return [];
 
@@ -237,10 +271,11 @@ async function pickForNeed(query, filters) {
     .slice(0, MAX_PICKS)
     .map(({ listing, reason }) => ({ id: candidates[listing - 1].id, reason: reason.trim() }));
 
-  const { usage } = response;
+  const u = response.usage;
+  const cost = usage.recordCall("pick", u);
   console.log(
     `AI picks "${query}" -> ${picks.length} of ${candidates.length}`,
-    `[${usage.input_tokens} in (+${usage.cache_read_input_tokens ?? 0} cached) / ${usage.output_tokens} out, ${Date.now() - started}ms]`
+    `[${u.input_tokens} in (+${u.cache_read_input_tokens ?? 0} cache read, +${u.cache_creation_input_tokens ?? 0} cache write) / ${u.output_tokens} out, ${Date.now() - started}ms, ~${formatCost(cost)}]`
   );
 
   pickCache.set(key, { picks, at: Date.now() });
@@ -248,10 +283,14 @@ async function pickForNeed(query, filters) {
 }
 
 async function interpretSearch(rawQuery) {
-  const query = String(rawQuery ?? "").trim().slice(0, MAX_QUERY_LENGTH);
+  const query = String(rawQuery ?? "")
+    .replace(/[\u0000-\u001f\u007f]/g, " ") // control characters
+    .trim()
+    .slice(0, MAX_QUERY_LENGTH);
   if (!query) throw new AiSearchError("Search text is required", 400);
 
   const result = await understand(query);
+  usage.recordSearch({ cached: result.cached });
 
   if (result.isNeed) {
     const picks = await pickForNeed(query, result.filters);
@@ -271,4 +310,4 @@ async function withRelaxing(result) {
   return { ...result, filters, dropped };
 }
 
-module.exports = { interpretSearch, AiSearchError };
+module.exports = { interpretSearch, AiSearchError, aiStats: usage.stats };

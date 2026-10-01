@@ -1,12 +1,13 @@
 const express = require("express");
 const Anthropic = require("@anthropic-ai/sdk").default;
-const { interpretSearch, AiSearchError } = require("../services/aiSearchService");
+const { interpretSearch, AiSearchError, aiStats } = require("../services/aiSearchService");
+const { aiRateLimit } = require("../middleware/aiRateLimit");
 
 const router = express.Router();
 
 // POST /api/search/ai  { "query": "shoes for kids" }
 // -> { success, filters: { category: "kids", type: "shoes" }, summary, isNeed }
-router.post("/ai", async (req, res) => {
+router.post("/ai", aiRateLimit, async (req, res) => {
   try {
     const result = await interpretSearch(req.body?.query);
     res.json({ success: true, ...result });
@@ -28,6 +29,11 @@ router.post("/ai", async (req, res) => {
     console.error("AI search failed:", error);
     res.status(500).json({ success: false, message: "AI search failed" });
   }
+});
+
+// GET /api/search/ai/stats -> today's AI searches, tokens and estimated spend
+router.get("/ai/stats", (req, res) => {
+  res.json({ success: true, ...aiStats() });
 });
 
 module.exports = router;
