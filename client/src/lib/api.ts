@@ -47,6 +47,7 @@ export type SearchParams = {
   category?: string;
   type?: string;
   gender?: string;
+  size?: string;
   condition?: string;
   color?: string;
   minPrice?: string;

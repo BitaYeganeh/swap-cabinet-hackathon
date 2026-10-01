@@ -23,6 +23,7 @@ import {
   subcategoryLabel,
   timeAgo,
 } from "../lib/format";
+import { SIZE_SYSTEMS, setSizeSystem, sizeInfo, useSizeSystem } from "../lib/sizes";
 import { BRAND, btn } from "../lib/ui";
 import type { listingLoader } from "../loaders";
 
@@ -73,6 +74,7 @@ function ListingDetail({ listing }: { listing: Listing }) {
 
   const image = listing.images[imageIndex];
   const wanted = isWanted(listing);
+  const size = sizeInfo(listing.size, listing.category);
   const { text, credit } = splitPhotoCredit(listing.description || "");
   // "default" means the user landed here directly, so there is no page to go back to.
   const canGoBack = location.key !== "default";
@@ -89,7 +91,8 @@ function ListingDetail({ listing }: { listing: Listing }) {
         .join(" · "),
     ],
     ["Condition", conditionLabel(listing.condition)],
-    ["Size", listing.size?.toUpperCase()],
+    // Sizes with known EU/UK/US equivalents get their own block below.
+    ["Size", size && !size.conversion ? size.label : undefined],
     ["Brand", listing.brand],
     ["Colour", listing.color && listing.color.charAt(0).toUpperCase() + listing.color.slice(1)],
     ["Material", listing.material],
@@ -218,6 +221,8 @@ function ListingDetail({ listing }: { listing: Listing }) {
             </dl>
           )}
 
+          {size?.conversion && <SizeBlock kind={size.kind} label={size.label} conversion={size.conversion} />}
+
           <div className="flex flex-wrap items-center gap-3">
             <div className="grid size-11 shrink-0 place-items-center rounded-full bg-ink font-display text-xl text-gold">
               {(listing.sellerName || "?").charAt(0)}
@@ -279,6 +284,50 @@ function ListingDetail({ listing }: { listing: Listing }) {
             </p>
           )}
         </div>
+      </div>
+    </div>
+  );
+}
+
+function SizeBlock({
+  kind,
+  label,
+  conversion,
+}: {
+  kind: "letter" | "shoe" | "kids";
+  label: string;
+  conversion: Record<(typeof SIZE_SYSTEMS)[number], string>;
+}) {
+  const system = useSizeSystem();
+  const title = kind === "shoe" ? "Shoe size" : `Size · ${label}`;
+
+  return (
+    <div>
+      <div className="mb-2 flex items-baseline justify-between gap-2">
+        <h2 className="text-xs font-semibold tracking-wide text-ink-3 uppercase">{title}</h2>
+        <span className="text-xs text-ink-3">Approximate conversion</span>
+      </div>
+      <div className="grid grid-cols-3 gap-2">
+        {SIZE_SYSTEMS.map((s) => (
+          // Picking a system here also switches the sizes shown on cards.
+          <button
+            type="button"
+            key={s}
+            onClick={() => setSizeSystem(s)}
+            aria-pressed={s === system}
+            className={`rounded-xl border px-3 py-2 text-center transition ${
+              s === system ? "border-ink bg-ink text-white" : "border-line bg-surface hover:border-ink-3"
+            }`}
+          >
+            <div className={`text-[11px] font-semibold tracking-wide ${s === system ? "text-white/75" : "text-ink-3"}`}>
+              {s}
+            </div>
+            <div className="font-semibold leading-tight">
+              {conversion[s]}
+              {kind === "kids" && s === "EU" && <span className="text-xs font-medium"> cm</span>}
+            </div>
+          </button>
+        ))}
       </div>
     </div>
   );

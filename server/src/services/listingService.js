@@ -26,7 +26,15 @@ const GENDERS = ["boys", "girls"];
 // match in one go (Sharetribe caps perPage at 100) and paginate locally.
 const MAX_PER_PAGE = 100;
 
-function buildQuery({ keywords, category, type, condition, color, minPrice, maxPrice, sort, page }) {
+// Size filter values: "m" (clothing), "shoe-38" (EU shoe size) or "kids-5y" (kids' age).
+function applySize(query, size) {
+  if (!size) return;
+  if (size.startsWith("shoe-")) query.pub_shoeSize = size.slice(5);
+  else if (size.startsWith("kids-")) query.pub_kidsSize = size.slice(5);
+  else query.pub_size = size;
+}
+
+function buildQuery({ keywords, category, type, size, condition, color, minPrice, maxPrice, sort, page }) {
   const query = {
     perPage: PER_PAGE,
     page: Math.max(1, parseInt(page, 10) || 1),
@@ -36,6 +44,7 @@ function buildQuery({ keywords, category, type, condition, color, minPrice, maxP
   if (keywords && keywords.trim()) query.keywords = keywords.trim();
   if (category) query.pub_categoryLevel1 = category;
   if (category && TYPES.includes(type)) query.pub_categoryLevel2 = `${category}-${type}`;
+  applySize(query, size);
   if (condition) query.pub_condition = condition;
   if (color) query.pub_color = color;
 

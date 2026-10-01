@@ -12,7 +12,7 @@ function logSharetribeError(error) {
   );
 }
 
-// GET /api/listings?keywords=&category=&type=&gender=&condition=&color=&minPrice=&maxPrice=&sort=&page=
+// GET /api/listings?keywords=&category=&type=&gender=&size=&condition=&color=&minPrice=&maxPrice=&sort=&page=
 router.get("/", async (req, res) => {
   try {
     const { listings, pagination } = await getListings(req.query);

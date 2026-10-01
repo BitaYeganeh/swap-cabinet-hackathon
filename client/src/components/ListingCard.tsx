@@ -12,6 +12,7 @@ import {
   isWanted,
   subcategoryLabel,
 } from "../lib/format";
+import { formatSize, useSizeSystem } from "../lib/sizes";
 
 const chip = "rounded-md bg-surface-2 px-1.5 py-px text-[11px] font-medium text-ink-2 sm:text-xs";
 
@@ -19,6 +20,7 @@ export default function ListingCard({ listing }: { listing: Listing }) {
   const favorite = !!useFavorites()[listing.id];
   const image = listing.images[0];
   const wanted = isWanted(listing);
+  const size = formatSize(listing.size, listing.category, useSizeSystem());
 
   return (
     <article className="group relative flex min-w-0 flex-col overflow-hidden rounded-xl border border-line bg-surface shadow-xs transition duration-200 hover:-translate-y-0.5 hover:shadow-card">
@@ -65,7 +67,7 @@ export default function ListingCard({ listing }: { listing: Listing }) {
             {listing.condition && listing.condition !== "like-new" && (
               <span className={chip}>{conditionLabel(listing.condition)}</span>
             )}
-            {listing.size && <span className={chip}>Size {listing.size.toUpperCase()}</span>}
+            {size && <span className={chip}>{size}</span>}
             {listing.brand && <span className={chip}>{listing.brand}</span>}
           </div>
 

@@ -8,6 +8,7 @@ import ListingCard, { ListingGrid } from "../components/ListingCard";
 import Pagination from "../components/Pagination";
 import type { SearchParams } from "../lib/api";
 import { COLORS, CONDITIONS, SORTS, TYPES, categoryLabel, genderLabel, labelFor } from "../lib/format";
+import { sizeFilterLabel, useSizeSystem } from "../lib/sizes";
 import { QUERY_KEYS, browseUrl, isBrowsePath, readSearch } from "../lib/search";
 import { BRAND, btn, countBadge } from "../lib/ui";
 import type { listingsLoader } from "../loaders";
@@ -28,6 +29,7 @@ export default function HomePage() {
   const navigation = useNavigation();
   const [filtersOpen, setFiltersOpen] = useState(false);
   const resultsRef = useRef<HTMLDivElement>(null);
+  const sizeSystem = useSizeSystem();
 
   const params: SearchParams = { ...readSearch(searchParams), category };
   const loading = navigation.state === "loading" && isBrowsePath(navigation.location.pathname);
@@ -50,6 +52,7 @@ export default function HomePage() {
     category && { key: "category", label: categoryLabel(category) },
     params.gender && { key: "gender", label: genderLabel(params.gender) },
     params.type && { key: "type", label: labelFor(TYPES, params.type) },
+    params.size && { key: "size", label: `Size ${sizeFilterLabel(params.size, category, sizeSystem)}` },
     params.condition && { key: "condition", label: labelFor(CONDITIONS, params.condition) },
     params.color && { key: "color", label: labelFor(COLORS, params.color) },
     (params.minPrice || params.maxPrice) && {

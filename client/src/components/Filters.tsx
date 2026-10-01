@@ -1,6 +1,18 @@
 import { useState, type SubmitEvent } from "react";
 import type { SearchParams } from "../lib/api";
 import { CATEGORIES, COLORS, CONDITIONS, GENDERS, TYPES } from "../lib/format";
+import {
+  ADULT_SHOE_SIZES,
+  KIDS_AGES,
+  KIDS_SHOE_SIZES,
+  LETTER_SIZES,
+  SIZE_SYSTEMS,
+  formatSize,
+  setSizeSystem,
+  sizeInfo,
+  useSizeSystem,
+  type SizeSystem,
+} from "../lib/sizes";
 import { btn } from "../lib/ui";
 
 type Props = {
@@ -88,6 +100,8 @@ export default function Filters({ params, onChange, onClear }: Props) {
         </section>
       )}
 
+      <SizeFilter params={params} onChange={onChange} />
+
       <section className="border-b border-line py-[18px]">
         <h3 className={groupTitle}>Condition</h3>
         <div className="flex flex-wrap gap-2">
@@ -146,6 +160,115 @@ export default function Filters({ params, onChange, onClear }: Props) {
           })}
         </div>
       </section>
+    </div>
+  );
+}
+
+const sizeSelect =
+  "h-10 w-full cursor-pointer rounded-lg border border-line bg-surface px-3 text-sm outline-none focus:border-accent";
+
+function SizeFilter({ params, onChange }: Pick<Props, "params" | "onChange">) {
+  const system = useSizeSystem();
+  const { category, type, size = "" } = params;
+  const kids = category === "kids";
+
+  const showClothing = !type || type === "tops" || type === "bottoms";
+  const showShoes = !type || type === "shoes";
+  if (!showClothing && !showShoes) return null;
+
+  const shoeSizes = kids ? KIDS_SHOE_SIZES : ADULT_SHOE_SIZES;
+  const pick = (value: string) => onChange({ size: size === value ? "" : value });
+
+  return (
+    <section className="border-b border-line py-[18px]">
+      <div className="mb-3 flex items-center justify-between gap-2">
+        <h3 className={`${groupTitle} mb-0`}>Size</h3>
+        <SizeSystemToggle value={system} />
+      </div>
+
+      {showClothing && !kids && (
+        <div className="grid grid-cols-3 gap-2">
+          {LETTER_SIZES.map((letter) => {
+            const active = size === letter;
+            const converted = sizeInfo(letter, category)?.conversion?.[system];
+            return (
+              <button
+                type="button"
+                key={letter}
+                aria-pressed={active}
+                onClick={() => pick(letter)}
+                className={`flex flex-col items-center rounded-lg border py-1.5 transition ${
+                  active ? "border-ink bg-ink text-white" : "border-line bg-surface hover:border-ink-3"
+                }`}
+              >
+                <span className="text-sm font-semibold">{letter.toUpperCase()}</span>
+                {converted && (
+                  <span className={`text-[11px] ${active ? "text-white/75" : "text-ink-3"}`}>
+                    {system} {converted}
+                  </span>
+                )}
+              </button>
+            );
+          })}
+        </div>
+      )}
+
+      {showClothing && kids && (
+        <label className="block">
+          <span className="mb-1.5 block text-xs font-medium text-ink-2">Clothing (age)</span>
+          <select
+            value={size.startsWith("kids-") ? size : ""}
+            onChange={(e) => onChange({ size: e.target.value })}
+            className={sizeSelect}
+          >
+            <option value="">Any age</option>
+            {KIDS_AGES.map((age) => (
+              <option key={age.value} value={`kids-${age.value}`}>
+                {age.label} · {formatSize(age.value, "kids", system)}
+              </option>
+            ))}
+          </select>
+        </label>
+      )}
+
+      {showShoes && (
+        <label className={`block ${showClothing ? "mt-3" : ""}`}>
+          <span className="mb-1.5 block text-xs font-medium text-ink-2">Shoes</span>
+          <select
+            value={size.startsWith("shoe-") ? size : ""}
+            onChange={(e) => onChange({ size: e.target.value })}
+            className={sizeSelect}
+          >
+            <option value="">Any shoe size</option>
+            {shoeSizes.map((eu) => (
+              <option key={eu} value={`shoe-${eu}`}>
+                {/* Adult shoe conversions differ for men and women, so stay EU-only on "All". */}
+                {system === "EU" || !category ? `EU ${eu}` : `${formatSize(eu, category, system)} (EU ${eu})`}
+              </option>
+            ))}
+          </select>
+        </label>
+      )}
+    </section>
+  );
+}
+
+export function SizeSystemToggle({ value }: { value: SizeSystem }) {
+  return (
+    <div className="inline-flex rounded-full border border-line bg-surface p-0.5 text-xs" role="group" aria-label="Size system">
+      {SIZE_SYSTEMS.map((s) => (
+        <button
+          type="button"
+          key={s}
+          aria-pressed={value === s}
+          onClick={() => setSizeSystem(s)}
+          className={`rounded-full px-2.5 py-1 font-semibold transition ${
+            value === s ? "bg-ink text-white" : "text-ink-2 hover:text-ink"
+          }`}
+        >
+          {s}
+        </button>
+      ))}
     </div>
   );
 }
