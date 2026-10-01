@@ -29,10 +29,6 @@ const TYPES = ["tops", "bottoms", "shoes", "accessories", "bundles"];
 
 const GENDERS = ["boys", "girls"];
 
-// The gender filter is applied here rather than by Sharetribe, so fetch every
-// match in one go (Sharetribe caps perPage at 100) and paginate locally.
-const MAX_PER_PAGE = 100;
-
 // Size filter values: "m" (clothing), "shoe-38" (EU shoe size) or "kids-5y" (kids' age).
 function applySize(query, size) {
   if (!size) return;
@@ -158,6 +154,94 @@ function toListing(listing, includedById) {
   };
 }
 
+const normalizeBrand = (brand) => (brand || "").trim().toLowerCase();
+
+// Brand isn't in the marketplace search schema (Sharetribe ignores pub_brand)
+// and kids gender is inferred, so both are applied here after fetching.
+function localFilters(params) {
+  return {
+    brand: normalizeBrand(params.brand),
+    gender: params.category === "kids" && GENDERS.includes(params.gender) ? params.gender : null,
+  };
+}
+
+const matchesFilters = ({ brand, gender }) => (listing) =>
+  (!brand || normalizeBrand(listing.brand) === brand) &&
+  (!gender || listing.gender === gender || listing.gender === "unisex");
+
+// Fetch every page of a query (100 per page, the Marketplace API maximum).
+async function queryAll(query) {
+  const data = [];
+  const included = [];
+  let page = 1;
+  let totalPages = 1;
+
+  do {
+    const response = await sharetribe.listings.query({ ...query, perPage: FETCH_PER_PAGE, page });
+    data.push(...response.data.data);
+    included.push(...(response.data.included || []));
+    totalPages = response.data.meta.totalPages;
+    page++;
+  } while (page <= totalPages);
+
+  return { data, included };
+}
+
+// For brand or gender filters, fetch everything matching the other filters
+// (already sorted) and filter + paginate locally.
+async function getListingsFiltered(query, { brand, gender }) {
+  const { perPage, page, ...rest } = query;
+  const { data, included } = await queryAll(rest);
+
+  const includedById = Object.fromEntries(included.map((item) => [item.id.uuid, item]));
+  const matches = data
+    .map((listing) => toListing(listing, includedById))
+    .filter(matchesFilters({ brand, gender }));
+
+  const start = (page - 1) * perPage;
+
+  return {
+    listings: matches.slice(start, start + perPage),
+    pagination: {
+      page,
+      totalPages: Math.ceil(matches.length / perPage),
+      totalItems: matches.length,
+      perPage,
+    },
+  };
+}
+
+const BRANDS_CACHE_MS = 5 * 60 * 1000;
+let brandsCache = null; // { promise, expiresAt }
+
+// Distinct brands across all listings, most listings first: [{ name, count }]
+async function fetchBrands() {
+  const { data } = await queryAll({ "fields.listing": ["publicData"] });
+  const brands = new Map();
+
+  for (const listing of data) {
+    const name = listing.attributes.publicData?.brand?.trim();
+    if (!name) continue;
+    const key = name.toLowerCase();
+    const entry = brands.get(key) || { name, count: 0 };
+    entry.count++;
+    brands.set(key, entry);
+  }
+
+  return [...brands.values()].sort((a, b) => b.count - a.count || a.name.localeCompare(b.name));
+}
+
+function getBrands() {
+  if (!brandsCache || brandsCache.expiresAt < Date.now()) {
+    const promise = fetchBrands().catch((error) => {
+      brandsCache = null; // retry on the next request instead of caching the failure
+      throw error;
+    });
+    brandsCache = { promise, expiresAt: Date.now() + BRANDS_CACHE_MS };
+  }
+  return brandsCache.promise;
+}
+
 function mapResponse(response) {
   const { data, included = [], meta } = response.data;
   const includedById = Object.fromEntries(included.map((item) => [item.id.uuid, item]));
@@ -200,17 +284,8 @@ const IN_MEMORY_SORTS = {
   "price-desc": (a, b) => priceOf(b) - priceOf(a),
 };
 
-// Kids gender filter value, or null when it doesn't apply.
-function genderFilter(params) {
-  return params.category === "kids" && GENDERS.includes(params.gender) ? params.gender : null;
-}
-
-const matchesGender = (gender) => (listing) => listing.gender === gender || listing.gender === "unisex";
-
 async function searchByKeywords(params) {
-  const gender = genderFilter(params);
-  let candidates = await getCandidates(params);
-  if (gender) candidates = candidates.filter(matchesGender(gender));
+  const candidates = (await getCandidates(params)).filter(matchesFilters(localFilters(params)));
   const keywords = params.keywords.trim();
 
   let matches = searchListings(candidates, keywords);
@@ -235,8 +310,8 @@ async function searchByKeywords(params) {
 async function getListings(params = {}) {
   if (params.keywords && params.keywords.trim()) return searchByKeywords(params);
 
-  const gender = genderFilter(params);
-  if (gender) return getListingsByGender(buildQuery(params), gender);
+  const filters = localFilters(params);
+  if (filters.brand || filters.gender) return getListingsFiltered(buildQuery(params), filters);
 
   const { listings, meta } = mapResponse(await sharetribe.listings.query(buildQuery(params)));
 
@@ -247,24 +322,6 @@ async function getListings(params = {}) {
       totalPages: meta.totalPages,
       totalItems: meta.totalItems,
       perPage: meta.perPage,
-    },
-  };
-}
-
-async function getListingsByGender(query, gender) {
-  const { page } = query;
-  const response = await sharetribe.listings.query({ ...query, page: 1, perPage: MAX_PER_PAGE });
-  const matches = mapResponse(response).listings.filter(matchesGender(gender));
-
-  const start = (page - 1) * PER_PAGE;
-
-  return {
-    listings: matches.slice(start, start + PER_PAGE),
-    pagination: {
-      page,
-      totalPages: Math.ceil(matches.length / PER_PAGE),
-      totalItems: matches.length,
-      perPage: PER_PAGE,
     },
   };
 }
@@ -298,4 +355,5 @@ module.exports = {
   getListings,
   getListing,
   getAutocomplete,
+  getBrands,
 };

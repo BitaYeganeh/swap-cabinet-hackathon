@@ -1,7 +1,7 @@
 import type { SearchParams } from "./api";
 
 // Filters kept in the query string. Category lives in the path: /category/:category
-export const QUERY_KEYS = ["keywords", "type", "gender", "size", "condition", "color", "minPrice", "maxPrice", "sort"] as const;
+export const QUERY_KEYS = ["keywords", "type", "gender", "size", "condition", "color", "brand", "minPrice", "maxPrice", "sort"] as const;
 
 export function readSearch(searchParams: URLSearchParams): SearchParams {
   const params: SearchParams = {};
