@@ -1,5 +1,5 @@
 const express = require("express");
-const { getListings, getListing } = require("../services/listingService");
+const { getListings, getListing, getAutocomplete } = require("../services/listingService");
 
 const router = express.Router();
 
@@ -15,12 +15,13 @@ function logSharetribeError(error) {
 // GET /api/listings?keywords=&category=&type=&gender=&size=&condition=&color=&minPrice=&maxPrice=&sort=&page=
 router.get("/", async (req, res) => {
   try {
-    const { listings, pagination } = await getListings(req.query);
+    const { listings, pagination, suggestion } = await getListings(req.query);
 
     res.json({
       success: true,
       listings,
       pagination,
+      suggestion: suggestion ?? null,
     });
   } catch (error) {
     logSharetribeError(error);
@@ -32,6 +33,18 @@ router.get("/", async (req, res) => {
           ? "Invalid search filters"
           : "Failed to fetch listings",
     });
+  }
+});
+
+// GET /api/listings/autocomplete?q=&category=
+// Declared before /:id so "autocomplete" isn't taken for a listing id.
+router.get("/autocomplete", async (req, res) => {
+  try {
+    const { items, places } = await getAutocomplete(req.query);
+    res.json({ success: true, items, places });
+  } catch (error) {
+    logSharetribeError(error);
+    res.status(500).json({ success: false, message: "Failed to fetch suggestions" });
   }
 });
 
