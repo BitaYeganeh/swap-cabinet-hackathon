@@ -4,8 +4,10 @@ import { isLanding, readSearch } from "./lib/search";
 
 // "/" — search results for the current query string (nothing to fetch for the hero).
 export async function listingsLoader({ request }: LoaderFunctionArgs) {
-  const search = readSearch(new URL(request.url).searchParams);
-  if (isLanding(search)) {
+  const searchParams = new URL(request.url).searchParams;
+  const search = readSearch(searchParams);
+  // An AI search ("q") always shows results, even if the AI chose no filters.
+  if (isLanding(search) && !searchParams.get("q")) {
     return {
       success: true,
       listings: [],

@@ -1,6 +1,6 @@
 import { useRef } from "react";
-import { LuSearch, LuX } from "react-icons/lu";
-import { useLoaderData, useNavigate, useNavigation, useSearchParams } from "react-router";
+import { LuSearch, LuSparkles, LuX } from "react-icons/lu";
+import { Link, useLoaderData, useNavigate, useNavigation, useSearchParams } from "react-router";
 import EmptyState from "../components/EmptyState";
 import FilterBar from "../components/FilterBar";
 import Hero from "../components/Hero";
@@ -8,6 +8,7 @@ import ListingCard, { ListingGrid } from "../components/ListingCard";
 import Pagination from "../components/Pagination";
 import type { SearchParams } from "../lib/api";
 import { COLORS, CONDITIONS, SORTS, TYPES, categoryLabel, genderLabel, labelFor } from "../lib/format";
+import { readPickReasons } from "../lib/aiPicks";
 import { sizeFilterLabel, useSizeSystem } from "../lib/sizes";
 import { browseUrl, isLanding, readSearch } from "../lib/search";
 import { BRAND, btn } from "../lib/ui";
@@ -33,6 +34,12 @@ export default function HomePage() {
 
   const params: SearchParams = readSearch(searchParams);
   const { category } = params;
+  const aiQuery = searchParams.get("q");
+  const aiSummary = searchParams.get("ai");
+  const relaxed = searchParams.get("relaxed")?.split(",").filter(Boolean) ?? [];
+  const picked = !!params.ids;
+  const noPicks = searchParams.get("nopicks") === "1";
+  const reasons = picked ? readPickReasons(aiQuery) : {};
   const loading = navigation.state === "loading" && navigation.location.pathname === "/";
 
   const update = (changes: Partial<SearchParams>) =>
@@ -51,7 +58,11 @@ export default function HomePage() {
     category && { key: "category", label: categoryLabel(category) },
     params.gender && { key: "gender", label: genderLabel(params.gender) },
     params.type && { key: "type", label: labelFor(TYPES, params.type) },
-    params.size && { key: "size", label: `Size ${sizeFilterLabel(params.size, category, sizeSystem)}` },
+    params.size && {
+      key: "size",
+      // Shoe labels already read "Shoe EU 38".
+      label: `${params.size.startsWith("shoe-") ? "" : "Size "}${sizeFilterLabel(params.size, category, sizeSystem)}`,
+    },
     params.condition && { key: "condition", label: labelFor(CONDITIONS, params.condition) },
     params.color && { key: "color", label: labelFor(COLORS, params.color) },
     params.brand && { key: "brand", label: params.brand },
@@ -67,7 +78,9 @@ export default function HomePage() {
   const sectionHeading = CATEGORY_HEADINGS[(category === "kids" && params.gender) || category || ""];
   const typeHeading = params.type && labelFor(TYPES, params.type);
 
-  const heading = params.keywords
+  const heading = aiSummary
+    ? aiSummary
+    : params.keywords
     ? `Results for “${params.keywords}”`
     : sectionHeading
       ? typeHeading
@@ -75,7 +88,7 @@ export default function HomePage() {
         : sectionHeading
       : "All items";
 
-  if (isLanding(params)) {
+  if (isLanding(params) && !aiQuery) {
     return (
       <>
         <title>{`${BRAND} · Pre-loved fashion`}</title>
@@ -110,6 +123,10 @@ export default function HomePage() {
             )}
           </div>
 
+          {aiQuery && aiSummary && (
+            <AiBanner query={aiQuery} relaxed={relaxed} picked={picked} noPicks={noPicks} />
+          )}
+
           <FilterBar params={params} brands={brands} onChange={update}>
             <label className="flex h-10 shrink-0 items-center gap-2 rounded-full border border-line bg-surface pr-1.5 pl-4 text-sm text-ink-2">
               <span className="whitespace-nowrap max-sm:hidden">Sort by</span>
@@ -135,9 +152,9 @@ export default function HomePage() {
                   type="button"
                   key={pill.key}
                   onClick={() => removePill(pill.key)}
-                  className="inline-flex items-center gap-1.5 rounded-full bg-accent-soft py-1.5 pr-2.5 pl-3.5 text-sm font-medium text-accent hover:bg-[#d3e6dc]"
+                  className="inline-flex max-w-full items-center gap-1.5 rounded-full bg-accent-soft py-1.5 pr-2.5 pl-3.5 text-sm font-medium text-accent hover:bg-[#d3e6dc]"
                 >
-                  {pill.label}
+                  <span className="truncate">{pill.label}</span>
                   <LuX className="size-3.5" />
                 </button>
               ))}
@@ -162,7 +179,7 @@ export default function HomePage() {
           ) : (
             <ListingGrid dimmed={loading}>
               {listings.map((listing) => (
-                <ListingCard key={listing.id} listing={listing} />
+                <ListingCard key={listing.id} listing={listing} reason={reasons[listing.id]} />
               ))}
             </ListingGrid>
           )}
@@ -171,5 +188,63 @@ export default function HomePage() {
         </section>
       </div>
     </>
+  );
+}
+
+const RELAXED_LABELS: Record<string, string> = {
+  color: "colour",
+  condition: "condition",
+  size: "size",
+  minPrice: "minimum price",
+  maxPrice: "maximum price",
+  keywords: "some search words",
+  gender: "boys/girls",
+  type: "item type",
+};
+
+function AiBanner({
+  query,
+  relaxed,
+  picked,
+  noPicks,
+}: {
+  query: string;
+  relaxed: string[];
+  picked: boolean;
+  noPicks: boolean;
+}) {
+  return (
+    <div className="mb-4 flex gap-3 rounded-2xl border border-accent/20 bg-accent-soft/60 px-4 py-3 text-sm">
+      <LuSparkles className="mt-0.5 size-[18px] shrink-0 text-accent" />
+      <div className="min-w-0 flex-1">
+        {picked ? (
+          <p className="text-ink">
+            The AI picked these for <strong className="font-semibold break-words">“{query}”</strong>, best
+            match first. Each item says why it fits.
+          </p>
+        ) : (
+          <p className="text-ink">
+            AI search for <strong className="font-semibold break-words">“{query}”</strong>. Adjust the
+            filters below to refine it.
+          </p>
+        )}
+        {noPicks && (
+          <p className="mt-1 text-ink-2">
+            Nothing in the shop is a clear fit yet, so these are the closest matches by keyword.
+          </p>
+        )}
+        {relaxed.length > 0 && (
+          <p className="mt-1 text-ink-2">
+            No exact matches, so we left out: {relaxed.map((key) => RELAXED_LABELS[key] ?? key).join(", ")}.
+          </p>
+        )}
+        <Link
+          to={`/?keywords=${encodeURIComponent(query)}`}
+          className="mt-1 inline-block font-semibold text-accent no-underline hover:underline"
+        >
+          Search for the exact words instead
+        </Link>
+      </div>
+    </div>
   );
 }
