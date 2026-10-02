@@ -59,4 +59,19 @@ describe('ListingCard', () => {
     const without = render(<ListingCard listing={listing} intl={fakeIntl} />);
     expect(without.container.querySelector('[title="Why the AI picked this"]')).toBeNull();
   });
+
+  it('shows a Wanted badge instead of the price for buyer requests', () => {
+    const wanted = createListing(
+      'listing1',
+      { title: 'Looking for black boots', publicData: { listingType: 'in-search-of-clothing' } },
+      { author: createUser('user1') }
+    );
+    const w = render(<ListingCard listing={wanted} intl={fakeIntl} />);
+    expect(w.getAllByText('Wanted')).toHaveLength(2);
+    w.unmount();
+
+    const normal = createListing('listing2', {}, { author: createUser('user1') });
+    const n = render(<ListingCard listing={normal} intl={fakeIntl} />);
+    expect(n.queryByText('Wanted')).toBeNull();
+  });
 });

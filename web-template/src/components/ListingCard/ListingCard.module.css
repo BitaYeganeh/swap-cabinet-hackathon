@@ -2,6 +2,7 @@
 
 .root {
   /* Layout */
+  position: relative;
   display: flex;
   flex-direction: column;
 
@@ -148,4 +149,19 @@
   height: 12px;
   margin-top: 2px;
   fill: currentColor;
+}
+
+.wantedBadge {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  padding: 2px 8px;
+  border-radius: var(--borderRadiusMedium);
+  background-color: var(--colorAttention);
+  color: var(--colorGrey900);
+  font-size: 11px;
+  font-weight: var(--fontWeightBold);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  pointer-events: none;
 }

@@ -21,6 +21,9 @@ import { getListingCardTranslations } from './ListingCard.helpers';
 
 import css from './ListingCard.module.css';
 
+// Buyer requests ("Looking for ...") are listings of this type.
+const WANTED_TYPE = 'in-search-of-clothing';
+
 const LazyImage = lazyLoadWithDimensions(ResponsiveImage, { loadAfterInitialRendering: 3000 });
 
 /**
@@ -157,6 +160,8 @@ export const ListingCard = props => {
       }
     : null;
 
+  const isWanted = listingType === WANTED_TYPE;
+
   return (
     <NamedLink
       className={classes}
@@ -186,8 +191,13 @@ export const ListingCard = props => {
           setActivePropsMaybe={setActivePropsMaybe}
         />
       )}
+      {isWanted ? <span className={css.wantedBadge}>Wanted</span> : null}
       <div className={css.info}>
-        {showPrice ? (
+        {isWanted ? (
+          <div className={css.price}>
+            <span className={css.priceValue}>Wanted</span>
+          </div>
+        ) : showPrice ? (
           <div className={css.price} title={priceTooltip}>
             {priceMessage}
           </div>
