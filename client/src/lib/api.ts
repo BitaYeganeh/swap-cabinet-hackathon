@@ -186,7 +186,10 @@ export type Brand = {
 };
 
 /** Matching items per filter option, each field counted with the other filters applied. */
-export type Facets = Record<"color" | "condition" | "brand", Record<string, number>>;
+export type Facets = Record<"color" | "condition" | "brand", Record<string, number>> & {
+  /** Cheapest and dearest item in cents, ignoring the price filter; null when nothing matches. */
+  price: { min: number; max: number } | null;
+};
 
 export async function getFacets(params: SearchParams, signal?: AbortSignal): Promise<Facets> {
   const query = new URLSearchParams();

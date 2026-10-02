@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type ReactNode, type SubmitEvent } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 import { LuCheck, LuChevronDown, LuSearch } from "react-icons/lu";
 import { getFacets, type Brand, type Facets, type SearchParams } from "../lib/api";
@@ -109,7 +109,7 @@ export default function FilterBar({ params, brands, onChange, children }: Props)
   const [open, setOpen] = useState<{ key: FilterKey; left: number | null } | null>(null);
 
   const close = () => setOpen(null);
-  const facets = useFacets(params, open !== null && ["color", "condition", "brand"].includes(open.key));
+  const facets = useFacets(params, open !== null && ["color", "condition", "brand", "price"].includes(open.key));
 
   useEffect(() => {
     if (!open) return;
@@ -252,7 +252,10 @@ export default function FilterBar({ params, brands, onChange, children }: Props)
           {current.key === "size" && <SizeOptions params={params} system={system} onChange={apply} />}
           {current.key === "brand" && <BrandOptions params={params} brands={brands} counts={facets?.brand} onChange={apply} />}
           {current.key === "price" && (
-            <PriceFilter
+            <PriceSlider
+              key={facets ? "ready" : "loading"}
+              range={facets?.price}
+              loading={!facets}
               minPrice={params.minPrice ?? ""}
               maxPrice={params.maxPrice ?? ""}
               onApply={(minPrice, maxPrice) => apply({ minPrice, maxPrice })}
@@ -461,53 +464,112 @@ function SizeSystemToggle({ value }: { value: SizeSystem }) {
   );
 }
 
-const priceInput =
-  "h-10 w-full min-w-0 rounded-lg border border-line bg-surface px-3 outline-none focus:border-accent";
+const PRICE_STEP = 1; // euros
 
-function PriceFilter({
+// Two-handle price slider over the search's own price range (whole euros).
+// Dragging only moves the handles; "Show items" applies the range.
+function PriceSlider({
+  range,
+  loading,
   minPrice,
   maxPrice,
   onApply,
 }: {
+  range: { min: number; max: number } | null | undefined;
+  loading: boolean;
   minPrice: string;
   maxPrice: string;
   onApply: (min: string, max: string) => void;
 }) {
-  const [min, setMin] = useState(minPrice);
-  const [max, setMax] = useState(maxPrice);
+  const floor = range ? Math.floor(range.min / 100) : 0;
+  const ceil = range ? Math.max(floor + 1, Math.ceil(range.max / 100)) : 100;
+  const clamp = (n: number) => Math.min(ceil, Math.max(floor, n));
 
-  const submit = (e: SubmitEvent) => {
-    e.preventDefault();
-    onApply(min, max);
-  };
+  const [low, setLow] = useState(() => clamp(minPrice ? Number(minPrice) : floor));
+  const [high, setHigh] = useState(() => clamp(maxPrice ? Number(maxPrice) : ceil));
+
+  if (loading) return <div className="shimmer h-24 rounded-lg" />;
+  if (!range) return <p className="text-sm text-ink-3">No priced items in this search.</p>;
+
+  const pct = (n: number) => ((n - floor) / (ceil - floor)) * 100;
+  const full = low === floor && high === ceil;
+  // Leaving a handle at the end of the range means "no limit" on that side.
+  const apply = () => onApply(low === floor ? "" : String(low), high === ceil ? "" : String(high));
+
+  const thumb =
+    "pointer-events-none absolute inset-0 h-full w-full appearance-none bg-transparent outline-none " +
+    "[&::-webkit-slider-thumb]:pointer-events-auto [&::-webkit-slider-thumb]:size-5 [&::-webkit-slider-thumb]:cursor-grab " +
+    "[&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:border-2 " +
+    "[&::-webkit-slider-thumb]:border-accent [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:shadow-card " +
+    "active:[&::-webkit-slider-thumb]:cursor-grabbing focus-visible:[&::-webkit-slider-thumb]:ring-4 focus-visible:[&::-webkit-slider-thumb]:ring-accent-soft " +
+    "[&::-moz-range-thumb]:pointer-events-auto [&::-moz-range-thumb]:size-5 [&::-moz-range-thumb]:cursor-grab " +
+    "[&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:border-2 [&::-moz-range-thumb]:border-accent " +
+    "[&::-moz-range-thumb]:bg-white [&::-moz-range-thumb]:shadow-card [&::-moz-range-track]:bg-transparent";
 
   return (
-    <form className="flex items-center gap-2" onSubmit={submit}>
-      <input
-        type="number"
-        min={0}
-        inputMode="numeric"
-        placeholder="Min"
-        autoFocus
-        value={min}
-        onChange={(e) => setMin(e.target.value)}
-        aria-label="Minimum price"
-        className={priceInput}
-      />
-      <span className="text-ink-3">–</span>
-      <input
-        type="number"
-        min={0}
-        inputMode="numeric"
-        placeholder="Max"
-        value={max}
-        onChange={(e) => setMax(e.target.value)}
-        aria-label="Maximum price"
-        className={priceInput}
-      />
-      <button type="submit" className={`${btn.dark} shrink-0`}>
-        Go
-      </button>
-    </form>
+    <div>
+      <div className="mb-4 flex items-baseline justify-between text-[15px] font-semibold tabular-nums">
+        <span>€{low}</span>
+        <span className="text-ink-3">–</span>
+        <span>
+          €{high}
+          {high === ceil && "+"}
+        </span>
+      </div>
+
+      <div className="relative h-5">
+        <div className="absolute inset-x-0 top-1/2 h-1 -translate-y-1/2 rounded-full bg-line" />
+        <div
+          className="absolute top-1/2 h-1 -translate-y-1/2 rounded-full bg-accent"
+          style={{ left: `${pct(low)}%`, right: `${100 - pct(high)}%` }}
+        />
+        <input
+          type="range"
+          min={floor}
+          max={ceil}
+          step={PRICE_STEP}
+          value={low}
+          onChange={(e) => setLow(Math.min(Number(e.target.value), high - PRICE_STEP))}
+          aria-label="Minimum price"
+          aria-valuetext={`€${low}`}
+          // Keep the low handle reachable when both sit at the top end.
+          className={`${thumb} ${low > ceil - (ceil - floor) / 10 ? "z-20" : "z-10"}`}
+        />
+        <input
+          type="range"
+          min={floor}
+          max={ceil}
+          step={PRICE_STEP}
+          value={high}
+          onChange={(e) => setHigh(Math.max(Number(e.target.value), low + PRICE_STEP))}
+          aria-label="Maximum price"
+          aria-valuetext={`€${high}`}
+          className={`${thumb} z-10`}
+        />
+      </div>
+
+      <div className="mt-2 flex justify-between text-xs text-ink-3">
+        <span>€{floor}</span>
+        <span>€{ceil}</span>
+      </div>
+
+      <div className="mt-5 flex items-center gap-3">
+        {!full && (
+          <button
+            type="button"
+            onClick={() => {
+              setLow(floor);
+              setHigh(ceil);
+            }}
+            className={btn.link}
+          >
+            Reset
+          </button>
+        )}
+        <button type="button" onClick={apply} className={`${btn.primary} ml-auto h-10`}>
+          Show items
+        </button>
+      </div>
+    </div>
   );
 }

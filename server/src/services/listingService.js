@@ -438,7 +438,8 @@ async function allMatches(params) {
 
 // Counts per option for each filter dropdown, as on H&M: each field is counted
 // with all the *other* filters applied, so a dropdown shows what picking any of
-// its options would give. -> { color: { blue: 15, … }, condition: {…}, brand: {…} }
+// its options would give. -> { color: { blue: 15, … }, condition: {…}, brand: {…},
+// price: { min, max } in cents }
 async function getFacets(params = {}) {
   const entries = await Promise.all(
     Object.entries(FACETS).map(async ([field, valueOf]) => {
@@ -450,7 +451,13 @@ async function getFacets(params = {}) {
       return [field, counts];
     })
   );
-  return Object.fromEntries(entries);
+  // Price range of the search without its own price filter, for the price slider.
+  const prices = (await allMatches({ ...params, minPrice: "", maxPrice: "", page: 1 }))
+    .map((listing) => listing.price?.amount)
+    .filter((amount) => amount != null);
+  const price = prices.length ? { min: Math.min(...prices), max: Math.max(...prices) } : null;
+
+  return { ...Object.fromEntries(entries), price };
 }
 
 module.exports = {
