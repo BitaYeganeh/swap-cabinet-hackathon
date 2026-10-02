@@ -63,6 +63,31 @@ async function readPhoto(buffer, mediaType) {
   return { items, queryVector };
 }
 
+// "Looking for" listings shown next to the results ("People also look for this").
+const MAX_WANTED = 8;
+
+// Turns the ranking into the answer the search bar shows. Wanted listings come
+// with their title, so the browser can link to them without another fetch.
+function shapeAnswer({ items, selected, queryItem, ranked, rows }) {
+  // Best groups first ("same" model, "exact" kind, "close" kind, then the rest).
+  const ids = ranked.groups.flatMap(g => g.ids.map(x => x.id)).slice(0, MAX_RESULTS);
+  const titles = new Map(rows.map(row => [row.id, row.title]));
+  return {
+    items: items || [],
+    selected,
+    labels: queryItem || null,
+    // Labelling failed: one list ordered by looks only.
+    fallback: !queryItem,
+    noClothing: false,
+    groups: ranked.groups.map(g => ({ key: g.key, count: g.ids.length })),
+    wanted: (ranked.wanted || [])
+      .slice(0, MAX_WANTED)
+      .map(x => ({ id: x.id, title: titles.get(x.id) || '' })),
+    // Sold or closed listings drop out here: the search page only shows published ones.
+    url: ids.length ? `/s?${new URLSearchParams({ ids: ids.join(',') })}` : null,
+  };
+}
+
 // `itemIndex` picks which of the items seen in the photo to search for.
 async function searchByPhoto(buffer, mediaType, itemIndex = 0) {
   const [{ items, queryVector }, rows] = await Promise.all([
@@ -71,7 +96,16 @@ async function searchByPhoto(buffer, mediaType, itemIndex = 0) {
   ]);
 
   if (items && items.length === 0) {
-    return { items: [], selected: 0, noClothing: true, groups: [], url: null };
+    return {
+      items: [],
+      selected: 0,
+      labels: null,
+      fallback: false,
+      noClothing: true,
+      groups: [],
+      wanted: [],
+      url: null,
+    };
   }
   if (rows.length === 0) {
     throw new PhotoSearchError('Photo search has no listings yet. Run the smart search sync.', 503);
@@ -80,24 +114,15 @@ async function searchByPhoto(buffer, mediaType, itemIndex = 0) {
   const selected = items ? Math.min(Math.max(0, itemIndex), items.length - 1) : 0;
   const queryItem = items ? items[selected] : null;
   const ranked = rankPhotoSearch({ queryItem, queryVector, rows });
-
-  // Best groups first ("same" model, "exact" kind, "close" kind, then the rest).
-  const ids = ranked.groups.flatMap(g => g.ids.map(x => x.id)).slice(0, MAX_RESULTS);
-  const groups = ranked.groups.map(g => ({ key: g.key, count: g.ids.length }));
+  const answer = shapeAnswer({ items, selected, queryItem, ranked, rows });
 
   console.log(
     `Smart photo search -> ${queryItem ? queryItem.kind : 'no labels'}:`,
-    groups.map(g => `${g.key} ${g.count}`).join(', ')
+    answer.groups.map(g => `${g.key} ${g.count}`).join(', '),
+    `| wanted ${answer.wanted.length}`
   );
 
-  return {
-    items: items || [],
-    selected,
-    noClothing: false,
-    groups,
-    // Sold or closed listings drop out here: the search page only shows published ones.
-    url: ids.length ? `/s?${new URLSearchParams({ ids: ids.join(',') })}` : null,
-  };
+  return answer;
 }
 
-module.exports = { searchByPhoto, PhotoSearchError };
+module.exports = { searchByPhoto, shapeAnswer, PhotoSearchError };

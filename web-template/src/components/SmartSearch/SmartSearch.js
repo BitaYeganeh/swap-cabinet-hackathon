@@ -12,6 +12,14 @@ import { widenedText } from './widened';
 import { clearAiResult, storeAiResult, useStoredAiResult } from './aiResults';
 import { MatrixLoader, ThinkingStatus } from './SmartSearchMotion';
 import Suggestions, { toOptions, useAutocomplete } from './Suggestions';
+import {
+  PHOTO_TYPES,
+  WRONG_TYPE_MESSAGE,
+  describeItem,
+  hasFiles,
+  isPhoto,
+  listenForPhotos,
+} from './photoDrop';
 
 import css from './SmartSearch.module.css';
 
@@ -22,8 +30,6 @@ const GROUP_NAMES = {
   other: 'other',
   closest: 'closest look',
 };
-
-const PHOTO_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
 
 // What the status line says while a search runs (what the server is doing, in order).
 const AI_STATES = [
@@ -225,8 +231,8 @@ const SmartSearch = props => {
   const startPhotoSearch = file => {
     if (!file || busy) return;
     closeSuggestions();
-    if (!PHOTO_TYPES.includes(file.type)) {
-      setError('Use a JPG, PNG or WEBP photo');
+    if (!isPhoto(file)) {
+      setError(WRONG_TYPE_MESSAGE);
       return;
     }
     const preview = URL.createObjectURL(file);
@@ -240,8 +246,23 @@ const SmartSearch = props => {
     startPhotoSearch(file);
   };
 
+  // A photo dropped elsewhere on the page (PhotoDropOverlay) comes here, so it
+  // runs the same photo search. The listener reads the latest state via a ref.
+  const startPhotoRef = useRef(startPhotoSearch);
+  startPhotoRef.current = startPhotoSearch;
+  useEffect(() => listenForPhotos(file => startPhotoRef.current(file)), []);
+  // A photo dropped on a page without a search bar opened this page with it.
+  useEffect(() => {
+    const pending = history.location.state?.smartSearch?.pendingPhoto;
+    if (!pending) return;
+    // Cleared first, so a reload or a second effect run doesn't search again.
+    const { pathname, search, hash } = history.location;
+    history.replace({ pathname, search, hash }, {});
+    startPhotoRef.current(pending);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   // Drag and drop a photo anywhere on the search bar.
-  const hasFiles = e => Array.from(e.dataTransfer?.types || []).includes('Files');
   const handleDragOver = e => {
     if (!hasFiles(e)) return;
     e.preventDefault();
@@ -362,7 +383,7 @@ const SmartSearch = props => {
           ref={fileInput}
           className={css.hiddenInput}
           type="file"
-          accept="image/jpeg,image/png,image/webp"
+          accept={PHOTO_TYPES.join(',')}
           onChange={handlePhotoChosen}
         />
       </form>
@@ -420,30 +441,43 @@ const SmartSearch = props => {
         </div>
       ) : null}
 
-      {photo && !busy ? (
+      {photo && !busy && photoResult ? (
         <div className={css.info}>
           <div className={css.photoRow}>
             {photo.preview ? <img className={css.preview} src={photo.preview} alt="" /> : null}
             <div>
-              {photoResult?.items?.length > 0 ? (
+              {photoResult.items?.length === 1 ? (
+                <span>
+                  We see: <strong>{describeItem(photoResult.items[0])}</strong>
+                </span>
+              ) : null}
+              {photoResult.items?.length > 1 ? (
                 <>
-                  <span>Searching for: </span>
-                  {photoResult.items.map((item, i) => (
-                    <button
-                      key={`${item.kind}-${i}`}
-                      type="button"
-                      className={classNames(css.chip, {
-                        [css.chipSelected]: i === photoResult.selected,
-                      })}
-                      disabled={!!busy}
-                      onClick={() => searchPhoto(photo.file, i)}
-                    >
-                      {[item.color, item.brand, item.kind].filter(Boolean).join(' ')}
-                    </button>
-                  ))}
+                  <p className={css.question}>We see more than one item. Which one do you want?</p>
+                  <div className={css.chips} role="group" aria-label="Item to search for">
+                    {photoResult.items.map((item, i) => (
+                      <button
+                        key={`${item.kind}-${i}`}
+                        type="button"
+                        className={classNames(css.chip, {
+                          [css.chipSelected]: i === photoResult.selected,
+                        })}
+                        aria-pressed={i === photoResult.selected}
+                        disabled={!!busy}
+                        onClick={() => {
+                          if (i !== photoResult.selected) searchPhoto(photo.file, i);
+                        }}
+                      >
+                        {describeItem(item, true)}
+                      </button>
+                    ))}
+                  </div>
                 </>
               ) : null}
-              {photoResult?.groups?.length > 0 ? (
+              {photoResult.fallback ? (
+                <p className={css.note}>Showing the items that look most alike.</p>
+              ) : null}
+              {photoResult.groups?.length > 0 ? (
                 <p className={css.groups}>
                   {photoResult.groups
                     .map(g => `${g.count} ${GROUP_NAMES[g.key] || g.key}`)
@@ -452,6 +486,27 @@ const SmartSearch = props => {
               ) : null}
             </div>
           </div>
+          {photoResult.wanted?.length > 0 ? (
+            <div className={css.wanted}>
+              <p className={css.wantedTitle}>People also look for this</p>
+              <ul className={css.wantedList}>
+                {photoResult.wanted.map(({ id, title }) => (
+                  <li key={id}>
+                    <Link
+                      to={createResourceLocatorString(
+                        'ListingPage',
+                        routeConfiguration,
+                        { id, slug: createSlug(title || 'listing') },
+                        {}
+                      )}
+                    >
+                      {title || 'Looking for…'}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ) : null}
         </div>
       ) : null}
     </div>

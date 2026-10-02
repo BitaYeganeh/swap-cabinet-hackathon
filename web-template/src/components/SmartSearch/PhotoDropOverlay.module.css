@@ -1,0 +1,74 @@
+/* Page-wide: covers the whole window while a photo is dragged over it. The
+   drop still reaches the page under it (and the search bar's own drop area). */
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: grid;
+  place-items: center;
+  padding: 16px;
+  background-color: rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(3px);
+  pointer-events: none;
+  animation: overlayIn var(--duration-fast, 150ms) var(--ease-smooth-out, ease-out);
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 36px 32px;
+  border: 2px dashed var(--marketplaceColor);
+  border-radius: var(--borderRadiusMedium);
+  background-color: var(--colorWhite);
+  box-shadow: var(--boxShadowPopup);
+  text-align: center;
+}
+
+.icon {
+  font-size: 36px;
+  line-height: 1;
+}
+
+.title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: var(--fontWeightSemiBold);
+  color: var(--colorGrey800);
+}
+
+.hint {
+  margin: 0;
+  font-size: 14px;
+  color: var(--colorGrey700);
+}
+
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: 24px;
+  z-index: 1000;
+  padding: 10px 20px;
+  border-radius: 24px;
+  background-color: var(--colorGrey800);
+  color: var(--colorWhite);
+  font-size: 15px;
+  transform: translateX(-50%);
+  box-shadow: var(--boxShadowPopup);
+}
+
+@keyframes overlayIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .overlay {
+    animation: none;
+  }
+}

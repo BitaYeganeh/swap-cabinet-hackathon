@@ -287,3 +287,37 @@
   margin: 8px 0 0 0;
   font-size: 15px;
 }
+
+/* ---- Photo answer ---- */
+
+.question {
+  margin: 0 0 4px 0;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+/* "People also look for this": wanted listings for the same kind of item. */
+.wanted {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid var(--colorGrey100);
+}
+
+.wantedTitle {
+  margin: 0 0 4px 0;
+  font-weight: var(--fontWeightSemiBold);
+  font-size: 14px;
+}
+
+.wantedList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 16px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 14px;
+}
