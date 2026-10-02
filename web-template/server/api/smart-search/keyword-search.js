@@ -22,6 +22,9 @@ const CACHE_TTL_MS = 60 * 1000;
 const IMAGE_VARIANT = 'scaled-small';
 const QUERY_PARAMS = {
   perPage: 100,
+  // Same stock rule as the template's search: sold-out listings are not shown.
+  minStock: 1,
+  stockMode: 'match-undefined',
   include: ['images'],
   'fields.image': [`variants.${IMAGE_VARIANT}`],
 };
