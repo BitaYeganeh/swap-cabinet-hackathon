@@ -1,0 +1,275 @@
+.root {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 16px 24px 0 24px;
+}
+
+.form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.input {
+  flex: 1 1 320px;
+  min-width: 0;
+  height: 48px;
+  padding: 0 16px;
+  border: 1px solid var(--colorGrey300);
+  border-radius: var(--borderRadiusMedium);
+  font-size: 16px;
+}
+
+.searchButton,
+.photoButton {
+  height: 48px;
+  padding: 0 20px;
+  border: none;
+  border-radius: var(--borderRadiusMedium);
+  font-weight: var(--fontWeightSemiBold);
+  cursor: pointer;
+}
+
+.searchButton {
+  background-color: var(--marketplaceColor);
+  color: var(--colorWhite);
+}
+
+.photoButton {
+  background-color: var(--colorGrey100);
+  color: var(--colorGrey800);
+}
+
+.searchButton:disabled,
+.photoButton:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.hiddenInput {
+  display: none;
+}
+
+.error {
+  margin: 0;
+  color: var(--colorFail);
+}
+
+.info {
+  padding: 12px 16px;
+  border-radius: var(--borderRadiusMedium);
+  background-color: var(--colorGrey50);
+  font-size: 15px;
+}
+
+.picks {
+  margin: 8px 0 0 0;
+  padding-left: 20px;
+  list-style: disc;
+}
+
+.photoRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.preview {
+  width: 64px;
+  height: 64px;
+  object-fit: cover;
+  border-radius: var(--borderRadiusMedium);
+}
+
+.chip {
+  margin: 2px 4px 2px 0;
+  padding: 4px 10px;
+  border: 1px solid var(--colorGrey300);
+  border-radius: 16px;
+  background-color: var(--colorWhite);
+  cursor: pointer;
+}
+
+.chipSelected {
+  border-color: var(--marketplaceColor);
+  color: var(--marketplaceColor);
+}
+
+.groups {
+  margin: 6px 0 0 0;
+  color: var(--colorGrey700);
+  font-size: 14px;
+}
+
+/* In the Page Builder hero, in place of the Console search bar */
+.ctaWrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  margin-top: 24px;
+}
+
+.inHero {
+  width: 100%;
+  max-width: 720px;
+  padding: 8px;
+  border-radius: var(--borderRadiusMedium);
+  background-color: var(--colorWhite);
+  box-shadow: var(--boxShadowPopup);
+  text-align: left;
+  color: var(--colorGrey800);
+}
+
+.inHero .input {
+  border-color: transparent;
+}
+
+.inHero .info {
+  margin: 0 4px 4px 4px;
+}
+
+.suggestion {
+  margin: 0;
+  color: var(--colorGrey700);
+  font-size: 15px;
+}
+
+/* ---- Drag and drop ---- */
+
+/* Covers the bar while a photo is dragged over it. */
+.dropOverlay {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  column-gap: 10px;
+  border: 2px dashed var(--marketplaceColor);
+  border-radius: var(--borderRadiusMedium);
+  background-color: rgba(255, 255, 255, 0.94);
+  backdrop-filter: blur(2px);
+  color: var(--colorGrey800);
+  text-align: center;
+  pointer-events: none;
+  opacity: 0;
+  transform: scale(0.98);
+  transition:
+    opacity var(--duration-quick) var(--ease-smooth-out),
+    transform var(--duration-quick) var(--ease-smooth-out);
+}
+
+.dragging .dropOverlay {
+  opacity: 1;
+  transform: scale(1);
+  transition:
+    opacity var(--duration-fast) var(--ease-smooth-out),
+    transform var(--duration-fast) var(--ease-smooth-out);
+}
+
+.dropIcon {
+  font-size: 22px;
+  line-height: 1;
+}
+
+.dragging .dropIcon {
+  animation: dropBob 1s ease-in-out infinite;
+}
+
+@keyframes dropBob {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-4px); }
+}
+
+.dropTitle {
+  font-weight: var(--fontWeightSemiBold);
+  font-size: 16px;
+}
+
+.dropHint {
+  font-size: 13px;
+  color: var(--colorGrey700);
+}
+
+/* ---- Searching ---- */
+
+.buttonBusy {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* The loader in the dark button needs light dots. */
+.buttonLoader {
+  --matrix-base: rgba(255, 255, 255, 0.35);
+  --matrix-active: #ffffff;
+}
+
+.loading {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  border-radius: var(--borderRadiusMedium);
+  background-color: var(--colorGrey50);
+  font-size: 15px;
+  animation: loadingIn var(--duration-fast) var(--ease-smooth-out);
+}
+
+/* Status lines share a left edge next to the loader. */
+.loading :global(.t-think) {
+  text-align: left;
+}
+
+@keyframes loadingIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* The shopper's photo, with a line sweeping over it while it is read. */
+.scanThumb {
+  position: relative;
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  overflow: hidden;
+  border-radius: 6px;
+}
+
+.scanThumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.scanThumb::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 30%;
+  background: linear-gradient(180deg, transparent, rgba(255, 255, 255, 0.85), transparent);
+  animation: scanLine 1.2s linear infinite;
+}
+
+@keyframes scanLine {
+  from { transform: translateY(-100%); }
+  to   { transform: translateY(340%); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dropOverlay,
+  .dragging .dropOverlay {
+    transition: none;
+  }
+  .dragging .dropIcon,
+  .loading,
+  .scanThumb::after {
+    animation: none;
+  }
+}
