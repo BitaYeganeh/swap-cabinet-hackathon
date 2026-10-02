@@ -1,17 +1,18 @@
 import { LuArrowRight, LuShieldCheck, LuSparkles, LuTruck } from "react-icons/lu";
 import heroPhoto from "../assets/hero-rack.jpg";
 import { btn } from "../lib/ui";
-import { useChromeHeight } from "../lib/useHeaderHeight";
+import { useHeaderHeight } from "../lib/useHeaderHeight";
 
 const TRUST_POINTS = [
   { icon: LuTruck, label: "Shipping or pickup" },
   { icon: LuShieldCheck, label: "Condition checked" },
 ];
 
-// Full-width photo in softened, neutral colour so the copy and button stand out; a white fade gives the copy a clean "white side"
-// (from the left on desktop, the top on phones). Sized to exactly the space between
-// header and footer so the whole home page fits on one screen; on a very short
-// window the copy scrolls inside the hero instead.
+// Full-width photo in softened, neutral colour so the copy and button stand out; a
+// white fade gives the copy a clean "white side" (from the left on desktop, the top
+// on phones). Stops a little short of the screen bottom so the next section peeks
+// in; on a very short window the copy scrolls inside the hero instead.
+
 // The hero's one call to action: jump into the header search, where the AI
 // turns a plain description into results.
 const focusSearch = () => {
@@ -21,11 +22,11 @@ const focusSearch = () => {
 };
 
 export default function Hero() {
-  const chromeHeight = useChromeHeight();
+  const headerHeight = useHeaderHeight();
 
   return (
     <section
-      style={{ height: `calc(100svh - ${chromeHeight}px)` }}
+      style={{ height: `calc(90svh - ${headerHeight}px)` }}
       className="relative isolate flex min-h-[320px] flex-col overflow-hidden bg-white"
     >
       <img

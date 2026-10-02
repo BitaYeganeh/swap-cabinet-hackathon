@@ -85,6 +85,8 @@ export type ListingsResponse = {
   pagination: Pagination;
   /** Spelling-corrected keywords, when the search had likely typos. */
   suggestion?: string | null;
+  /** Nothing matched the words exactly; every result is a "similar meaning" match. */
+  similarOnly?: boolean;
 };
 
 export class ApiError extends Error {
@@ -184,6 +186,21 @@ export type Brand = {
   name: string;
   count: number;
 };
+
+/** Matching items per filter option, each field counted with the other filters applied. */
+export type Facets = Record<"color" | "condition" | "brand", Record<string, number>> & {
+  /** Cheapest and dearest item in cents, ignoring the price filter; null when nothing matches. */
+  price: { min: number; max: number } | null;
+};
+
+export async function getFacets(params: SearchParams, signal?: AbortSignal): Promise<Facets> {
+  const query = new URLSearchParams();
+  Object.entries(params).forEach(([key, value]) => {
+    if (value !== undefined && value !== "" && key !== "item") query.set(key, String(value));
+  });
+  const body = await request<{ facets: Facets }>(`/api/listings/facets?${query}`, signal);
+  return body.facets;
+}
 
 export async function getBrands(signal?: AbortSignal): Promise<Brand[]> {
   const body = await request<{ brands: Brand[] }>("/api/listings/brands", signal);

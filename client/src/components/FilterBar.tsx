@@ -1,6 +1,7 @@
-import { useEffect, useRef, useState, type ReactNode, type SubmitEvent } from "react";
-import { LuChevronDown, LuSearch } from "react-icons/lu";
-import type { Brand, SearchParams } from "../lib/api";
+import { useEffect, useRef, useState, type ReactNode } from "react";
+import { createPortal } from "react-dom";
+import { LuCheck, LuChevronDown, LuSearch } from "react-icons/lu";
+import { getFacets, type Brand, type Facets, type SearchParams } from "../lib/api";
 import { COLORS, CONDITIONS, labelFor } from "../lib/format";
 import {
   ADULT_SHOE_SIZES,
@@ -24,6 +25,8 @@ type Props = {
   onChange: (changes: Partial<SearchParams>) => void;
   // Rendered at the right end of the bar (the sort control).
   children?: ReactNode;
+  /** Matching items, shown at the start of the bar (as H&M does). */
+  count?: number;
 };
 
 type FilterKey = "size" | "brand" | "price" | "condition" | "color";
@@ -32,21 +35,83 @@ const PANEL_WIDTH = 360;
 const PANEL_GUTTER = 24; // matches the bar's sm:px-6
 const BRANDS_SHOWN = 20;
 
-const chipButton = (active: boolean) =>
-  `rounded-full border px-3.5 py-[7px] text-sm transition ${
-    active ? "border-ink bg-ink text-white" : "border-line bg-surface hover:border-ink-3"
-  }`;
+// Option counts for the open dropdown, refetched when the search changes.
+function useFacets(params: SearchParams, enabled: boolean) {
+  const [result, setResult] = useState<{ key: string; facets: Facets } | null>(null);
+  // Paging and the item popup don't change the counts.
+  const key = JSON.stringify({ ...params, item: undefined, page: undefined });
+
+  useEffect(() => {
+    if (!enabled) return;
+    const controller = new AbortController();
+    getFacets(JSON.parse(key), controller.signal)
+      .then((facets) => setResult({ key, facets }))
+      .catch(() => {});
+    return () => controller.abort();
+  }, [key, enabled]);
+
+  return result?.key === key ? result.facets : null;
+}
+
+// One H&M-style option row: square checkbox, name, [count], optional colour dot.
+// Options with nothing to show are greyed out (unless already picked).
+function OptionRow({
+  label,
+  count,
+  active,
+  swatch,
+  onClick,
+}: {
+  label: string;
+  count: number | undefined;
+  active: boolean;
+  swatch?: string;
+  onClick: () => void;
+}) {
+  const empty = count === 0 && !active;
+  return (
+    <li>
+      <button
+        type="button"
+        role="checkbox"
+        aria-checked={active}
+        disabled={empty}
+        onClick={onClick}
+        className="flex w-full items-center gap-3 py-2 text-left text-[15px] transition enabled:hover:text-accent disabled:cursor-default disabled:text-ink-3/60"
+      >
+        <span
+          className={`grid size-5 shrink-0 place-items-center border ${
+            active ? "border-ink bg-ink text-white" : empty ? "border-line" : "border-ink-3"
+          }`}
+        >
+          {active && <LuCheck className="size-3.5" strokeWidth={3} />}
+        </span>
+        <span className="min-w-0 flex-1 truncate">{label}</span>
+        {count !== undefined && <span className="shrink-0 text-sm text-ink-3 tabular-nums">[ {count} ]</span>}
+        {swatch && (
+          <span
+            style={{ background: swatch }}
+            className={`size-5 shrink-0 rounded-full border border-black/20 ${empty ? "opacity-40" : ""}`}
+          />
+        )}
+      </button>
+    </li>
+  );
+}
+
+const optionList = "-my-1 max-h-[min(60vh,420px)] overflow-y-auto pr-1";
 
 // Size filtering only applies to clothing and shoes.
 const hasSizes = (type?: string) => !type || ["tops", "bottoms", "shoes"].includes(type);
 
-export default function FilterBar({ params, brands, onChange, children }: Props) {
+export default function FilterBar({ params, brands, onChange, children, count }: Props) {
   const system = useSizeSystem();
   const headerHeight = useHeaderHeight();
   const barRef = useRef<HTMLDivElement>(null);
   const [open, setOpen] = useState<{ key: FilterKey; left: number | null } | null>(null);
 
   const close = () => setOpen(null);
+  const facets = useFacets(params, open !== null && ["color", "condition", "brand", "price"].includes(open.key));
 
   useEffect(() => {
     if (!open) return;
@@ -113,9 +178,17 @@ export default function FilterBar({ params, brands, onChange, children }: Props)
     <div
       ref={barRef}
       style={{ top: headerHeight }}
-      className="sticky z-10 -mx-4 mb-5 border-b border-line bg-bg/95 px-4 py-3 backdrop-blur-md sm:-mx-6 sm:px-6"
+      // While a dropdown is open the bar rises above the header so only it stays lit.
+      className={`sticky -mx-4 mb-4 border-b border-line bg-bg/95 px-4 py-2.5 backdrop-blur-md sm:-mx-6 sm:px-6 ${
+        open ? "z-40" : "z-10"
+      }`}
     >
       <div className="flex items-center gap-2.5">
+        {count !== undefined && (
+          <p className="shrink-0 pr-1 text-sm whitespace-nowrap text-ink-3" aria-live="polite">
+            {count} {count === 1 ? "item" : "items"}
+          </p>
+        )}
         <div
           className="flex min-w-0 flex-1 gap-2 overflow-x-auto [scrollbar-width:none]"
           onScroll={close}
@@ -154,6 +227,14 @@ export default function FilterBar({ params, brands, onChange, children }: Props)
         {children}
       </div>
 
+      {/* Dims the rest of the page (header included) while choosing, as on H&M.
+          Portalled: the bar's backdrop blur would trap a fixed overlay inside it. */}
+      {open &&
+        createPortal(
+          <div className="fixed inset-0 z-30 animate-fade-in bg-black/60" aria-hidden="true" />,
+          document.body
+        )}
+
       {open && current && (
         <div
           style={open.left === null ? undefined : { left: open.left, width: PANEL_WIDTH }}
@@ -176,33 +257,34 @@ export default function FilterBar({ params, brands, onChange, children }: Props)
           </div>
 
           {current.key === "size" && <SizeOptions params={params} system={system} onChange={apply} />}
-          {current.key === "brand" && <BrandOptions params={params} brands={brands} onChange={apply} />}
+          {current.key === "brand" && <BrandOptions params={params} brands={brands} counts={facets?.brand} onChange={apply} />}
           {current.key === "price" && (
-            <PriceFilter
+            <PriceSlider
+              key={facets ? "ready" : "loading"}
+              range={facets?.price}
+              loading={!facets}
               minPrice={params.minPrice ?? ""}
               maxPrice={params.maxPrice ?? ""}
               onApply={(minPrice, maxPrice) => apply({ minPrice, maxPrice })}
             />
           )}
           {current.key === "condition" && (
-            <div className="flex flex-wrap gap-2">
+            <ul className={optionList}>
               {CONDITIONS.map((c) => {
                 const active = params.condition === c.value;
                 return (
-                  <button
-                    type="button"
+                  <OptionRow
                     key={c.value}
-                    aria-pressed={active}
+                    label={c.label}
+                    count={facets ? (facets.condition[c.value] ?? 0) : undefined}
+                    active={active}
                     onClick={() => apply({ condition: active ? "" : c.value })}
-                    className={chipButton(active)}
-                  >
-                    {c.label}
-                  </button>
+                  />
                 );
               })}
-            </div>
+            </ul>
           )}
-          {current.key === "color" && <ColorOptions params={params} onChange={apply} />}
+          {current.key === "color" && <ColorOptions params={params} counts={facets?.color} onChange={apply} />}
         </div>
       )}
     </div>
@@ -214,75 +296,76 @@ type OptionProps = {
   onChange: (changes: Partial<SearchParams>) => void;
 };
 
-function BrandOptions({ params, brands, onChange }: OptionProps & { brands: Brand[] }) {
+function BrandOptions({
+  params,
+  brands,
+  counts,
+  onChange,
+}: OptionProps & { brands: Brand[]; counts?: Record<string, number> }) {
   const [query, setQuery] = useState("");
   const q = query.trim().toLowerCase();
-  const matches = q ? brands.filter((b) => b.name.toLowerCase().includes(q)) : brands.slice(0, BRANDS_SHOWN);
+  const countOf = (b: Brand) => (counts ? (counts[b.name.toLowerCase()] ?? 0) : undefined);
+  const isActive = (b: Brand) => params.brand?.toLowerCase() === b.name.toLowerCase();
+
+  // Only brands with items in this search (plus a picked one), most items first.
+  // Brand lists are long, so unlike colours, brands with nothing are left out.
+  const available = counts
+    ? brands.filter((b) => (countOf(b) ?? 0) > 0 || isActive(b)).sort((a, b) => (countOf(b) ?? 0) - (countOf(a) ?? 0))
+    : brands;
+  const matches = q ? available.filter((b) => b.name.toLowerCase().includes(q)) : available.slice(0, BRANDS_SHOWN);
 
   return (
     <>
-      {brands.length > 8 && (
+      {available.length > 8 && (
         <label className="mb-3 flex h-10 items-center gap-2 rounded-lg border border-line bg-surface px-3 focus-within:border-accent">
           <LuSearch className="size-4 shrink-0 text-ink-3" />
           <input
             autoFocus
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder={`Search ${brands.length} brands`}
+            placeholder={`Search ${available.length} brands`}
             aria-label="Search brands"
             className="w-full bg-transparent text-sm outline-none"
           />
         </label>
       )}
-      <div className="flex max-h-64 flex-wrap gap-2 overflow-y-auto">
-        {matches.map((b) => {
-          const active = params.brand?.toLowerCase() === b.name.toLowerCase();
-          return (
-            <button
-              type="button"
-              key={b.name}
-              aria-pressed={active}
-              onClick={() => onChange({ brand: active ? "" : b.name })}
-              className={chipButton(active)}
-            >
-              {b.name}
-              <span className={`ml-1.5 ${active ? "text-white/70" : "text-ink-3"}`}>{b.count}</span>
-            </button>
-          );
-        })}
-        {matches.length === 0 && <p className="text-sm text-ink-3">No brands match “{query}”.</p>}
-      </div>
+      <ul className={optionList}>
+        {matches.map((b) => (
+          <OptionRow
+            key={b.name}
+            label={b.name}
+            count={countOf(b)}
+            active={isActive(b)}
+            onClick={() => onChange({ brand: isActive(b) ? "" : b.name })}
+          />
+        ))}
+        {matches.length === 0 && (
+          <p className="py-2 text-sm text-ink-3">
+            {q ? `No brands match “${query}”.` : "None of the items in this search has a brand."}
+          </p>
+        )}
+      </ul>
     </>
   );
 }
 
-function ColorOptions({ params, onChange }: OptionProps) {
+function ColorOptions({ params, counts, onChange }: OptionProps & { counts?: Record<string, number> }) {
   return (
-    <div className="grid grid-cols-4 gap-x-1 gap-y-2.5">
+    <ul className={optionList}>
       {COLORS.map((c) => {
         const active = params.color === c.value;
         return (
-          <button
-            type="button"
+          <OptionRow
             key={c.value}
-            title={c.label}
-            aria-pressed={active}
+            label={c.label === "Multi" ? "Multicolour" : c.label}
+            count={counts ? (counts[c.value] ?? 0) : undefined}
+            active={active}
+            swatch={c.swatch}
             onClick={() => onChange({ color: active ? "" : c.value })}
-            className={`group flex flex-col items-center gap-1.5 py-1 text-xs ${
-              active ? "font-semibold text-ink" : "text-ink-2"
-            }`}
-          >
-            <span
-              style={{ background: c.swatch }}
-              className={`size-[30px] rounded-full border border-black/15 ring-offset-[3px] ring-offset-surface transition ${
-                active ? "ring-2 ring-ink" : "group-hover:ring-1 group-hover:ring-line"
-              }`}
-            />
-            {c.label}
-          </button>
+          />
         );
       })}
-    </div>
+    </ul>
   );
 }
 
@@ -388,53 +471,112 @@ function SizeSystemToggle({ value }: { value: SizeSystem }) {
   );
 }
 
-const priceInput =
-  "h-10 w-full min-w-0 rounded-lg border border-line bg-surface px-3 outline-none focus:border-accent";
+const PRICE_STEP = 1; // euros
 
-function PriceFilter({
+// Two-handle price slider over the search's own price range (whole euros).
+// Dragging only moves the handles; "Show items" applies the range.
+function PriceSlider({
+  range,
+  loading,
   minPrice,
   maxPrice,
   onApply,
 }: {
+  range: { min: number; max: number } | null | undefined;
+  loading: boolean;
   minPrice: string;
   maxPrice: string;
   onApply: (min: string, max: string) => void;
 }) {
-  const [min, setMin] = useState(minPrice);
-  const [max, setMax] = useState(maxPrice);
+  const floor = range ? Math.floor(range.min / 100) : 0;
+  const ceil = range ? Math.max(floor + 1, Math.ceil(range.max / 100)) : 100;
+  const clamp = (n: number) => Math.min(ceil, Math.max(floor, n));
 
-  const submit = (e: SubmitEvent) => {
-    e.preventDefault();
-    onApply(min, max);
-  };
+  const [low, setLow] = useState(() => clamp(minPrice ? Number(minPrice) : floor));
+  const [high, setHigh] = useState(() => clamp(maxPrice ? Number(maxPrice) : ceil));
+
+  if (loading) return <div className="shimmer h-24 rounded-lg" />;
+  if (!range) return <p className="text-sm text-ink-3">No priced items in this search.</p>;
+
+  const pct = (n: number) => ((n - floor) / (ceil - floor)) * 100;
+  const full = low === floor && high === ceil;
+  // Leaving a handle at the end of the range means "no limit" on that side.
+  const apply = () => onApply(low === floor ? "" : String(low), high === ceil ? "" : String(high));
+
+  const thumb =
+    "pointer-events-none absolute inset-0 h-full w-full appearance-none bg-transparent outline-none " +
+    "[&::-webkit-slider-thumb]:pointer-events-auto [&::-webkit-slider-thumb]:size-5 [&::-webkit-slider-thumb]:cursor-grab " +
+    "[&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:border-2 " +
+    "[&::-webkit-slider-thumb]:border-accent [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:shadow-card " +
+    "active:[&::-webkit-slider-thumb]:cursor-grabbing focus-visible:[&::-webkit-slider-thumb]:ring-4 focus-visible:[&::-webkit-slider-thumb]:ring-accent-soft " +
+    "[&::-moz-range-thumb]:pointer-events-auto [&::-moz-range-thumb]:size-5 [&::-moz-range-thumb]:cursor-grab " +
+    "[&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:border-2 [&::-moz-range-thumb]:border-accent " +
+    "[&::-moz-range-thumb]:bg-white [&::-moz-range-thumb]:shadow-card [&::-moz-range-track]:bg-transparent";
 
   return (
-    <form className="flex items-center gap-2" onSubmit={submit}>
-      <input
-        type="number"
-        min={0}
-        inputMode="numeric"
-        placeholder="Min"
-        autoFocus
-        value={min}
-        onChange={(e) => setMin(e.target.value)}
-        aria-label="Minimum price"
-        className={priceInput}
-      />
-      <span className="text-ink-3">–</span>
-      <input
-        type="number"
-        min={0}
-        inputMode="numeric"
-        placeholder="Max"
-        value={max}
-        onChange={(e) => setMax(e.target.value)}
-        aria-label="Maximum price"
-        className={priceInput}
-      />
-      <button type="submit" className={`${btn.dark} shrink-0`}>
-        Go
-      </button>
-    </form>
+    <div>
+      <div className="mb-4 flex items-baseline justify-between text-[15px] font-semibold tabular-nums">
+        <span>€{low}</span>
+        <span className="text-ink-3">–</span>
+        <span>
+          €{high}
+          {high === ceil && "+"}
+        </span>
+      </div>
+
+      <div className="relative h-5">
+        <div className="absolute inset-x-0 top-1/2 h-1 -translate-y-1/2 rounded-full bg-line" />
+        <div
+          className="absolute top-1/2 h-1 -translate-y-1/2 rounded-full bg-accent"
+          style={{ left: `${pct(low)}%`, right: `${100 - pct(high)}%` }}
+        />
+        <input
+          type="range"
+          min={floor}
+          max={ceil}
+          step={PRICE_STEP}
+          value={low}
+          onChange={(e) => setLow(Math.min(Number(e.target.value), high - PRICE_STEP))}
+          aria-label="Minimum price"
+          aria-valuetext={`€${low}`}
+          // Keep the low handle reachable when both sit at the top end.
+          className={`${thumb} ${low > ceil - (ceil - floor) / 10 ? "z-20" : "z-10"}`}
+        />
+        <input
+          type="range"
+          min={floor}
+          max={ceil}
+          step={PRICE_STEP}
+          value={high}
+          onChange={(e) => setHigh(Math.max(Number(e.target.value), low + PRICE_STEP))}
+          aria-label="Maximum price"
+          aria-valuetext={`€${high}`}
+          className={`${thumb} z-10`}
+        />
+      </div>
+
+      <div className="mt-2 flex justify-between text-xs text-ink-3">
+        <span>€{floor}</span>
+        <span>€{ceil}</span>
+      </div>
+
+      <div className="mt-5 flex items-center gap-3">
+        {!full && (
+          <button
+            type="button"
+            onClick={() => {
+              setLow(floor);
+              setHigh(ceil);
+            }}
+            className={btn.link}
+          >
+            Reset
+          </button>
+        )}
+        <button type="button" onClick={apply} className={`${btn.primary} ml-auto h-10`}>
+          Show items
+        </button>
+      </div>
+    </div>
   );
 }

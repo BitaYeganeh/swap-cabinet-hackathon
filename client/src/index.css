@@ -2,8 +2,10 @@
 
 @theme {
   --font-sans: "Inter", system-ui, "Segoe UI", Roboto, sans-serif;
-  --font-display: "Fraunces", Georgia, "Times New Roman", serif;
+  /* Headings use Plus Jakarta Sans, everything else Inter. */
   --font-hero: "Plus Jakarta Sans", "Inter", system-ui, sans-serif;
+  /* The marketplace's own stack (SF Pro on Apple devices), used by the home hero to match it. */
+  --font-system: -apple-system, system-ui, "Inter", Helvetica, Arial, sans-serif;
 
   --color-bg: #faf8f4;
   --color-surface: #ffffff;

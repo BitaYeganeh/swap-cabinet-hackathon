@@ -7,7 +7,7 @@ const STORAGE_KEY = "rethread:basket";
 
 // Checkout happens on the team's Sharetribe marketplace, where buyers log in and
 // pay with Stripe. One purchase per listing, as Sharetribe transactions are.
-const MARKETPLACE_URL =
+export const MARKETPLACE_URL =
   import.meta.env.VITE_MARKETPLACE_URL || "https://startuprefugeeshackathon20264-krwpjx.mysharetribe-test.com";
 
 const slug = (title: string) =>

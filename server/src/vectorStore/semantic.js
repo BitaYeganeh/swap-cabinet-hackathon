@@ -19,7 +19,9 @@ function createSemantic({ store = defaultStore, textVector = (text) => embed.tex
     return hits.filter((hit) => hit.score >= minScore).map((hit) => hit.id);
   }
 
-  async function similarIds(text, { limit = 20, minScore = 0.45 } = {}) {
+  // 0.52: below it hits are loose associations ("socks" -> sneakers, mittens at
+  // ~0.46-0.50); real meaning matches ("winter boots" -> boots) score 0.53+.
+  async function similarIds(text, { limit = 20, minScore = 0.52 } = {}) {
     let timer;
     const timeout = new Promise((resolve) => {
       timer = setTimeout(() => {
