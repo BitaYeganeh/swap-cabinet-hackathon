@@ -7,6 +7,7 @@ import { apiBaseUrl } from '../../util/api';
 import { parse } from '../../util/urlHelpers';
 
 import { widenedText } from './widened';
+import { clearAiResult, storeAiResult, useStoredAiResult } from './aiResults';
 import { MatrixLoader, ThinkingStatus } from './SmartSearchMotion';
 
 import css from './SmartSearch.module.css';
@@ -71,14 +72,16 @@ const SmartSearch = props => {
   const location = useLocation();
   const fileInput = useRef(null);
 
-  // A search started on another page (e.g. the landing page hero) arrives here
-  // with its answer in the location state, so the summary is still shown.
+  // A photo search started on another page (e.g. the landing page hero) arrives
+  // here with its answer in the location state (a photo can't be stored).
   const carried = location.state?.smartSearch || {};
+  // An AI answer is kept in sessionStorage for the URL it led to, so a reload
+  // or Back still shows it, and any other search shows nothing.
+  const aiResult = useStoredAiResult();
 
-  const [query, setQuery] = useState(carried.query || '');
+  const [query, setQuery] = useState('');
   const [busy, setBusy] = useState(null); // 'ai' | 'photo' | null
   const [error, setError] = useState(null);
-  const [aiResult, setAiResult] = useState(carried.aiResult || null);
   const [photo, setPhoto] = useState(carried.photo || null); // { file, preview, result }
   const [dragging, setDragging] = useState(false);
   // Phones and tablets can't drag files, but their photo picker offers the camera.
@@ -87,6 +90,10 @@ const SmartSearch = props => {
   useEffect(() => {
     setIsTouch(window.matchMedia?.('(pointer: coarse)').matches || false);
   }, []);
+  // After a reload the box is empty: fill it with the restored AI query.
+  useEffect(() => {
+    if (aiResult?.query) setQuery(prev => prev || aiResult.query);
+  }, [aiResult]);
 
   const go = (url, smartSearch) => {
     if (url) history.push(url, { smartSearch });
@@ -100,8 +107,8 @@ const SmartSearch = props => {
     setPhoto(null);
     try {
       const data = await readAnswer(await postJson('/ai', { query }));
-      setAiResult(data);
-      go(data.url, { query, aiResult: data });
+      storeAiResult({ ...data, query: data.query || query });
+      go(data.url);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -112,9 +119,9 @@ const SmartSearch = props => {
   const searchPhoto = async (file, item = 0, preview = photo?.preview) => {
     setBusy('photo');
     setError(null);
-    setAiResult(null);
     try {
       const data = await readAnswer(await postPhoto(file, item));
+      clearAiResult();
       setPhoto(prev => ({ ...prev, file, result: data }));
       if (data.noClothing) setError("We couldn't see a clothing item in this photo.");
       go(data.url, { photo: { file, preview, result: data } });
@@ -172,7 +179,7 @@ const SmartSearch = props => {
 
   const dropped = aiResult?.dropped || [];
   const photoResult = photo?.result;
-  const exactQuery = aiResult?.query || carried.query || query;
+  const exactQuery = aiResult?.query || query;
 
   return (
     <div
@@ -275,15 +282,6 @@ const SmartSearch = props => {
               {' '}
               · Nothing in the shop is a clear fit yet, so these are the closest matches by keyword.
             </span>
-          ) : null}
-          {aiResult.picks?.length > 0 ? (
-            <ul className={css.picks}>
-              {aiResult.picks.map(p => (
-                <li key={p.id}>
-                  <strong>{p.title}</strong>: {p.reason}
-                </li>
-              ))}
-            </ul>
           ) : null}
           {exactQuery ? (
             <p className={css.exactLink}>

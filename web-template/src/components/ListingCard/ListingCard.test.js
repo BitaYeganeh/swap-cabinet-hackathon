@@ -47,4 +47,16 @@ describe('ListingCard', () => {
     const tree = render(<ListingCard listing={listing} intl={fakeIntl} />, { config });
     expect(tree.asFragment().firstChild).toMatchSnapshot();
   });
+
+  it('shows the AI reason only when given', () => {
+    const listing = createListing('listing1', {}, { author: createUser('user1') });
+    const withReason = render(
+      <ListingCard listing={listing} intl={fakeIntl} reason="Waterproof shell" />
+    );
+    expect(withReason.getByText('Waterproof shell')).toBeInTheDocument();
+    withReason.unmount();
+
+    const without = render(<ListingCard listing={listing} intl={fakeIntl} />);
+    expect(without.container.querySelector('[title="Why the AI picked this"]')).toBeNull();
+  });
 });

@@ -81,6 +81,13 @@ const ListingCardImage = props => {
   );
 };
 
+// Small four-point sparkle, marks the AI's reason for picking a listing.
+const SparkleIcon = () => (
+  <svg className={css.reasonIcon} viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+    <path d="M8 1.5l1.6 4.9 4.9 1.6-4.9 1.6L8 14.5l-1.6-4.9L1.5 8l4.9-1.6z" />
+  </svg>
+);
+
 /**
  * ListingCard
  *
@@ -93,6 +100,7 @@ const ListingCardImage = props => {
  * @param {string?} props.renderSizes for img/srcset
  * @param {Function?} props.setActiveListing
  * @param {boolean?} props.showAuthorInfo
+ * @param {string?} props.reason why the AI search picked this listing (shown under the title)
  * @returns {JSX.Element} listing card to be used in search result panel etc.
  */
 export const ListingCard = props => {
@@ -109,6 +117,7 @@ export const ListingCard = props => {
     setActiveListing,
     showAuthorInfo = true,
     lazyLoadImage = true,
+    reason,
   } = props;
 
   const translations = getListingCardTranslations(listing, config, intl);
@@ -189,6 +198,12 @@ export const ListingCard = props => {
               {titleFormatted}
             </div>
           )}
+          {reason ? (
+            <p className={css.reason} title="Why the AI picked this">
+              <SparkleIcon />
+              <span>{reason}</span>
+            </p>
+          ) : null}
           {showAuthorInfo ? (
             <div className={classNames(css.authorInfo, { [css.lightText]: darkMode })}>
               {authorName}

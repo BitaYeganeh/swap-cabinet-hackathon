@@ -3,6 +3,7 @@ import classNames from 'classnames';
 
 import { propTypes } from '../../../util/types';
 import { ListingCard, PaginationLinks } from '../../../components';
+import { useStoredAiResult } from '../../../components/SmartSearch/aiResults';
 
 import css from './SearchResultsPanel.module.css';
 
@@ -33,6 +34,8 @@ const SearchResultsPanel = props => {
     intl,
   } = props;
   const classes = classNames(rootClassName || css.root, className);
+  // Why the AI search picked each listing, if these are its results.
+  const aiReasons = useStoredAiResult()?.picks || {};
   const pageName = listingTypeParam ? 'SearchPageWithListingType' : 'SearchPage';
 
   const paginationLinks =
@@ -82,6 +85,7 @@ const SearchResultsPanel = props => {
               listing={l}
               renderSizes={cardRenderSizes(isMapVariant)}
               setActiveListing={setActiveListing}
+              reason={aiReasons[l.id.uuid]}
             />
           </li>
         ))}
