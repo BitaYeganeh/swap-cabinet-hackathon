@@ -1,0 +1,308 @@
+[
+  {
+    "query": "boots",
+    "why": "plain word",
+    "expected": [
+      {
+        "id": "6abe4a63-34d4-4e78-966c-87707446ab04",
+        "title": "Brown winter duck boots, size 44"
+      },
+      {
+        "id": "6ab28c89-c571-40e7-bbdc-1ed16cfcd131",
+        "title": "Brown leather work boots"
+      },
+      {
+        "id": "6abe4a48-ed52-490d-b054-9f74056067a4",
+        "title": "Brown leather knee-high boots, size 40"
+      },
+      {
+        "id": "6abe4a46-cc53-4e0d-bd9f-6cce3a55414e",
+        "title": "Black leather lace-up boots, size 39"
+      },
+      {
+        "id": "6abe4a7c-c680-441d-b11a-67bbe82521be",
+        "title": "Brown kids hiking boots, size 28"
+      },
+      {
+        "id": "6ab28c89-d2cb-47e2-a252-56c6f6887ec0",
+        "title": "Kids' work-style boots, 4y"
+      },
+      {
+        "id": "6ab28c89-a807-4124-a98f-5177a0d93528",
+        "title": "Women's clothing bundle - sweaters, boots & skirt"
+      }
+    ]
+  },
+  {
+    "query": "sneakrs size 38",
+    "why": "typo + size",
+    "expected": [
+      {
+        "id": "6abe4a47-4f07-484a-97f1-115b009eb7dc",
+        "title": "White canvas sneakers, size 38"
+      }
+    ]
+  },
+  {
+    "query": "farkut",
+    "why": "Finnish word for jeans",
+    "expected": [
+      {
+        "id": "6abe4a5d-b5b7-4f4a-8977-3f3b1e8cae97",
+        "title": "Dark blue slim jeans L"
+      },
+      {
+        "id": "6abe4a41-a4d2-429a-a592-ee9bce56a5ba",
+        "title": "High-waist blue Levi's jeans S"
+      },
+      {
+        "id": "6ab28c89-7c94-4cdb-8e01-aa59986583ec",
+        "title": "Dark blue Acne jeans M"
+      },
+      {
+        "id": "6ab28c89-ef22-411a-aaa3-d1d857ed1bda",
+        "title": "Kids' jeans & denim jacket bundle, 11y"
+      }
+    ]
+  },
+  {
+    "query": "jeans",
+    "why": "plain word",
+    "expected": [
+      {
+        "id": "6abe4a5d-b5b7-4f4a-8977-3f3b1e8cae97",
+        "title": "Dark blue slim jeans L"
+      },
+      {
+        "id": "6abe4a41-a4d2-429a-a592-ee9bce56a5ba",
+        "title": "High-waist blue Levi's jeans S"
+      },
+      {
+        "id": "6ab28c89-7c94-4cdb-8e01-aa59986583ec",
+        "title": "Dark blue Acne jeans M"
+      },
+      {
+        "id": "6ab28c89-ef22-411a-aaa3-d1d857ed1bda",
+        "title": "Kids' jeans & denim jacket bundle, 11y"
+      }
+    ]
+  },
+  {
+    "query": "wool sweater",
+    "why": "material + item",
+    "expected": [
+      {
+        "id": "6abe4a3e-3a50-4a53-96e5-d01a4a706433",
+        "title": "Striped wool-cashmere sweater L"
+      },
+      {
+        "id": "6abe4a39-7fcc-486e-b58c-5b2c8b1a3948",
+        "title": "Grey knitted merino sweater M"
+      },
+      {
+        "id": "6ab28c89-f11f-4907-9f7b-43c20b30728f",
+        "title": "Beige wool sweater M"
+      },
+      {
+        "id": "6abe4a72-27f6-4c2b-9bca-1cf7e41e8b95",
+        "title": "Rust knitted sweater, 2y"
+      },
+      {
+        "id": "6ab28c89-c6cf-4497-ac79-952d1b4439f3",
+        "title": "Brown and white wool cardigan S"
+      }
+    ]
+  },
+  {
+    "query": "warm hat",
+    "why": "synonym (beanie)",
+    "expected": [
+      {
+        "id": "6abe4a66-bb47-46e2-8943-23a37fca82c1",
+        "title": "Black knitted beanie"
+      },
+      {
+        "id": "6abe4a8a-3b60-4c22-909b-558412063743",
+        "title": "Kids winter accessories bundle - hat, scarf & gloves"
+      }
+    ]
+  },
+  {
+    "query": "kids shoes",
+    "why": "category words",
+    "expected": [
+      {
+        "id": "6abe4a82-b5ff-44bb-9077-a5f23befee0f",
+        "title": "Brown leather sandals, size 30"
+      },
+      {
+        "id": "6abe4a81-bb10-4af9-a681-3ff566de4df8",
+        "title": "Pink kids sneakers, size 26"
+      },
+      {
+        "id": "6abe4a7c-c680-441d-b11a-67bbe82521be",
+        "title": "Brown kids hiking boots, size 28"
+      },
+      {
+        "id": "6ab28c89-d2cb-47e2-a252-56c6f6887ec0",
+        "title": "Kids' work-style boots, 4y"
+      },
+      {
+        "id": "6ab28c89-40fb-48e4-9df4-0f9fafc7ca76",
+        "title": "Green flip-flops, kids"
+      }
+    ]
+  },
+  {
+    "query": "something to keep me dry in the rain",
+    "why": "vague need",
+    "expected": [
+      {
+        "id": "6abe4a59-8168-49bd-b800-95c91c48b474",
+        "title": "Orange waterproof rain jacket L"
+      },
+      {
+        "id": "6abe4a6f-b254-4327-a6c1-f68d86da66de",
+        "title": "Yellow kids rain jacket, 6y"
+      },
+      {
+        "id": "6abe4a63-34d4-4e78-966c-87707446ab04",
+        "title": "Brown winter duck boots, size 44"
+      },
+      {
+        "id": "6abe4a79-8247-4701-b7dd-1b1ea81586df",
+        "title": "Kids waterproof snow pants, 5y"
+      }
+    ]
+  },
+  {
+    "query": "warm winter clothes for my kid",
+    "why": "vague need",
+    "expected": [
+      {
+        "id": "6abe4a8a-3b60-4c22-909b-558412063743",
+        "title": "Kids winter accessories bundle - hat, scarf & gloves"
+      },
+      {
+        "id": "6abe4a84-f4ce-4215-8443-22d058987f1a",
+        "title": "Grey knitted wool mittens"
+      },
+      {
+        "id": "6abe4a79-8247-4701-b7dd-1b1ea81586df",
+        "title": "Kids waterproof snow pants, 5y"
+      },
+      {
+        "id": "6abe4a6d-062e-4961-b314-b12154967ba7",
+        "title": "Kids padded winter jacket, 4y"
+      },
+      {
+        "id": "6abe4a72-27f6-4c2b-9bca-1cf7e41e8b95",
+        "title": "Rust knitted sweater, 2y"
+      },
+      {
+        "id": "6abe4a75-781d-4285-890d-2d1b8ce5cc0d",
+        "title": "Teal hooded kids jacket, 8y"
+      }
+    ]
+  },
+  {
+    "query": "what to wear to a wedding",
+    "why": "vague need",
+    "expected": [
+      {
+        "id": "6abe4a5b-f5e8-4396-9246-5dd746d03758",
+        "title": "Navy wool blazer M"
+      },
+      {
+        "id": "6abe4a5f-6e87-4bb2-93b9-fa65cd432b0b",
+        "title": "Black wool suit trousers L"
+      },
+      {
+        "id": "6abe4a61-7ebc-4185-a123-4074b4545371",
+        "title": "Brown leather dress shoes, size 43"
+      },
+      {
+        "id": "6abe4a68-4553-43aa-a7c1-832f478fb928",
+        "title": "Burgundy patterned silk tie"
+      },
+      {
+        "id": "6ab28c89-e4aa-4e38-96b4-7285f49385a2",
+        "title": "Dress shoes, sunglasses & tie bundle"
+      },
+      {
+        "id": "6abe4a50-25b1-4777-b6ca-0eff6660fa58",
+        "title": "Party dress bundle - two white dresses"
+      },
+      {
+        "id": "6abe4a4a-1c4d-4ddf-bba3-e0a416a62002",
+        "title": "Red high heels, size 37"
+      },
+      {
+        "id": "6abe4a3f-beda-4245-95f4-3b72e4be5ffd",
+        "title": "Black satin midi skirt M"
+      },
+      {
+        "id": "6abe4a4f-55c8-4591-be6a-5a18b0ddab92",
+        "title": "Silver necklace with green pendant"
+      }
+    ]
+  },
+  {
+    "query": "leather",
+    "why": "material",
+    "expected": [
+      {
+        "id": "6abe4a54-80d5-4323-82d7-69a6951e0110",
+        "title": "Black leather jacket M"
+      },
+      {
+        "id": "6abe4a65-7409-4e0e-a451-6e834c1b9b85",
+        "title": "Brown leather belt"
+      },
+      {
+        "id": "6abe4a61-7ebc-4185-a123-4074b4545371",
+        "title": "Brown leather dress shoes, size 43"
+      },
+      {
+        "id": "6abe4a63-34d4-4e78-966c-87707446ab04",
+        "title": "Brown winter duck boots, size 44"
+      },
+      {
+        "id": "6ab28c89-c571-40e7-bbdc-1ed16cfcd131",
+        "title": "Brown leather work boots"
+      },
+      {
+        "id": "6abe4a48-ed52-490d-b054-9f74056067a4",
+        "title": "Brown leather knee-high boots, size 40"
+      },
+      {
+        "id": "6abe4a46-cc53-4e0d-bd9f-6cce3a55414e",
+        "title": "Black leather lace-up boots, size 39"
+      },
+      {
+        "id": "6abe4a4b-9042-4195-9996-df90822d7b6f",
+        "title": "Brown leather weekend bag"
+      },
+      {
+        "id": "6abe4a82-b5ff-44bb-9077-a5f23befee0f",
+        "title": "Brown leather sandals, size 30"
+      },
+      {
+        "id": "6abe4a7c-c680-441d-b11a-67bbe82521be",
+        "title": "Brown kids hiking boots, size 28"
+      },
+      {
+        "id": "6ab28c89-e4aa-4e38-96b4-7285f49385a2",
+        "title": "Dress shoes, sunglasses & tie bundle"
+      },
+      {
+        "id": "6abe4a6a-3bdb-404a-9a1f-3b4363c7b882",
+        "title": "Grey and brown canvas backpack"
+      },
+      {
+        "id": "6ab28c89-a807-4124-a98f-5177a0d93528",
+        "title": "Women's clothing bundle - sweaters, boots & skirt"
+      }
+    ]
+  }
+]
