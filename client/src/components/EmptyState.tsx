@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { heading } from "../lib/ui";
 
 export default function EmptyState({
   icon,
@@ -16,7 +17,7 @@ export default function EmptyState({
       <div className="mb-1.5 grid size-[72px] place-items-center rounded-full bg-surface-2 text-ink-2 [&>svg]:size-8">
         {icon}
       </div>
-      <h3 className="font-display text-2xl font-medium">{title}</h3>
+      <h3 className={heading.panel}>{title}</h3>
       {children && <p className="mb-2.5 max-w-[380px] text-ink-2">{children}</p>}
       {action}
     </div>

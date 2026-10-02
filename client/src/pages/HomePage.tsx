@@ -12,7 +12,7 @@ import { COLORS, CONDITIONS, SORTS, TYPES, categoryLabel, genderLabel, labelFor 
 import { readPickReasons } from "../lib/aiPicks";
 import { sizeFilterLabel, useSizeSystem } from "../lib/sizes";
 import { browseUrl, isLanding, readSearch } from "../lib/search";
-import { BRAND, btn } from "../lib/ui";
+import { BRAND, btn, heading as headingStyle } from "../lib/ui";
 import { useHeaderHeight } from "../lib/useHeaderHeight";
 import type { listingsLoader } from "../loaders";
 
@@ -123,7 +123,7 @@ export default function HomePage() {
       >
         <section className="min-w-0">
           <div className="mb-4">
-            <h2 className="font-display text-2xl leading-tight font-medium tracking-tight sm:text-3xl">{heading}</h2>
+            <h2 className={headingStyle.page}>{heading}</h2>
             <p className="mt-1 text-sm text-ink-3">
               {pagination.totalItems} {pagination.totalItems === 1 ? "item" : "items"}
             </p>

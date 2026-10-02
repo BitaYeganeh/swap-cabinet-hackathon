@@ -1,7 +1,6 @@
-import { useEffect, useState } from "react";
 import { Link } from "react-router";
-import { getListings, type Listing, type SearchParams } from "../lib/api";
-import { CONDITIONS, GENDERS, TYPES, categoryLabel, isWanted } from "../lib/format";
+import type { SearchParams } from "../lib/api";
+import { CONDITIONS, GENDERS, TYPES, categoryLabel } from "../lib/format";
 import { browseUrl } from "../lib/search";
 
 // Menu links start a fresh search, like a store's department menu.
@@ -17,7 +16,7 @@ function groupsFor(category: string): MenuLink[][] {
   const featured: MenuLink[] = [
     { label: "New in", to: linkTo(category, { sort: "newest" }) },
     { label: "Like new", to: linkTo(category, { condition: "like-new" }) },
-    { label: "Under €25", to: linkTo(category, { maxPrice: "25" }), highlight: true },
+    { label: "Under €15", to: linkTo(category, { maxPrice: "15" }), highlight: true },
   ];
 
   const products: MenuLink[][] =
@@ -38,48 +37,21 @@ function groupsFor(category: string): MenuLink[][] {
 
 type Tile = { key: string; src: string; label: string; to: string };
 
-// One photo per product type (plus the newest arrival), so each tile shows what
-// it links to — the Men menu shows men's tops, shoes… Kept for the session so
-// re-opening a menu doesn't refetch.
-const tilesCache = new Map<string, Tile[]>();
+// Hand-picked photo per category and tile ("men-shoes.jpg", "men-new.jpg"), so
+// every tile clearly shows what it links to; sellers' own photos often show
+// other things too. Free Unsplash photos, ids listed in assets/menu/CREDITS.md.
+const MENU_PHOTOS = import.meta.glob<string>("../assets/menu/*.jpg", { eager: true, import: "default" });
+const menuPhoto = (category: string, type: string) => MENU_PHOTOS[`../assets/menu/${category}-${type}.jpg`];
 
-// Shimmer squares shown while the tile photos load.
-const PLACEHOLDER_TILES: Tile[] = [1, 2, 3, 4, 5, 6].map((n) => ({ key: `loading-${n}`, src: "", label: "", to: "" }));
-
-const photoOf = (listing?: Listing) => listing?.images[0] && (listing.images[0].url || listing.images[0].url2x);
-
-function useTiles(category: string) {
-  const [tiles, setTiles] = useState(() => tilesCache.get(category) ?? null);
-
-  useEffect(() => {
-    if (tilesCache.has(category)) return;
-    const controller = new AbortController();
-    const withPhotos = (params: Partial<SearchParams>) =>
-      getListings({ category, ...params }, controller.signal).then(({ listings }) =>
-        listings.filter((l) => photoOf(l) && !isWanted(l))
-      );
-
-    Promise.all([
-      ...TYPES.map((t) => withPhotos({ type: t.value }).then((ls) => ({ ...t, listing: ls[0], changes: { type: t.value } }))),
-      withPhotos({ sort: "newest" }),
-    ])
-      .then((all) => {
-        const byType = all.slice(0, TYPES.length) as { value: string; label: string; listing?: Listing; changes: Partial<SearchParams> }[];
-        // "New in" uses the newest item whose photo isn't already on another tile.
-        const shown = new Set(byType.map((r) => r.listing?.id));
-        const newest = (all[TYPES.length] as Listing[]).find((l) => !shown.has(l.id));
-        const results = [...byType, { value: "new", label: "New in", listing: newest, changes: { sort: "newest" } }];
-        const next = results
-          .filter((r) => r.listing)
-          .map((r) => ({ key: r.value, src: photoOf(r.listing)!, label: r.label, to: linkTo(category, r.changes) }));
-        tilesCache.set(category, next);
-        setTiles(next);
-      })
-      .catch(() => {});
-    return () => controller.abort();
-  }, [category]);
-
-  return tiles;
+function useTiles(category: string): Tile[] {
+  const tiles = [
+    ...TYPES.map((t) => ({ key: t.value, label: t.label, to: linkTo(category, { type: t.value }) })),
+    { key: "new", label: "New in", to: linkTo(category, { sort: "newest" }) },
+  ];
+  return tiles.flatMap((tile) => {
+    const src = menuPhoto(category, tile.key);
+    return src ? [{ ...tile, src }] : [];
+  });
 }
 
 const linkClass = (link: MenuLink) =>
@@ -110,7 +82,7 @@ export default function CategoryMenu({ category }: { category: string }) {
       </nav>
 
       <div className="grid content-start grid-cols-2 gap-x-3 gap-y-4">
-        {(tiles ?? PLACEHOLDER_TILES).map((tile) =>
+        {tiles.map((tile) =>
           tile.src ? (
             <Link key={tile.key} to={tile.to} className="group block no-underline">
               <div className="aspect-square overflow-hidden rounded-xl bg-surface-2">

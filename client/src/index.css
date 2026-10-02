@@ -3,6 +3,7 @@
 @theme {
   --font-sans: "Inter", system-ui, "Segoe UI", Roboto, sans-serif;
   --font-display: "Fraunces", Georgia, "Times New Roman", serif;
+  /* Headings use Plus Jakarta Sans, everything else Inter; Fraunces is kept for the logo wordmark only. */
   --font-hero: "Plus Jakarta Sans", "Inter", system-ui, sans-serif;
 
   --color-bg: #faf8f4;

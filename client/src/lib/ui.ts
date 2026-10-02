@@ -13,5 +13,14 @@ export const btn = {
   link: "text-sm text-ink-2 underline underline-offset-[3px] hover:text-ink",
 };
 
+// One heading scale for the whole site (Plus Jakarta Sans), so the same kind of
+// title always has the same size and weight.
+export const heading = {
+  /** Results and page titles: "Women's pre-loved fashion", "Photo search". */
+  page: "font-hero text-2xl leading-tight font-bold tracking-[-0.02em] sm:text-[28px]",
+  /** Drawer, popup and empty-state titles. */
+  panel: "font-hero text-xl leading-snug font-bold tracking-[-0.01em]",
+};
+
 export const countBadge =
   "min-w-[18px] h-[18px] px-[5px] rounded-full bg-warm text-white text-[11px] font-bold leading-[18px] text-center";

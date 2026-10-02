@@ -1,7 +1,7 @@
 import { useEffect, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 import { LuX } from "react-icons/lu";
-import { countBadge } from "../lib/ui";
+import { countBadge, heading } from "../lib/ui";
 
 type Props = {
   title: ReactNode;
@@ -40,7 +40,7 @@ export default function SideDrawer({ title, label, onClose, children }: Props) {
         className="absolute inset-y-0 right-0 flex w-[min(420px,100vw)] animate-slide-in-right flex-col bg-bg shadow-float"
       >
         <header className="flex items-center justify-between border-b border-line px-5 py-4">
-          <h2 className="font-hero text-xl font-extrabold tracking-tight">{title}</h2>
+          <h2 className={heading.panel}>{title}</h2>
           <button
             type="button"
             onClick={onClose}
