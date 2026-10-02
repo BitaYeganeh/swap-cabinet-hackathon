@@ -25,6 +25,8 @@ type Props = {
   onChange: (changes: Partial<SearchParams>) => void;
   // Rendered at the right end of the bar (the sort control).
   children?: ReactNode;
+  /** Matching items, shown at the start of the bar (as H&M does). */
+  count?: number;
 };
 
 type FilterKey = "size" | "brand" | "price" | "condition" | "color";
@@ -102,7 +104,7 @@ const optionList = "-my-1 max-h-[min(60vh,420px)] overflow-y-auto pr-1";
 // Size filtering only applies to clothing and shoes.
 const hasSizes = (type?: string) => !type || ["tops", "bottoms", "shoes"].includes(type);
 
-export default function FilterBar({ params, brands, onChange, children }: Props) {
+export default function FilterBar({ params, brands, onChange, children, count }: Props) {
   const system = useSizeSystem();
   const headerHeight = useHeaderHeight();
   const barRef = useRef<HTMLDivElement>(null);
@@ -177,11 +179,16 @@ export default function FilterBar({ params, brands, onChange, children }: Props)
       ref={barRef}
       style={{ top: headerHeight }}
       // While a dropdown is open the bar rises above the header so only it stays lit.
-      className={`sticky -mx-4 mb-5 border-b border-line bg-bg/95 px-4 py-3 backdrop-blur-md sm:-mx-6 sm:px-6 ${
+      className={`sticky -mx-4 mb-4 border-b border-line bg-bg/95 px-4 py-2.5 backdrop-blur-md sm:-mx-6 sm:px-6 ${
         open ? "z-40" : "z-10"
       }`}
     >
       <div className="flex items-center gap-2.5">
+        {count !== undefined && (
+          <p className="shrink-0 pr-1 text-sm whitespace-nowrap text-ink-3" aria-live="polite">
+            {count} {count === 1 ? "item" : "items"}
+          </p>
+        )}
         <div
           className="flex min-w-0 flex-1 gap-2 overflow-x-auto [scrollbar-width:none]"
           onScroll={close}

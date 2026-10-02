@@ -309,11 +309,12 @@ async function keywordMatches(params) {
   const found = new Set(matches.map((l) => l.id));
   const byId = new Map(candidates.map((l) => [l.id, l]));
   const extra = (await similarIds(keywords, { limit: SEMANTIC_LIMIT })).filter((id) => !found.has(id) && byId.has(id)).map((id) => byId.get(id));
-  return { matches: [...matches, ...extra], suggestion };
+  // similarOnly: nothing matched the words, so every result is a meaning match.
+  return { matches: [...matches, ...extra], suggestion, similarOnly: matches.length === 0 && extra.length > 0 };
 }
 
 async function searchByKeywords(params) {
-  let { matches, suggestion } = await keywordMatches(params);
+  let { matches, suggestion, similarOnly } = await keywordMatches(params);
 
   if (IN_MEMORY_SORTS[params.sort]) matches = [...matches].sort(IN_MEMORY_SORTS[params.sort]);
 
@@ -325,6 +326,7 @@ async function searchByKeywords(params) {
     listings: matches.slice((page - 1) * PER_PAGE, page * PER_PAGE),
     pagination: { page, totalPages, totalItems, perPage: PER_PAGE },
     suggestion,
+    similarOnly,
   };
 }
 

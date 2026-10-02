@@ -46,13 +46,14 @@ router.get("/brands", async (req, res) => {
 // GET /api/listings?keywords=&category=&type=&gender=&size=&condition=&color=&brand=&minPrice=&maxPrice=&sort=&page=&ids=
 router.get("/", async (req, res) => {
   try {
-    const { listings, pagination, suggestion } = await getListings(req.query);
+    const { listings, pagination, suggestion, similarOnly } = await getListings(req.query);
 
     res.json({
       success: true,
       listings,
       pagination,
       suggestion: suggestion ?? null,
+      similarOnly: !!similarOnly,
     });
   } catch (error) {
     logSharetribeError(error);

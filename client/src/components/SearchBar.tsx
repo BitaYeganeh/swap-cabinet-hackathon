@@ -262,12 +262,15 @@ export default function SearchBar({
         if (!e.currentTarget.contains(e.relatedTarget as Node | null)) setOpen(false);
       }}
       aria-busy={thinking}
-      className="relative order-3 flex h-12 flex-[1_1_100%] items-center rounded-full border-[1.5px] border-line bg-surface py-1 pr-1 pl-12 shadow-xs transition focus-within:border-accent focus-within:ring-4 focus-within:ring-accent-soft sm:order-none sm:h-[52px] sm:flex-[0_1_680px]"
+      className="relative order-3 flex h-12 min-w-0 flex-[1_1_100%] items-center border-b border-transparent pr-1 pl-9 transition focus-within:border-line max-sm:border-line sm:order-none sm:h-[52px] sm:flex-[0_1_560px]"
     >
-      {useAi ? (
-        <LuSparkles className="absolute left-[18px] size-5 text-accent" aria-label="AI search" />
+      {/* Enter searches; the icon shows AI mode and progress instead of a Search button. */}
+      {thinking ? (
+        <LuLoaderCircle className="absolute left-0.5 size-6 animate-spin text-accent" aria-hidden="true" />
+      ) : useAi ? (
+        <LuSparkles className="absolute left-0.5 size-6 text-accent" aria-label="AI search" />
       ) : (
-        <LuSearch className="absolute left-[18px] size-5 text-ink-3" />
+        <LuSearch className="absolute left-0.5 size-6 stroke-[1.75] text-ink-2" />
       )}
       <span className="sr-only" aria-live="polite">
         {thinking ? "Searching with AI…" : ""}
@@ -295,7 +298,7 @@ export default function SearchBar({
         aria-controls={listboxId}
         aria-activedescendant={expanded && active >= 0 ? optionId(active) : undefined}
         autoComplete="off"
-        className="h-full min-w-0 flex-1 bg-transparent outline-none placeholder:text-ink-3"
+        className="h-full min-w-0 flex-1 bg-transparent text-[17px] outline-none placeholder:text-ink-3 [&::-webkit-search-cancel-button]:hidden"
       />
       {shown && (
         <button
@@ -313,17 +316,9 @@ export default function SearchBar({
         </button>
       )}
       <PhotoSearchButton className="mr-1" />
-      <button
-        type="submit"
-        disabled={thinking}
-        className="inline-flex h-[42px] w-[42px] shrink-0 items-center justify-center gap-2 rounded-full bg-accent font-semibold text-white transition hover:bg-accent-hover active:scale-[0.98] disabled:cursor-wait disabled:opacity-90 sm:w-auto sm:px-[22px]"
-      >
-        {thinking ? (
-          <LuLoaderCircle className="size-[18px] animate-spin" />
-        ) : (
-          <LuSearch className="size-[18px]" />
-        )}
-        <span className="hidden sm:inline">{thinking ? "Thinking…" : "Search"}</span>
+      {/* Hidden: Enter submits through it, and screen readers still get a Search button. */}
+      <button type="submit" disabled={thinking} className="sr-only">
+        {thinking ? "Searching…" : "Search"}
       </button>
 
       {expanded && !thinking && (

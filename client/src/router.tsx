@@ -5,6 +5,7 @@ import { listingsLoader } from "./loaders";
 import ErrorPage from "./pages/ErrorPage";
 import HomePage from "./pages/HomePage";
 import PhotoSearchPage from "./pages/PhotoSearchPage";
+import SellPage from "./pages/SellPage";
 
 const withoutItem = (url: URL) => {
   const params = new URLSearchParams(url.search);
@@ -34,6 +35,11 @@ export const router = createBrowserRouter([
           {
             path: "photo",
             element: <PhotoSearchPage />,
+          },
+          {
+            // Where sellers will enter a listing's details.
+            path: "sell",
+            element: <SellPage />,
           },
           {
             // Any other address goes back to the one page.

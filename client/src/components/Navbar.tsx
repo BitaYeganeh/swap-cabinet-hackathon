@@ -1,14 +1,19 @@
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
+import { LuUser } from "react-icons/lu";
 import { Link, useLocation, useSearchParams } from "react-router";
+import logo from "../assets/logo-swap-cabinet.png";
+import { MARKETPLACE_URL } from "../lib/basket";
+import { BRAND } from "../lib/ui";
 import { CATEGORIES, GENDERS, TYPES, categoryLabel } from "../lib/format";
 import { cancelAiSearch, useAiSearchPending } from "../lib/aiSearch";
 import { browseUrl, readSearch } from "../lib/search";
 import { BasketButton } from "./Basket";
 import { SavedButton } from "./Saved";
 import CategoryMenu from "./CategoryMenu";
-import Logo from "./Logo";
 import SearchBar from "./SearchBar";
+
+const headerLink = "px-2 text-[15px] whitespace-nowrap text-ink no-underline transition hover:text-accent";
 
 export default function Navbar() {
   const location = useLocation();
@@ -48,28 +53,56 @@ export default function Navbar() {
   }, [open]);
 
   return (
-    <header className="sticky top-0 z-20 border-b border-line bg-bg/90 backdrop-blur-md backdrop-saturate-150">
-      <div className="mx-auto flex max-w-7xl flex-wrap items-center gap-x-3 gap-y-2.5 px-4 py-3 sm:flex-nowrap sm:gap-6 sm:px-6 sm:py-0 sm:h-[76px]">
-        {/* Equal-width slots either side keep the search bar centred. */}
-        <div className="sm:flex-1">
-          <Logo />
-        </div>
+    <header className="sticky top-0 z-20 border-b border-line bg-white">
+      {/* Like the marketplace header: logo | search on the left, account links and icons on the right. */}
+      <div className="mx-auto flex max-w-7xl flex-wrap items-center gap-x-4 gap-y-2 px-4 py-3 sm:h-[76px] sm:flex-nowrap sm:gap-x-6 sm:px-6 sm:py-0">
+        <Link
+          to="/"
+          aria-label={`${BRAND} home`}
+          className="min-w-0 shrink sm:h-full sm:shrink-0 sm:border-r sm:border-line sm:pr-6"
+        >
+          <span className="flex h-full items-center">
+            {/* The logo PNG has a white background; multiply blends it into the header. */}
+            <img
+              src={logo}
+              alt={BRAND}
+              width={288}
+              height={36}
+              className="h-5 w-auto mix-blend-multiply sm:h-7 xl:h-9"
+            />
+          </span>
+        </Link>
 
         {/* Remount when the URL keywords change so the input mirrors the URL. */}
-        <SearchBar
-          key={shownSearch}
-          initial={shownSearch}
-          category={category}
-          current={searchParams}
-        />
+        <SearchBar key={shownSearch} initial={shownSearch} category={category} current={searchParams} />
 
-        <div className="ml-auto flex justify-end sm:flex-1">
+        <div className="ml-auto flex shrink-0 items-center gap-0.5 sm:gap-2">
+          <Link to="/sell" className={`${headerLink} max-xl:hidden`}>
+            Post a new listing
+          </Link>
+          <a
+            href={`${MARKETPLACE_URL}/inbox/orders`}
+            target="_blank"
+            rel="noreferrer"
+            className={`${headerLink} max-xl:hidden`}
+          >
+            Inbox
+          </a>
           <SavedButton />
           <BasketButton />
+          <a
+            href={`${MARKETPLACE_URL}/profile-settings`}
+            target="_blank"
+            rel="noreferrer"
+            aria-label="Your account"
+            className="ml-1 grid size-9 shrink-0 place-items-center rounded-full bg-[#4a5d6e] sm:size-11 text-white transition hover:bg-[#3d4e5d]"
+          >
+            <LuUser className="size-5" />
+          </a>
         </div>
       </div>
 
-      <nav
+    <nav
         ref={tabsRef}
         className="mx-auto flex max-w-7xl gap-1 overflow-x-auto px-4 [scrollbar-width:none] sm:px-6"
         aria-label="Categories"
@@ -115,10 +148,11 @@ export default function Navbar() {
               <CategoryMenu key={open.category} category={open.category} />
             </div>
           </div>,
-          document.body
+          document.body,
         )}
 
-      {category && <SubcategoryNav category={category} current={searchParams} />}
+      {/* Tops / Bottoms / … : on the home page too (across all categories) and on every results page. */}
+      {location.pathname === "/" && <SubcategoryNav category={category} current={searchParams} />}
 
       {aiPending && (
         <div className="absolute inset-x-0 -bottom-px h-0.5 overflow-hidden bg-accent-soft" aria-hidden="true">
@@ -134,15 +168,12 @@ const subLink = (active: boolean) =>
     active ? "bg-ink text-white" : "bg-surface-2 text-ink-2 hover:text-ink"
   }`;
 
-function SubcategoryNav({ category, current }: { category: string; current: URLSearchParams }) {
+function SubcategoryNav({ category, current }: { category?: string; current: URLSearchParams }) {
   const gender = current.get("gender") ?? "";
   const type = current.get("type") ?? "";
 
   return (
-    <nav
-      className="border-t border-line"
-      aria-label="Subcategories"
-    >
+    <nav className="border-t border-line" aria-label="Subcategories">
       <div className="mx-auto flex max-w-7xl items-center gap-2 overflow-x-auto px-4 py-2 [scrollbar-width:none] sm:px-6">
         {category === "kids" && (
           <>

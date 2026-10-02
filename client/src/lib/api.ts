@@ -85,6 +85,8 @@ export type ListingsResponse = {
   pagination: Pagination;
   /** Spelling-corrected keywords, when the search had likely typos. */
   suggestion?: string | null;
+  /** Nothing matched the words exactly; every result is a "similar meaning" match. */
+  similarOnly?: boolean;
 };
 
 export class ApiError extends Error {

@@ -1,4 +1,4 @@
-export const BRAND = "Rethread";
+export const BRAND = "The Swap Cabinet";
 
 // Shared Tailwind class strings for buttons used across pages.
 const btnBase =

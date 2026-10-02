@@ -139,6 +139,10 @@ async function relaxUntilFound(filters) {
 
   for (const key of RELAX_ORDER) {
     if (!(key in current)) continue;
+    // Never drop the last thing describing the item ("socks" in "pink socks"):
+    // with only a category or sort left, every listing would "match".
+    const rest = Object.keys(current).filter((k) => k !== key && k !== "sort" && k !== "category");
+    if (rest.length === 0) break;
     delete current[key];
     dropped.push(key);
     if ((await count(current)) > 0) return { filters: current, dropped };
