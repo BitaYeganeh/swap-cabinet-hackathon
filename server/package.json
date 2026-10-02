@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "node --test 'test/**/*.test.js'",
+    "test": "node --test \"test/**/*.test.js\"",
     "start": "node src/index.js",
     "dev": "nodemon --ignore data/ src/index.js",
     "sync": "node src/vectorStore/sync.js"

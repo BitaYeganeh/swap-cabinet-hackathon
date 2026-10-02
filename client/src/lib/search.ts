@@ -19,10 +19,9 @@ export function readSearch(searchParams: URLSearchParams): SearchParams {
   return params;
 }
 
-// With nothing searched the page shows only the hero; any category, search or
-// filter shows results instead.
-export const isLanding = (search: SearchParams) =>
-  !search.page && QUERY_KEYS.every((key) => key === "sort" || !search[key]);
+// With nothing searched the page shows only the hero; any category, search,
+// filter or sort shows results instead.
+export const isLanding = (search: SearchParams) => !search.page && QUERY_KEYS.every((key) => !search[key]);
 
 // An AI search adds these to the URL: the shopper's own words, the AI's summary
 // of what it searched for, any filters dropped to find matches, and for need

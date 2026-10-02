@@ -1,4 +1,4 @@
-export const BRAND = "Rethread";
+export const BRAND = "The Swap Cabinet";
 
 // Shared Tailwind class strings for buttons used across pages.
 const btnBase =
@@ -11,6 +11,15 @@ export const btn = {
   ghost: `${btnBase} h-11 px-5 border-line bg-surface text-ink hover:border-ink-3`,
   ghostSmall: `${btnBase} h-9 px-3.5 text-sm border-line bg-surface text-ink hover:border-ink-3`,
   link: "text-sm text-ink-2 underline underline-offset-[3px] hover:text-ink",
+};
+
+// One heading scale for the whole site (Plus Jakarta Sans), so the same kind of
+// title always has the same size and weight.
+export const heading = {
+  /** Results and page titles: "Women's pre-loved fashion", "Photo search". */
+  page: "font-hero text-2xl leading-tight font-bold tracking-[-0.02em] sm:text-[28px]",
+  /** Drawer, popup and empty-state titles. */
+  panel: "font-hero text-xl leading-snug font-bold tracking-[-0.01em]",
 };
 
 export const countBadge =

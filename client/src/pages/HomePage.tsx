@@ -4,6 +4,8 @@ import { Link, useLoaderData, useLocation, useNavigate, useNavigation, useSearch
 import EmptyState from "../components/EmptyState";
 import FilterBar from "../components/FilterBar";
 import Hero from "../components/Hero";
+import NoExactMatch from "../components/NoExactMatch";
+import { widenedText } from "../lib/widened";
 import ListingCard, { ListingGrid } from "../components/ListingCard";
 import ListingModal from "../components/ListingModal";
 import Pagination from "../components/Pagination";
@@ -25,7 +27,7 @@ const CATEGORY_HEADINGS: Record<string, string> = {
 };
 
 export default function HomePage() {
-  const { listings, pagination, suggestion, brands } = useLoaderData<typeof listingsLoader>();
+  const { listings, pagination, suggestion, similarOnly, brands } = useLoaderData<typeof listingsLoader>();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const location = useLocation();
@@ -101,10 +103,35 @@ export default function HomePage() {
     <ListingModal key={itemId} id={itemId} known={listings.find((l) => l.id === itemId)} onClose={closeItem} />
   );
 
+  // Count, filters and sort — on results pages and, as an entry point, above the hero.
+  const filterBar = (
+    <FilterBar params={params} brands={brands} onChange={update} count={pagination.totalItems}>
+      <label className="flex h-10 shrink-0 items-center gap-2 rounded-md border border-line bg-white pr-1.5 pl-4 transition hover:border-transparent hover:shadow-[0_2px_10px_rgb(0_0_0/0.12)] text-sm text-ink-2">
+        <span className="whitespace-nowrap max-sm:hidden">Sort by</span>
+        <select
+          value={params.sort ?? ""}
+          onChange={(e) => update({ sort: e.target.value })}
+          aria-label="Sort by"
+          className="h-full cursor-pointer bg-transparent font-semibold text-ink outline-none"
+        >
+          {SORTS.map((s) => (
+            <option key={s.value} value={s.value}>
+              {s.label}
+            </option>
+          ))}
+        </select>
+      </label>
+    </FilterBar>
+  );
+
   if (isLanding(params) && !aiQuery) {
     return (
       <>
         <title>{`${BRAND} · Pre-loved fashion`}</title>
+        {/* Pinned under the header so the filters stay in view while scrolling past the hero. */}
+        <div style={{ top: headerHeight }} className="sticky z-30 bg-bg">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 [&>div]:mb-0">{filterBar}</div>
+        </div>
         <Hero />
         {modal}
       </>
@@ -119,49 +146,48 @@ export default function HomePage() {
       <div
         ref={resultsRef}
         style={{ scrollMarginTop: headerHeight }}
-        className="mx-auto max-w-7xl px-4 pt-5 pb-16 sm:px-6 sm:pt-8"
+        className="mx-auto max-w-7xl px-4 pb-16 sm:px-6"
       >
         <section className="min-w-0">
-          <div className="mb-4">
-            <h2 className="font-display text-2xl leading-tight font-medium tracking-tight sm:text-3xl">{heading}</h2>
-            <p className="mt-1 text-sm text-ink-3">
-              {pagination.totalItems} {pagination.totalItems === 1 ? "item" : "items"}
-            </p>
-            {suggestion && (
-              <p className="mt-1 text-sm text-ink-2">
+          {/* No visible title (the tabs and filter pills say what's shown); kept for screen readers and the tab title. */}
+          <h2 className="sr-only">{heading}</h2>
+          {/* Honest label when nothing matched the words and these are only close in meaning. */}
+          {/* Not an exact match: a clear amber notice, above any AI note. */}
+          {aiQuery && aiSummary && relaxed.length > 0 && (
+            <div className="pt-4">
+              <NoExactMatch query={aiQuery} exactTo={`/?keywords=${encodeURIComponent(aiQuery)}`}>
+                {widenedText(relaxed)}
+              </NoExactMatch>
+            </div>
+          )}
+          {!(aiQuery && relaxed.length > 0) && similarOnly && params.keywords && (
+            <div className="pt-4">
+              <NoExactMatch query={aiQuery || params.keywords}>
+                No item mentions these words, so here are items that are similar in meaning.
+              </NoExactMatch>
+            </div>
+          )}
+
+          {suggestion && (
+            <div className="pt-4">
+              <p className="text-sm text-ink-2">
                 Did you mean{" "}
                 <button type="button" className={btn.link} onClick={() => update({ keywords: suggestion })}>
                   “{suggestion}”
                 </button>
                 ?
               </p>
-            )}
-          </div>
+            </div>
+          )}
 
           {aiQuery && aiSummary && (
             <AiBanner query={aiQuery} relaxed={relaxed} picked={picked} noPicks={noPicks} />
           )}
 
-          <FilterBar params={params} brands={brands} onChange={update}>
-            <label className="flex h-10 shrink-0 items-center gap-2 rounded-full border border-line bg-surface pr-1.5 pl-4 text-sm text-ink-2">
-              <span className="whitespace-nowrap max-sm:hidden">Sort by</span>
-              <select
-                value={params.sort ?? ""}
-                onChange={(e) => update({ sort: e.target.value })}
-                aria-label="Sort by"
-                className="h-full cursor-pointer bg-transparent font-semibold text-ink outline-none"
-              >
-                {SORTS.map((s) => (
-                  <option key={s.value} value={s.value}>
-                    {s.label}
-                  </option>
-                ))}
-              </select>
-            </label>
-          </FilterBar>
+          {filterBar}
 
           {pills.length > 0 && (
-            <div className="mb-5 flex flex-wrap items-center gap-2">
+            <div className="mb-4 flex flex-wrap items-center gap-2">
               {pills.map((pill) => (
                 <button
                   type="button"
@@ -206,17 +232,6 @@ export default function HomePage() {
   );
 }
 
-const RELAXED_LABELS: Record<string, string> = {
-  color: "colour",
-  condition: "condition",
-  size: "size",
-  minPrice: "minimum price",
-  maxPrice: "maximum price",
-  keywords: "some search words",
-  gender: "boys/girls",
-  type: "item type",
-};
-
 function AiBanner({
   query,
   relaxed,
@@ -248,17 +263,15 @@ function AiBanner({
             Nothing in the shop is a clear fit yet, so these are the closest matches by keyword.
           </p>
         )}
-        {relaxed.length > 0 && (
-          <p className="mt-1 text-ink-2">
-            No exact matches, so we left out: {relaxed.map((key) => RELAXED_LABELS[key] ?? key).join(", ")}.
-          </p>
+        {/* When filters were widened, the amber notice above says so and links to the exact search. */}
+        {relaxed.length === 0 && (
+          <Link
+            to={`/?keywords=${encodeURIComponent(query)}`}
+            className="mt-1 inline-block font-semibold text-accent no-underline hover:underline"
+          >
+            Search for the exact words instead
+          </Link>
         )}
-        <Link
-          to={`/?keywords=${encodeURIComponent(query)}`}
-          className="mt-1 inline-block font-semibold text-accent no-underline hover:underline"
-        >
-          Search for the exact words instead
-        </Link>
       </div>
     </div>
   );

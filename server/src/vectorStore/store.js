@@ -54,7 +54,10 @@ function createStore(dir = DEFAULT_DIR) {
 
   const table = () => {
     tablePromise ??= (async () => {
-      const db = await lancedb.connect(dir);
+      // `npm run sync` writes from a separate process. By default LanceDB never
+      // re-checks the table, so a running server would keep serving the rows it
+      // first opened (empty before the first sync). Check for new data every 5s.
+      const db = await lancedb.connect(dir, { readConsistencyInterval: 5 });
       const names = await db.tableNames();
       return names.includes(TABLE) ? db.openTable(TABLE) : db.createEmptyTable(TABLE, SCHEMA);
     })().catch((error) => {

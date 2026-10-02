@@ -6,7 +6,7 @@ import ListingModal from "../components/ListingModal";
 import type { Listing } from "../lib/api";
 import PhotoSearchButton from "../components/PhotoSearchButton";
 import { GROUP_TITLES, photoSearch, type PhotoLabels, type PhotoSearchResponse } from "../lib/photoSearch";
-import { BRAND } from "../lib/ui";
+import { BRAND, heading } from "../lib/ui";
 
 type State =
   | { status: "idle" }
@@ -69,7 +69,7 @@ function PhotoResults({ file }: { file?: File }) {
       <div className="mb-6 flex items-center gap-4">
         {file && <PhotoPreview file={file} />}
         <div className="min-w-0 flex-1">
-          <h2 className="font-display text-2xl leading-tight font-medium tracking-tight sm:text-3xl">Photo search</h2>
+          <h2 className={heading.page}>Photo search</h2>
           <p className="mt-1 text-sm text-ink-3">
             {state.status === "idle" && "Take or upload a photo of an item you like."}
             {state.status === "loading" && "Looking at your photo…"}

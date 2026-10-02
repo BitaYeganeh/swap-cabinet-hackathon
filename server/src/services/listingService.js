@@ -291,7 +291,9 @@ const IN_MEMORY_SORTS = {
   "price-desc": (a, b) => priceOf(b) - priceOf(a),
 };
 
-async function searchByKeywords(params) {
+// Every listing matching the filters and keywords, best first, plus the
+// spelling suggestion used. Shared by the keyword search and the facet counts.
+async function keywordMatches(params) {
   const candidates = (await getCandidates(params)).filter(matchesFilters(localFilters(params)));
   const keywords = params.keywords.trim();
 
@@ -307,7 +309,12 @@ async function searchByKeywords(params) {
   const found = new Set(matches.map((l) => l.id));
   const byId = new Map(candidates.map((l) => [l.id, l]));
   const extra = (await similarIds(keywords, { limit: SEMANTIC_LIMIT })).filter((id) => !found.has(id) && byId.has(id)).map((id) => byId.get(id));
-  matches = [...matches, ...extra];
+  // similarOnly: nothing matched the words, so every result is a meaning match.
+  return { matches: [...matches, ...extra], suggestion, similarOnly: matches.length === 0 && extra.length > 0 };
+}
+
+async function searchByKeywords(params) {
+  let { matches, suggestion, similarOnly } = await keywordMatches(params);
 
   if (IN_MEMORY_SORTS[params.sort]) matches = [...matches].sort(IN_MEMORY_SORTS[params.sort]);
 
@@ -319,6 +326,7 @@ async function searchByKeywords(params) {
     listings: matches.slice((page - 1) * PER_PAGE, page * PER_PAGE),
     pagination: { page, totalPages, totalItems, perPage: PER_PAGE },
     suggestion,
+    similarOnly,
   };
 }
 
@@ -414,7 +422,48 @@ async function getListingsByIds(ids) {
   return byId;
 }
 
+// Fields the filter dropdowns show counts for, and how to read them off a listing.
+const FACETS = {
+  color: (listing) => listing.color,
+  condition: (listing) => listing.condition,
+  brand: (listing) => normalizeBrand(listing.brand) || null,
+};
+
+// Every listing the current search matches, ignoring paging and sort.
+async function allMatches(params) {
+  if (params.keywords && params.keywords.trim()) return (await keywordMatches(params)).matches;
+  const matches = (await getCandidates(params)).filter(matchesFilters(localFilters(params)));
+  if (!params.ids) return matches;
+  const ids = new Set(params.ids.split(","));
+  return matches.filter((listing) => ids.has(listing.id));
+}
+
+// Counts per option for each filter dropdown, as on H&M: each field is counted
+// with all the *other* filters applied, so a dropdown shows what picking any of
+// its options would give. -> { color: { blue: 15, … }, condition: {…}, brand: {…},
+// price: { min, max } in cents }
+async function getFacets(params = {}) {
+  const entries = await Promise.all(
+    Object.entries(FACETS).map(async ([field, valueOf]) => {
+      const counts = {};
+      for (const listing of await allMatches({ ...params, [field]: "", page: 1 })) {
+        const value = valueOf(listing);
+        if (value) counts[value] = (counts[value] || 0) + 1;
+      }
+      return [field, counts];
+    })
+  );
+  // Price range of the search without its own price filter, for the price slider.
+  const prices = (await allMatches({ ...params, minPrice: "", maxPrice: "", page: 1 }))
+    .map((listing) => listing.price?.amount)
+    .filter((amount) => amount != null);
+  const price = prices.length ? { min: Math.min(...prices), max: Math.max(...prices) } : null;
+
+  return { ...Object.fromEntries(entries), price };
+}
+
 module.exports = {
+  getFacets,
   getListings,
   getListing,
   getAutocomplete,

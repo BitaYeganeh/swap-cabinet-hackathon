@@ -302,7 +302,7 @@ function ListingDetail({ listing }: { listing: Listing }) {
         )}
 
         <div className="mt-6 flex flex-wrap items-center gap-3 border-t border-line pt-6">
-          <div className="grid size-11 shrink-0 place-items-center rounded-full bg-ink font-display text-xl text-gold">
+          <div className="grid size-11 shrink-0 place-items-center rounded-full bg-ink font-hero text-lg font-bold text-gold">
             {(listing.sellerName || "?").charAt(0)}
           </div>
           <div>
