@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import classNames from 'classnames';
@@ -92,6 +92,12 @@ const SmartSearch = props => {
   const [aiResult, setAiResult] = useState(carried.aiResult || null);
   const [photo, setPhoto] = useState(carried.photo || null); // { file, preview, result }
   const [dragging, setDragging] = useState(false);
+  // Phones and tablets can't drag files, but their photo picker offers the camera.
+  // Set after the first render, so the server-rendered page matches.
+  const [isTouch, setIsTouch] = useState(false);
+  useEffect(() => {
+    setIsTouch(window.matchMedia?.('(pointer: coarse)').matches || false);
+  }, []);
 
   const go = (url, smartSearch) => {
     if (url) history.push(url, { smartSearch });
@@ -192,6 +198,8 @@ const SmartSearch = props => {
           placeholder={
             dragging
               ? 'Drop your photo to search with it'
+              : isTouch
+              ? 'Describe what you need, or snap a photo'
               : 'Describe what you need, or drop a photo here'
           }
           aria-label="Describe what you are looking for"

@@ -15,3 +15,6 @@ build
 npm-debug.log
 yarn-error.log
 server/api/smart-search/data/
+
+# Smart Search local vector index and models (rebuild with the sync script)
+server/api/smart-search/data/
