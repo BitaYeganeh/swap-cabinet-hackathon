@@ -53,7 +53,7 @@ export default function Navbar() {
   }, [open]);
 
   return (
-    <header className="sticky top-0 z-20 border-b border-line bg-white">
+    <header className="sticky top-0 z-20 bg-bg">
       {/* Like the marketplace header: logo | search on the left, account links and icons on the right. */}
       <div className="mx-auto flex max-w-7xl flex-wrap items-center gap-x-4 gap-y-2 px-4 py-3 sm:h-[76px] sm:flex-nowrap sm:gap-x-6 sm:px-6 sm:py-0">
         <Link
@@ -164,8 +164,8 @@ export default function Navbar() {
 }
 
 const subLink = (active: boolean) =>
-  `shrink-0 whitespace-nowrap rounded-full px-3.5 py-1.5 text-sm font-medium no-underline transition ${
-    active ? "bg-ink text-white" : "bg-surface-2 text-ink-2 hover:text-ink"
+  `shrink-0 whitespace-nowrap py-1.5 text-sm tracking-wide uppercase underline-offset-[6px] transition ${
+    active ? "font-medium text-ink underline decoration-[1.5px]" : "text-ink-2 no-underline hover:text-ink hover:underline"
   }`;
 
 function SubcategoryNav({ category, current }: { category?: string; current: URLSearchParams }) {
@@ -173,8 +173,8 @@ function SubcategoryNav({ category, current }: { category?: string; current: URL
   const type = current.get("type") ?? "";
 
   return (
-    <nav className="border-t border-line" aria-label="Subcategories">
-      <div className="mx-auto flex max-w-7xl items-center gap-2 overflow-x-auto px-4 py-2 [scrollbar-width:none] sm:px-6">
+    <nav aria-label="Subcategories">
+      <div className="mx-auto flex max-w-7xl items-center gap-6 overflow-x-auto px-4 py-2 [scrollbar-width:none] sm:px-6">
         {category === "kids" && (
           <>
             {[{ value: "", label: "All kids" }, ...GENDERS].map((g) => (

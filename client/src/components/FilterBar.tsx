@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
-import { createPortal } from "react-dom";
-import { LuCheck, LuChevronDown, LuSearch } from "react-icons/lu";
+import { LuCheck, LuSearch } from "react-icons/lu";
 import { getFacets, type Brand, type Facets, type SearchParams } from "../lib/api";
 import { COLORS, CONDITIONS, labelFor } from "../lib/format";
 import {
@@ -178,8 +177,8 @@ export default function FilterBar({ params, brands, onChange, children, count }:
     <div
       ref={barRef}
       style={{ top: headerHeight }}
-      // While a dropdown is open the bar rises above the header so only it stays lit.
-      className={`sticky -mx-4 mb-4 border-b border-line bg-bg/95 px-4 py-2.5 backdrop-blur-md sm:-mx-6 sm:px-6 ${
+      // While a dropdown is open the bar rises above the header so its panel isn't covered.
+      className={`sticky -mx-4 mb-4 bg-bg/95 px-4 py-2.5 backdrop-blur-md sm:-mx-6 sm:px-6 ${
         open ? "z-40" : "z-10"
       }`}
     >
@@ -190,7 +189,8 @@ export default function FilterBar({ params, brands, onChange, children, count }:
           </p>
         )}
         <div
-          className="flex min-w-0 flex-1 gap-2 overflow-x-auto [scrollbar-width:none]"
+          // Vertical padding keeps the hover shadow from being clipped by the scroll container.
+          className="-my-2 flex min-w-0 flex-1 gap-2.5 overflow-x-auto px-1 py-2 [scrollbar-width:none]"
           onScroll={close}
           role="toolbar"
           aria-label="Filters"
@@ -203,12 +203,13 @@ export default function FilterBar({ params, brands, onChange, children, count }:
                 key={f.key}
                 aria-expanded={open?.key === f.key}
                 onClick={(e) => toggle(f.key, e.currentTarget)}
-                className={`inline-flex h-10 shrink-0 items-center gap-1.5 rounded-full border px-4 text-sm font-medium whitespace-nowrap transition ${
+                // Square-ish white buttons that lift with a soft shadow on hover or while open.
+                className={`inline-flex h-10 shrink-0 items-center gap-1.5 rounded-md border px-5 text-sm font-medium whitespace-nowrap transition ${
                   f.value
                     ? "border-ink bg-ink text-white"
                     : open?.key === f.key
-                      ? "border-ink bg-surface"
-                      : "border-line bg-surface hover:border-ink-3"
+                      ? "border-transparent bg-white text-ink shadow-[0_2px_10px_rgb(0_0_0/0.12)]"
+                      : "border-line bg-white text-ink-2 hover:border-transparent hover:text-ink hover:shadow-[0_2px_10px_rgb(0_0_0/0.12)]"
                 }`}
               >
                 {f.value ? (
@@ -218,22 +219,11 @@ export default function FilterBar({ params, brands, onChange, children, count }:
                 ) : (
                   f.label
                 )}
-                <LuChevronDown
-                  className={`size-4 transition-transform ${open?.key === f.key ? "rotate-180" : ""}`}
-                />
               </button>
             ))}
         </div>
         {children}
       </div>
-
-      {/* Dims the rest of the page (header included) while choosing, as on H&M.
-          Portalled: the bar's backdrop blur would trap a fixed overlay inside it. */}
-      {open &&
-        createPortal(
-          <div className="fixed inset-0 z-30 animate-fade-in bg-black/60" aria-hidden="true" />,
-          document.body
-        )}
 
       {open && current && (
         <div

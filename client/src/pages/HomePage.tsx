@@ -6,7 +6,6 @@ import FilterBar from "../components/FilterBar";
 import Hero from "../components/Hero";
 import NoExactMatch from "../components/NoExactMatch";
 import { widenedText } from "../lib/widened";
-import HowItWorks from "../components/HowItWorks";
 import ListingCard, { ListingGrid } from "../components/ListingCard";
 import ListingModal from "../components/ListingModal";
 import Pagination from "../components/Pagination";
@@ -107,7 +106,7 @@ export default function HomePage() {
   // Count, filters and sort — on results pages and, as an entry point, above the hero.
   const filterBar = (
     <FilterBar params={params} brands={brands} onChange={update} count={pagination.totalItems}>
-      <label className="flex h-10 shrink-0 items-center gap-2 rounded-full border border-line bg-surface pr-1.5 pl-4 text-sm text-ink-2">
+      <label className="flex h-10 shrink-0 items-center gap-2 rounded-md border border-line bg-white pr-1.5 pl-4 transition hover:border-transparent hover:shadow-[0_2px_10px_rgb(0_0_0/0.12)] text-sm text-ink-2">
         <span className="whitespace-nowrap max-sm:hidden">Sort by</span>
         <select
           value={params.sort ?? ""}
@@ -129,9 +128,11 @@ export default function HomePage() {
     return (
       <>
         <title>{`${BRAND} · Pre-loved fashion`}</title>
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 [&>div]:mb-0">{filterBar}</div>
+        {/* Pinned under the header so the filters stay in view while scrolling past the hero. */}
+        <div style={{ top: headerHeight }} className="sticky z-30 bg-bg">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 [&>div]:mb-0">{filterBar}</div>
+        </div>
         <Hero />
-        <HowItWorks />
         {modal}
       </>
     );
