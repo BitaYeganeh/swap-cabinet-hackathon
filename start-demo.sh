@@ -1,7 +1,7 @@
 #!/bin/bash
 # Starts the whole demo on the laptop's Wi-Fi address, so phones on the same Wi-Fi can open it:
 #   - Web Template website (port 4000), with its Smart Search server inside
-#   - Our search server (port 3000) and our client website (port 5173)
+#   - Our client website and its search server, together on port 3000
 #   - Expo app server (port 8081)
 # If the Wi-Fi address changed, or the website was never built, it updates the app and
 # rebuilds the website first.
@@ -55,23 +55,19 @@ trap 'kill "${PIDS[@]}" 2>/dev/null' EXIT
 (cd "$WEB" && NODE_ENV=production PORT=4000 REACT_APP_MARKETPLACE_ROOT_URL="$URL" node server/index.js) &
 PIDS+=($!)
 
-# Our search server and client. If one already runs (for example a dev server you
-# started yourself), keep using it instead of starting a second copy.
+# Our client, built as static files that our search server serves on port 3000.
+echo "Building our client website..."
+(cd "$CLIENT" && npm run build >/dev/null)
 if listening 3000; then
+  # Already running (for example your own dev server): it serves the new build as it is.
   echo "Search server already running on port 3000, using it."
 else
   (cd "$SERVER" && npm start) &
   PIDS+=($!)
 fi
-if listening 5173; then
-  echo "Client already running on port 5173, using it."
-else
-  (cd "$CLIENT" && npm run dev -- --port 5173 --strictPort) &
-  PIDS+=($!)
-fi
 
 echo
 echo "Web Template website: $URL"
-echo "Our client website:   http://$IP:5173   (its searches go to our server on port 3000)"
+echo "Our client website:   http://$IP:3000"
 echo "Starting the app server. Scan the QR code below with your phone."
 cd "$APP" && npx expo start
