@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, type ReactNode, type SubmitEvent } from "react";
-import { LuChevronDown, LuSearch } from "react-icons/lu";
-import type { Brand, SearchParams } from "../lib/api";
+import { createPortal } from "react-dom";
+import { LuCheck, LuChevronDown, LuSearch } from "react-icons/lu";
+import { getFacets, type Brand, type Facets, type SearchParams } from "../lib/api";
 import { COLORS, CONDITIONS, labelFor } from "../lib/format";
 import {
   ADULT_SHOE_SIZES,
@@ -32,10 +33,71 @@ const PANEL_WIDTH = 360;
 const PANEL_GUTTER = 24; // matches the bar's sm:px-6
 const BRANDS_SHOWN = 20;
 
-const chipButton = (active: boolean) =>
-  `rounded-full border px-3.5 py-[7px] text-sm transition ${
-    active ? "border-ink bg-ink text-white" : "border-line bg-surface hover:border-ink-3"
-  }`;
+// Option counts for the open dropdown, refetched when the search changes.
+function useFacets(params: SearchParams, enabled: boolean) {
+  const [result, setResult] = useState<{ key: string; facets: Facets } | null>(null);
+  // Paging and the item popup don't change the counts.
+  const key = JSON.stringify({ ...params, item: undefined, page: undefined });
+
+  useEffect(() => {
+    if (!enabled) return;
+    const controller = new AbortController();
+    getFacets(JSON.parse(key), controller.signal)
+      .then((facets) => setResult({ key, facets }))
+      .catch(() => {});
+    return () => controller.abort();
+  }, [key, enabled]);
+
+  return result?.key === key ? result.facets : null;
+}
+
+// One H&M-style option row: square checkbox, name, [count], optional colour dot.
+// Options with nothing to show are greyed out (unless already picked).
+function OptionRow({
+  label,
+  count,
+  active,
+  swatch,
+  onClick,
+}: {
+  label: string;
+  count: number | undefined;
+  active: boolean;
+  swatch?: string;
+  onClick: () => void;
+}) {
+  const empty = count === 0 && !active;
+  return (
+    <li>
+      <button
+        type="button"
+        role="checkbox"
+        aria-checked={active}
+        disabled={empty}
+        onClick={onClick}
+        className="flex w-full items-center gap-3 py-2 text-left text-[15px] transition enabled:hover:text-accent disabled:cursor-default disabled:text-ink-3/60"
+      >
+        <span
+          className={`grid size-5 shrink-0 place-items-center border ${
+            active ? "border-ink bg-ink text-white" : empty ? "border-line" : "border-ink-3"
+          }`}
+        >
+          {active && <LuCheck className="size-3.5" strokeWidth={3} />}
+        </span>
+        <span className="min-w-0 flex-1 truncate">{label}</span>
+        {count !== undefined && <span className="shrink-0 text-sm text-ink-3 tabular-nums">[ {count} ]</span>}
+        {swatch && (
+          <span
+            style={{ background: swatch }}
+            className={`size-5 shrink-0 rounded-full border border-black/20 ${empty ? "opacity-40" : ""}`}
+          />
+        )}
+      </button>
+    </li>
+  );
+}
+
+const optionList = "-my-1 max-h-[min(60vh,420px)] overflow-y-auto pr-1";
 
 // Size filtering only applies to clothing and shoes.
 const hasSizes = (type?: string) => !type || ["tops", "bottoms", "shoes"].includes(type);
@@ -47,6 +109,7 @@ export default function FilterBar({ params, brands, onChange, children }: Props)
   const [open, setOpen] = useState<{ key: FilterKey; left: number | null } | null>(null);
 
   const close = () => setOpen(null);
+  const facets = useFacets(params, open !== null && ["color", "condition", "brand"].includes(open.key));
 
   useEffect(() => {
     if (!open) return;
@@ -113,7 +176,10 @@ export default function FilterBar({ params, brands, onChange, children }: Props)
     <div
       ref={barRef}
       style={{ top: headerHeight }}
-      className="sticky z-10 -mx-4 mb-5 border-b border-line bg-bg/95 px-4 py-3 backdrop-blur-md sm:-mx-6 sm:px-6"
+      // While a dropdown is open the bar rises above the header so only it stays lit.
+      className={`sticky -mx-4 mb-5 border-b border-line bg-bg/95 px-4 py-3 backdrop-blur-md sm:-mx-6 sm:px-6 ${
+        open ? "z-40" : "z-10"
+      }`}
     >
       <div className="flex items-center gap-2.5">
         <div
@@ -154,6 +220,14 @@ export default function FilterBar({ params, brands, onChange, children }: Props)
         {children}
       </div>
 
+      {/* Dims the rest of the page (header included) while choosing, as on H&M.
+          Portalled: the bar's backdrop blur would trap a fixed overlay inside it. */}
+      {open &&
+        createPortal(
+          <div className="fixed inset-0 z-30 animate-fade-in bg-black/60" aria-hidden="true" />,
+          document.body
+        )}
+
       {open && current && (
         <div
           style={open.left === null ? undefined : { left: open.left, width: PANEL_WIDTH }}
@@ -176,7 +250,7 @@ export default function FilterBar({ params, brands, onChange, children }: Props)
           </div>
 
           {current.key === "size" && <SizeOptions params={params} system={system} onChange={apply} />}
-          {current.key === "brand" && <BrandOptions params={params} brands={brands} onChange={apply} />}
+          {current.key === "brand" && <BrandOptions params={params} brands={brands} counts={facets?.brand} onChange={apply} />}
           {current.key === "price" && (
             <PriceFilter
               minPrice={params.minPrice ?? ""}
@@ -185,24 +259,22 @@ export default function FilterBar({ params, brands, onChange, children }: Props)
             />
           )}
           {current.key === "condition" && (
-            <div className="flex flex-wrap gap-2">
+            <ul className={optionList}>
               {CONDITIONS.map((c) => {
                 const active = params.condition === c.value;
                 return (
-                  <button
-                    type="button"
+                  <OptionRow
                     key={c.value}
-                    aria-pressed={active}
+                    label={c.label}
+                    count={facets ? (facets.condition[c.value] ?? 0) : undefined}
+                    active={active}
                     onClick={() => apply({ condition: active ? "" : c.value })}
-                    className={chipButton(active)}
-                  >
-                    {c.label}
-                  </button>
+                  />
                 );
               })}
-            </div>
+            </ul>
           )}
-          {current.key === "color" && <ColorOptions params={params} onChange={apply} />}
+          {current.key === "color" && <ColorOptions params={params} counts={facets?.color} onChange={apply} />}
         </div>
       )}
     </div>
@@ -214,75 +286,76 @@ type OptionProps = {
   onChange: (changes: Partial<SearchParams>) => void;
 };
 
-function BrandOptions({ params, brands, onChange }: OptionProps & { brands: Brand[] }) {
+function BrandOptions({
+  params,
+  brands,
+  counts,
+  onChange,
+}: OptionProps & { brands: Brand[]; counts?: Record<string, number> }) {
   const [query, setQuery] = useState("");
   const q = query.trim().toLowerCase();
-  const matches = q ? brands.filter((b) => b.name.toLowerCase().includes(q)) : brands.slice(0, BRANDS_SHOWN);
+  const countOf = (b: Brand) => (counts ? (counts[b.name.toLowerCase()] ?? 0) : undefined);
+  const isActive = (b: Brand) => params.brand?.toLowerCase() === b.name.toLowerCase();
+
+  // Only brands with items in this search (plus a picked one), most items first.
+  // Brand lists are long, so unlike colours, brands with nothing are left out.
+  const available = counts
+    ? brands.filter((b) => (countOf(b) ?? 0) > 0 || isActive(b)).sort((a, b) => (countOf(b) ?? 0) - (countOf(a) ?? 0))
+    : brands;
+  const matches = q ? available.filter((b) => b.name.toLowerCase().includes(q)) : available.slice(0, BRANDS_SHOWN);
 
   return (
     <>
-      {brands.length > 8 && (
+      {available.length > 8 && (
         <label className="mb-3 flex h-10 items-center gap-2 rounded-lg border border-line bg-surface px-3 focus-within:border-accent">
           <LuSearch className="size-4 shrink-0 text-ink-3" />
           <input
             autoFocus
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder={`Search ${brands.length} brands`}
+            placeholder={`Search ${available.length} brands`}
             aria-label="Search brands"
             className="w-full bg-transparent text-sm outline-none"
           />
         </label>
       )}
-      <div className="flex max-h-64 flex-wrap gap-2 overflow-y-auto">
-        {matches.map((b) => {
-          const active = params.brand?.toLowerCase() === b.name.toLowerCase();
-          return (
-            <button
-              type="button"
-              key={b.name}
-              aria-pressed={active}
-              onClick={() => onChange({ brand: active ? "" : b.name })}
-              className={chipButton(active)}
-            >
-              {b.name}
-              <span className={`ml-1.5 ${active ? "text-white/70" : "text-ink-3"}`}>{b.count}</span>
-            </button>
-          );
-        })}
-        {matches.length === 0 && <p className="text-sm text-ink-3">No brands match “{query}”.</p>}
-      </div>
+      <ul className={optionList}>
+        {matches.map((b) => (
+          <OptionRow
+            key={b.name}
+            label={b.name}
+            count={countOf(b)}
+            active={isActive(b)}
+            onClick={() => onChange({ brand: isActive(b) ? "" : b.name })}
+          />
+        ))}
+        {matches.length === 0 && (
+          <p className="py-2 text-sm text-ink-3">
+            {q ? `No brands match “${query}”.` : "None of the items in this search has a brand."}
+          </p>
+        )}
+      </ul>
     </>
   );
 }
 
-function ColorOptions({ params, onChange }: OptionProps) {
+function ColorOptions({ params, counts, onChange }: OptionProps & { counts?: Record<string, number> }) {
   return (
-    <div className="grid grid-cols-4 gap-x-1 gap-y-2.5">
+    <ul className={optionList}>
       {COLORS.map((c) => {
         const active = params.color === c.value;
         return (
-          <button
-            type="button"
+          <OptionRow
             key={c.value}
-            title={c.label}
-            aria-pressed={active}
+            label={c.label === "Multi" ? "Multicolour" : c.label}
+            count={counts ? (counts[c.value] ?? 0) : undefined}
+            active={active}
+            swatch={c.swatch}
             onClick={() => onChange({ color: active ? "" : c.value })}
-            className={`group flex flex-col items-center gap-1.5 py-1 text-xs ${
-              active ? "font-semibold text-ink" : "text-ink-2"
-            }`}
-          >
-            <span
-              style={{ background: c.swatch }}
-              className={`size-[30px] rounded-full border border-black/15 ring-offset-[3px] ring-offset-surface transition ${
-                active ? "ring-2 ring-ink" : "group-hover:ring-1 group-hover:ring-line"
-              }`}
-            />
-            {c.label}
-          </button>
+          />
         );
       })}
-    </div>
+    </ul>
   );
 }
 

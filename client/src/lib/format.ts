@@ -31,13 +31,20 @@ export const CONDITIONS = [
   { value: "heavily-used", label: "Heavily used" },
 ];
 
+// Same values as COLORS in server/src/config/catalog.js (the AI search uses those).
 export const COLORS = [
   { value: "black", label: "Black", swatch: "#1c1a17" },
   { value: "white", label: "White", swatch: "#ffffff" },
-  { value: "blue", label: "Blue", swatch: "#3a5f9e" },
-  { value: "green", label: "Green", swatch: "#4f7a4a" },
+  { value: "grey", label: "Grey", swatch: "#8d8a85" },
+  { value: "silver", label: "Silver", swatch: "linear-gradient(135deg, #f1f1f1, #a9a9a9 55%, #e4e4e4)" },
   { value: "brown", label: "Brown", swatch: "#7a5234" },
   { value: "bronze", label: "Bronze", swatch: "#a8733a" },
+  { value: "red", label: "Red", swatch: "#c63a32" },
+  { value: "pink", label: "Pink", swatch: "#eba3b6" },
+  { value: "orange", label: "Orange", swatch: "#e5822f" },
+  { value: "yellow", label: "Yellow", swatch: "#f0cc45" },
+  { value: "green", label: "Green", swatch: "#4f7a4a" },
+  { value: "blue", label: "Blue", swatch: "#3a5f9e" },
   {
     value: "multicolor",
     label: "Multi",

@@ -47,7 +47,7 @@ Filters (use null for anything the shopper did not ask for):
   - clothing letter sizes: xs, s, m, l, xl, xxl
   - EU shoe sizes as "shoe-<EU>", e.g. "shoe-38" (kids 18–35, adults 35–47). Convert UK/US sizes to EU: women EU = UK + 33 = US + 30.5; men EU = UK + 34 = US + 33. Round to the nearest whole size.
   - kids' clothing by age as "kids-<age>": kids-3m, kids-6m, kids-9m, kids-12m, kids-18m, kids-2y … kids-14y. Pick the closest age.
-- color: ${COLORS.join(", ")}. Map shades to the nearest (navy → blue, beige/tan → brown). Use multicolor for patterned or mixed colours.
+- color: ${COLORS.join(", ")}. Map shades to the nearest (navy → blue, beige/tan → brown, burgundy → red, purple → pink, gold → yellow, charcoal → grey). Use multicolor for patterned or mixed colours.
 - condition: like-new, gently-used, well-used, heavily-used. "New"/"mint" → like-new.
 - minPrice / maxPrice: euros. "Under 20" → maxPrice 20. "Cheap" alone sets no price; use sort price-asc instead.
 - sort: newest, price-asc, price-desc.

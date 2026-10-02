@@ -185,6 +185,18 @@ export type Brand = {
   count: number;
 };
 
+/** Matching items per filter option, each field counted with the other filters applied. */
+export type Facets = Record<"color" | "condition" | "brand", Record<string, number>>;
+
+export async function getFacets(params: SearchParams, signal?: AbortSignal): Promise<Facets> {
+  const query = new URLSearchParams();
+  Object.entries(params).forEach(([key, value]) => {
+    if (value !== undefined && value !== "" && key !== "item") query.set(key, String(value));
+  });
+  const body = await request<{ facets: Facets }>(`/api/listings/facets?${query}`, signal);
+  return body.facets;
+}
+
 export async function getBrands(signal?: AbortSignal): Promise<Brand[]> {
   const body = await request<{ brands: Brand[] }>("/api/listings/brands", signal);
   return body.brands;

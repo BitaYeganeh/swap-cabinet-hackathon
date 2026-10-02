@@ -1,5 +1,5 @@
 const express = require("express");
-const { getListings, getListing, getAutocomplete, getBrands } = require("../services/listingService");
+const { getFacets, getListings, getListing, getAutocomplete, getBrands } = require("../services/listingService");
 
 const router = express.Router();
 
@@ -14,6 +14,17 @@ function logSharetribeError(error) {
 
 // GET /api/listings/brands — brands available for the brand filter.
 // Must stay above "/:id" so "brands" isn't treated as a listing id.
+// GET /api/listings/facets?<same filters as /api/listings> — option counts for the
+// filter dropdowns. Must stay above "/:id" so "facets" isn't treated as a listing id.
+router.get("/facets", async (req, res) => {
+  try {
+    res.json({ success: true, facets: await getFacets(req.query) });
+  } catch (error) {
+    logSharetribeError(error);
+    res.status(500).json({ success: false, message: "Failed to count filter options" });
+  }
+});
+
 router.get("/brands", async (req, res) => {
   try {
     const brands = await getBrands();
