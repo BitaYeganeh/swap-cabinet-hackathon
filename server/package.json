@@ -3,9 +3,10 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "node --test 'test/**/*.test.js'",
     "start": "node src/index.js",
-    "dev": "nodemon src/index.js"
+    "dev": "nodemon --ignore data/ src/index.js",
+    "sync": "node src/vectorStore/sync.js"
   },
   "keywords": [],
   "author": "",
@@ -13,9 +14,13 @@
   "description": "",
   "dependencies": {
     "@anthropic-ai/sdk": "^0.131.0",
+    "@huggingface/transformers": "4.3",
+    "@lancedb/lancedb": "^0.39.0",
+    "apache-arrow": "^18.1.0",
     "cors": "^2.8.6",
     "dotenv": "^18.0.4",
     "express": "^5.2.1",
+    "multer": "^2.4.0",
     "sharetribe-flex-integration-sdk": "^1.14.1",
     "sharetribe-flex-sdk": "^1.24.2",
     "zod": "^4.6.5"

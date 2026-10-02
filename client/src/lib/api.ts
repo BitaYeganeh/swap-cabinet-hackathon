@@ -60,6 +60,8 @@ export type SearchParams = {
   page?: number;
   /** Comma-separated listing ids, e.g. the AI's picks. */
   ids?: string;
+  /** Listing shown in the details popup. Kept in the URL only; never sent to the API. */
+  item?: string;
 };
 
 export type AiSearchResponse = {

@@ -3,6 +3,7 @@
 @theme {
   --font-sans: "Inter", system-ui, "Segoe UI", Roboto, sans-serif;
   --font-display: "Fraunces", Georgia, "Times New Roman", serif;
+  --font-hero: "Plus Jakarta Sans", "Inter", system-ui, sans-serif;
 
   --color-bg: #faf8f4;
   --color-surface: #ffffff;
@@ -24,6 +25,7 @@
   --animate-shimmer: shimmer 1.3s linear infinite;
   --animate-fade-up: fade-up 0.35s ease both;
   --animate-slide-in: slide-in 0.25s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  --animate-slide-in-right: slide-in-right 0.25s cubic-bezier(0.2, 0.8, 0.2, 1) both;
   --animate-fade-in: fade-in 0.2s ease both;
   --animate-progress: progress 1.1s ease-in-out infinite;
 
@@ -53,6 +55,12 @@
   @keyframes slide-in {
     from {
       transform: translateX(-100%);
+    }
+  }
+
+  @keyframes slide-in-right {
+    from {
+      transform: translateX(100%);
     }
   }
 

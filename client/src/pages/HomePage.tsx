@@ -1,10 +1,11 @@
 import { useRef } from "react";
 import { LuSearch, LuSparkles, LuX } from "react-icons/lu";
-import { Link, useLoaderData, useNavigate, useNavigation, useSearchParams } from "react-router";
+import { Link, useLoaderData, useLocation, useNavigate, useNavigation, useSearchParams } from "react-router";
 import EmptyState from "../components/EmptyState";
 import FilterBar from "../components/FilterBar";
 import Hero from "../components/Hero";
 import ListingCard, { ListingGrid } from "../components/ListingCard";
+import ListingModal from "../components/ListingModal";
 import Pagination from "../components/Pagination";
 import type { SearchParams } from "../lib/api";
 import { COLORS, CONDITIONS, SORTS, TYPES, categoryLabel, genderLabel, labelFor } from "../lib/format";
@@ -27,6 +28,7 @@ export default function HomePage() {
   const { listings, pagination, suggestion, brands } = useLoaderData<typeof listingsLoader>();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
+  const location = useLocation();
   const navigation = useNavigation();
   const resultsRef = useRef<HTMLDivElement>(null);
   const sizeSystem = useSizeSystem();
@@ -88,11 +90,23 @@ export default function HomePage() {
         : sectionHeading
       : "All items";
 
+  // Item details popup, from a card click or a shared "?item=" link.
+  const itemId = searchParams.get("item");
+  const closeItem = () => {
+    // Opened from this page: step back so the Back button doesn't reopen it.
+    if (location.state?.openedItem) navigate(-1);
+    else navigate(browseUrl(searchParams, { item: "" }), { replace: true, preventScrollReset: true });
+  };
+  const modal = itemId && (
+    <ListingModal key={itemId} id={itemId} known={listings.find((l) => l.id === itemId)} onClose={closeItem} />
+  );
+
   if (isLanding(params) && !aiQuery) {
     return (
       <>
         <title>{`${BRAND} · Pre-loved fashion`}</title>
         <Hero />
+        {modal}
       </>
     );
   }
@@ -100,6 +114,7 @@ export default function HomePage() {
   return (
     <>
       <title>{`${heading} · ${BRAND}`}</title>
+      {modal}
 
       <div
         ref={resultsRef}

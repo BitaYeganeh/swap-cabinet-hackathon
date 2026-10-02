@@ -1,5 +1,6 @@
 const sharetribe = require("../config/sharetribe");
 const { searchListings, suggestKeywords, autocomplete } = require("./fuzzySearch");
+const { similarIds, labelsById } = require("../vectorStore/semantic");
 const { CATEGORIES, GENDERS, TYPES } = require("../config/catalog");
 
 const PER_PAGE = 12;
@@ -8,6 +9,7 @@ const PER_PAGE = 12;
 // them here, so it can tolerate typos. These bound that fetch.
 const FETCH_PER_PAGE = 100; // Sharetribe maximum
 const MAX_FETCH_PAGES = 10;
+const SEMANTIC_LIMIT = FETCH_PER_PAGE * MAX_FETCH_PAGES; // same bound as getCandidates
 const CANDIDATE_TTL_MS = 60 * 1000;
 
 // UI sort keys -> Sharetribe sort values ("-" prefix means ascending).
@@ -299,6 +301,14 @@ async function searchByKeywords(params) {
   // Nothing matched as typed, but a corrected spelling does: search that instead.
   if (!matches.length && suggestion) matches = searchListings(candidates, suggestion);
 
+  // Add listings that match by meaning ("warm" -> wool sweater). Only added
+  // after the keyword matches, never instead of them; filters still apply
+  // because only candidates can be added.
+  const found = new Set(matches.map((l) => l.id));
+  const byId = new Map(candidates.map((l) => [l.id, l]));
+  const extra = (await similarIds(keywords, { limit: SEMANTIC_LIMIT })).filter((id) => !found.has(id) && byId.has(id)).map((id) => byId.get(id));
+  matches = [...matches, ...extra];
+
   if (IN_MEMORY_SORTS[params.sort]) matches = [...matches].sort(IN_MEMORY_SORTS[params.sort]);
 
   const totalItems = matches.length;
@@ -347,15 +357,30 @@ async function getListing(id) {
   return toListing(data, includedById);
 }
 
-// Up to 100 buyable listings matching the filters (keywords ignored), for the
-// AI to choose from. "Wanted" requests are left out: they aren't for sale.
-async function getAiCandidates(params = {}) {
-  const query = { ...buildQuery({ ...params, keywords: "", ids: "" }), page: 1, perPage: FETCH_PER_PAGE };
-  const { listings } = mapResponse(await sharetribe.listings.query(query));
+const AI_CANDIDATES = 30;
 
-  return listings
+// Buyable listings matching the filters (keywords ignored), for the AI to
+// choose from. "Wanted" requests are left out: they aren't for sale.
+// With a query, only the closest by meaning, so the prompt stays small as the
+// marketplace grows; each comes with our labels so Claude knows more.
+async function getAiCandidates(params = {}, query = null) {
+  const all = (await getCandidates({ ...params, keywords: "", ids: "" }))
     .filter((listing) => listing.listingType !== WANTED_TYPE)
     .filter(matchesFilters(localFilters(params)));
+
+  let chosen = all;
+  if (query) {
+    const order = await similarIds(query, { limit: SEMANTIC_LIMIT, minScore: 0 });
+    const byId = new Map(all.map((l) => [l.id, l]));
+    const ranked = order.map((id) => byId.get(id)).filter(Boolean);
+    // Store empty or behind: fall back to the first listings, as before.
+    // Listings the store has not seen yet go after the ranked ones, so they can still be picked.
+    const seen = new Set(ranked.map((l) => l.id));
+    chosen = [...ranked, ...all.filter((l) => !seen.has(l.id))].slice(0, AI_CANDIDATES);
+  }
+
+  const labels = await labelsById(chosen.map((l) => l.id));
+  return chosen.map((listing) => ({ ...listing, labels: labels.get(listing.id) || null }));
 }
 
 // Search-bar suggestions: matching listings (slimmed down), places, and a
@@ -377,10 +402,23 @@ async function getAutocomplete({ q, category } = {}) {
   };
 }
 
+// Full listing data for the given ids, 100 per request (Sharetribe maximum).
+// Listings that are no longer published are simply missing from the map.
+async function getListingsByIds(ids) {
+  const byId = new Map();
+  for (let i = 0; i < ids.length; i += FETCH_PER_PAGE) {
+    const chunk = ids.slice(i, i + FETCH_PER_PAGE);
+    const response = await sharetribe.listings.query({ ids: chunk.join(","), perPage: FETCH_PER_PAGE, ...INCLUDES });
+    for (const listing of mapResponse(response).listings) byId.set(listing.id, listing);
+  }
+  return byId;
+}
+
 module.exports = {
   getListings,
   getListing,
   getAutocomplete,
   getBrands,
   getAiCandidates,
+  getListingsByIds,
 };

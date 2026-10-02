@@ -219,6 +219,7 @@ const describe = (listing, n) =>
       .filter(Boolean)
       .join(" "),
     listing.material && `material: ${listing.material}`,
+    listing.labels && `labels: ${listing.labels}`,
     listing.size && `size: ${listing.size}`,
     listing.price && `€${listing.price.amount / 100}`,
     (listing.description || "").replace(/\s*Photo by .*$/, "").slice(0, 160),
@@ -239,7 +240,7 @@ async function pickForNeed(query, filters) {
 
 async function callPick(query, narrowing, key) {
   checkBudget();
-  const candidates = await getAiCandidates(narrowing);
+  const candidates = await getAiCandidates(narrowing, query);
   if (candidates.length === 0) return [];
 
   const started = Date.now();

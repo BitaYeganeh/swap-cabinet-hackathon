@@ -17,8 +17,10 @@ import {
   type AutocompleteResponse,
 } from "../lib/api";
 import { formatMoney, WANTED_TYPE } from "../lib/format";
+import { useTypedExample } from "../lib/aiExamples";
 import { cancelAiSearch, runAiSearch, useAiSearchPending } from "../lib/aiSearch";
 import { browseUrl, shouldUseAi } from "../lib/search";
+import PhotoSearchButton from "./PhotoSearchButton";
 
 const DEBOUNCE_MS = 150;
 const EMPTY: AutocompleteResponse = { items: [], places: [] };
@@ -91,6 +93,9 @@ export default function SearchBar({
   const [text, setText] = useState(initial);
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState(-1);
+  const [focused, setFocused] = useState(false);
+  // The empty, idle box types out AI examples as its placeholder.
+  const typedExample = useTypedExample(!focused && !text);
   const { items, places, suggestion } = useAutocomplete(text, category);
   const pending = useAiSearchPending();
   const thinking = pending !== null;
@@ -128,8 +133,9 @@ export default function SearchBar({
       setText(option.text);
       search(option.text);
     }
-    // No item pages: picking an item searches for it on the page.
-    else if (option.kind === "item") search(option.item.title);
+    // Picking an item opens its details popup over the current page.
+    else if (option.kind === "item")
+      navigate(browseUrl(current, { item: option.item.id }), { preventScrollReset: true, state: { openedItem: true } });
     else if (option.kind === "place") search(option.place.query);
     else searchTyped();
   };
@@ -275,9 +281,13 @@ export default function SearchBar({
           setOpen(true);
           setActive(-1);
         }}
-        onFocus={() => setOpen(true)}
+        onFocus={() => {
+          setOpen(true);
+          setFocused(true);
+        }}
+        onBlur={() => setFocused(false)}
         onKeyDown={onKeyDown}
-        placeholder="Search, or describe what you need…"
+        placeholder={typedExample ?? "Search, or describe what you need…"}
         aria-label="Search listings"
         role="combobox"
         aria-autocomplete="list"
@@ -302,6 +312,7 @@ export default function SearchBar({
           <LuX className="size-4" />
         </button>
       )}
+      <PhotoSearchButton className="mr-1" />
       <button
         type="submit"
         disabled={thinking}
