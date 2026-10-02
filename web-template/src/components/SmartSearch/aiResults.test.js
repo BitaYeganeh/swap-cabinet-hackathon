@@ -17,6 +17,14 @@ describe('aiResults', () => {
     jest.restoreAllMocks();
   });
 
+  it('never stores or matches an entry with an empty key', () => {
+    storeAiResult({ ...answer, url: '' });
+    expect(window.sessionStorage.getItem('smartSearch:aiResult')).toBeNull();
+    window.sessionStorage.setItem('smartSearch:aiResult', JSON.stringify({ key: '', summary: 'x' }));
+    expect(readAiResult('')).toBeNull();
+    expect(readAiResult('/s')).toBeNull();
+  });
+
   it('makes a stable key from a URL or search string', () => {
     expect(searchKey('/s?b=2&a=1')).toBe('a=1&b=2');
     expect(searchKey('?a=1&b=2&page=3')).toBe('a=1&b=2');

@@ -141,7 +141,13 @@ const Suggestions = props => {
     ) : null;
 
   return (
-    <ul id={id} role="listbox" aria-label="Search suggestions" className={css.root}>
+    <ul
+      id={id}
+      role="listbox"
+      aria-label="Search suggestions"
+      className={css.root}
+      onMouseDown={e => e.preventDefault()}
+    >
       {suggestionRow ? (
         <li role="presentation" className={css.suggestionSection}>
           <ul role="group" aria-label="Spelling suggestion" className={css.group}>

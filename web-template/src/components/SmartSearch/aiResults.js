@@ -57,6 +57,7 @@ export const toEntry = data => ({
  */
 export const storeAiResult = data => {
   const entry = toEntry(data);
+  if (!entry.key) return entry;
   try {
     storage()?.setItem(STORAGE_KEY, JSON.stringify(entry));
   } catch (e) {
@@ -74,7 +75,7 @@ export const storeAiResult = data => {
 export const readAiResult = search => {
   try {
     const entry = JSON.parse(storage()?.getItem(STORAGE_KEY) || 'null');
-    if (!entry || typeof entry !== 'object') return null;
+    if (!entry || typeof entry !== 'object' || !entry.key) return null;
     return entry.key === searchKey(search) ? entry : null;
   } catch (e) {
     return null;
