@@ -89,7 +89,9 @@ async function searchKeywordIds(rawKeywords) {
   );
 
   const ids = [...matches.map(l => l.id), ...extra].slice(0, MAX_IDS);
-  return { ids, keywordMatches: matches.length, suggestion, corrected };
+  // Nothing mentions the words, so every result is a meaning match.
+  const similarOnly = matches.length === 0 && extra.length > 0;
+  return { ids, keywordMatches: matches.length, suggestion, corrected, similarOnly };
 }
 
 module.exports = { searchKeywordIds };

@@ -42,9 +42,9 @@ const withSmartKeywords = (params, config) => {
 
   const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
   const timer = setTimeout(() => controller?.abort(), SMART_KEYWORDS_TIMEOUT_MS);
-  const url = `${apiBaseUrl(config.marketplaceRootURL)}/api/smart-search/keywords?q=${encodeURIComponent(
-    keywords
-  )}`;
+  const url = `${apiBaseUrl(
+    config.marketplaceRootURL
+  )}/api/smart-search/keywords?q=${encodeURIComponent(keywords)}`;
 
   return fetch(url, { signal: controller?.signal })
     .then(res => (res.ok ? res.json() : null))
@@ -57,6 +57,7 @@ const withSmartKeywords = (params, config) => {
       return {
         apiParams: { ...rest, ids: smartIds.join(',') },
         smartSearchIds: smartIds,
+        smartSearchSimilarOnly: !!data.similarOnly,
         ...correctedMaybe,
       };
     })
@@ -372,10 +373,13 @@ const searchListingsPayloadCreator = ({ searchParams, config }, thunkAPI) => {
   // Smart Search module: keywords go through the typo-tolerant search first.
   // It answers with ranked ids, which replace the keywords; the other filters still apply.
   return withSmartKeywords(params, config)
-    .then(({ apiParams, smartSearchIds, smartSearchSuggestion }) =>
-      sdk.listings
-        .query(apiParams)
-        .then(response => ({ ...response, smartSearchIds, smartSearchSuggestion }))
+    .then(({ apiParams, smartSearchIds, smartSearchSuggestion, smartSearchSimilarOnly }) =>
+      sdk.listings.query(apiParams).then(response => ({
+        ...response,
+        smartSearchIds,
+        smartSearchSuggestion,
+        smartSearchSimilarOnly,
+      }))
     )
     .then(response => {
       const listingFields = config?.listing?.listingFields;
@@ -411,6 +415,8 @@ const searchPageSlice = createSlice({
     activeListingId: null,
     // Smart Search module: the spelling the keyword search used instead ("jakcet" -> "jacket")
     smartSearchSuggestion: null,
+    // Smart Search module: no listing mentions the words, all results match by meaning
+    smartSearchSimilarOnly: false,
   },
   reducers: {
     setActiveListing: (state, action) => {
@@ -430,6 +436,7 @@ const searchPageSlice = createSlice({
         const { ids, sort } = action.meta.arg?.searchParams || {};
         const smartIds = action.payload.smartSearchIds?.join(',');
         state.smartSearchSuggestion = action.payload.smartSearchSuggestion || null;
+        state.smartSearchSimilarOnly = !!action.payload.smartSearchSimilarOnly;
         state.currentPageResultIds = sort
           ? resultIds(action.payload.data)
           : keepIdsOrder(resultIds(action.payload.data), ids || smartIds);

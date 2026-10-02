@@ -375,6 +375,7 @@ async function interpretSearch(rawQuery) {
     const picks = await pickForNeed(query, result.filters);
     if (picks.length > 0) {
       return {
+        query,
         summary: result.summary,
         isNeed: true,
         picks,
@@ -388,10 +389,13 @@ async function interpretSearch(rawQuery) {
   // Listings change over time, so relaxing runs on every request.
   const { filters, dropped } = await relaxUntilFound(result.filters);
   return {
+    query,
     summary: result.summary,
     isNeed: result.isNeed,
     picks: [],
     dropped,
+    // A need search that found no clear fit and fell back to keyword results.
+    noPicks: result.isNeed,
     url: searchUrl(toUrlParams(filters)),
   };
 }

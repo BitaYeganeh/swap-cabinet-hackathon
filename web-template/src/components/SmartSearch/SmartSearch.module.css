@@ -273,3 +273,14 @@
     animation: none;
   }
 }
+
+.note {
+  margin: 0;
+  color: var(--colorGrey700);
+  font-size: 15px;
+}
+
+.exactLink {
+  margin: 8px 0 0 0;
+  font-size: 15px;
+}

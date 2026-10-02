@@ -1,26 +1,15 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { useHistory, useLocation } from 'react-router-dom';
+import { Link, useHistory, useLocation } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import classNames from 'classnames';
 
 import { apiBaseUrl } from '../../util/api';
 import { parse } from '../../util/urlHelpers';
 
+import { widenedText } from './widened';
 import { MatrixLoader, ThinkingStatus } from './SmartSearchMotion';
 
 import css from './SmartSearch.module.css';
-
-// Names for the filters the AI search may drop when nothing matches.
-const FILTER_NAMES = {
-  color: 'colour',
-  condition: 'condition',
-  size: 'size',
-  minPrice: 'minimum price',
-  maxPrice: 'maximum price',
-  keywords: 'keywords',
-  gender: 'boys/girls',
-  type: 'item type',
-};
 
 const GROUP_NAMES = {
   same: 'same model',
@@ -175,10 +164,15 @@ const SmartSearch = props => {
   // The keyword search fixed a spelling ("jakcet" -> "jacket") on the search page.
   const suggestion = useSelector(state => state.SearchPage?.smartSearchSuggestion);
   const typedKeywords = parse(location.search)?.keywords;
-  const showSuggestion = suggestion && typedKeywords && location.pathname.startsWith('/s');
+  const onSearchPage = location.pathname.startsWith('/s');
+  const showSuggestion = suggestion && typedKeywords && onSearchPage;
+  // No listing mentions the typed words, so all results are matches by meaning.
+  const similarOnly = useSelector(state => state.SearchPage?.smartSearchSimilarOnly);
+  const showSimilarOnly = similarOnly && typedKeywords && onSearchPage;
 
   const dropped = aiResult?.dropped || [];
   const photoResult = photo?.result;
+  const exactQuery = aiResult?.query || carried.query || query;
 
   return (
     <div
@@ -266,14 +260,20 @@ const SmartSearch = props => {
         </p>
       ) : null}
 
+      {showSimilarOnly ? (
+        <p className={css.note}>
+          No item mentions these words, so here are items similar in meaning.
+        </p>
+      ) : null}
+
       {aiResult && !busy ? (
         <div className={css.info}>
           <strong>{aiResult.summary}</strong>
-          {dropped.length > 0 ? (
+          {dropped.length > 0 ? <span> · {widenedText(dropped)}</span> : null}
+          {aiResult.noPicks ? (
             <span>
               {' '}
-              · Nothing matched exactly, so we left out:{' '}
-              {dropped.map(key => FILTER_NAMES[key] || key).join(', ')}
+              · Nothing in the shop is a clear fit yet, so these are the closest matches by keyword.
             </span>
           ) : null}
           {aiResult.picks?.length > 0 ? (
@@ -284,6 +284,13 @@ const SmartSearch = props => {
                 </li>
               ))}
             </ul>
+          ) : null}
+          {exactQuery ? (
+            <p className={css.exactLink}>
+              <Link to={`/s?keywords=${encodeURIComponent(exactQuery)}`}>
+                Search the exact words instead
+              </Link>
+            </p>
           ) : null}
         </div>
       ) : null}
