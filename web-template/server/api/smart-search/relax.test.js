@@ -7,6 +7,17 @@ describe('canDrop', () => {
     expect(canDrop({ category: 'women', sort: 'newest', keywords: 'socks' }, 'keywords')).toBe(false);
   });
 
+  it('does not count gender as a describing key (kids case)', () => {
+    const current = { category: 'kids', gender: 'girls', color: 'pink', keywords: 'socks' };
+    for (const key of RELAX_ORDER) {
+      if (!(key in current)) continue;
+      if (!canDrop(current, key)) break;
+      delete current[key];
+    }
+    expect(current.keywords).toBe('socks');
+    expect(canDrop({ category: 'kids', gender: 'girls', keywords: 'socks' }, 'keywords')).toBe(false);
+  });
+
   it('allows dropping a key while another describing key remains', () => {
     expect(canDrop({ category: 'kids', color: 'pink', type: 'shoes' }, 'color')).toBe(true);
   });

@@ -290,7 +290,6 @@ const describe = (l, n) =>
     `#${n}`,
     l.title,
     l.publicData.categoryLevel2,
-    l.publicData.categoryLevel1 === 'kids' && l.publicData.gender,
     l.publicData.material && `material: ${l.publicData.material}`,
     l.labels && `labels: ${l.labels}`,
     l.publicData.size && `size: ${l.publicData.size}`,
