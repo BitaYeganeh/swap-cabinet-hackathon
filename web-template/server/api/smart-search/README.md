@@ -35,8 +35,8 @@ the template's own SearchPage, listing cards, pagination and listing pages.
 
 ## Endpoints
 
-- `POST /api/smart-search/ai` with `{ "query": "..." }`. Returns `{ summary, url, picks, dropped }`.
-- `POST /api/smart-search/photo` with multipart field `photo` and an optional `item` index. Returns `{ items, groups, url }`.
+- `POST /api/smart-search/ai` with `{ "query": "..." }`. Returns `{ query, summary, url, picks, dropped, noPicks }`.
+- `POST /api/smart-search/photo` with multipart field `photo` and an optional `item` index. Returns `{ items, groups, labels, fallback, wanted, url }` (`wanted` is `{ id, title }`).
 - `GET /api/smart-search/keywords?q=jakcet` returns `{ ids, suggestion }`, ranked best first.
 - `GET /api/smart-search/autocomplete?q=jack` returns `{ suggestion, items, places }` for the
   search bar's dropdown while typing. No Claude calls.
