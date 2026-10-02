@@ -54,7 +54,7 @@ function createStore(dir = DEFAULT_DIR) {
 
   const table = () => {
     tablePromise ??= (async () => {
-      const db = await lancedb.connect(dir);
+      const db = await lancedb.connect(dir, { readConsistencyInterval: 5 });
       const names = await db.tableNames();
       return names.includes(TABLE) ? db.openTable(TABLE) : db.createEmptyTable(TABLE, SCHEMA);
     })().catch((error) => {

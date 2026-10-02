@@ -9,7 +9,21 @@ const TYPES = ["tops", "bottoms", "shoes", "accessories", "bundles"];
 // Only kids listings are split by gender.
 const GENDERS = ["boys", "girls"];
 
-const COLORS = ["black", "white", "blue", "green", "brown", "bronze", "multicolor"];
+const COLORS = [
+  "black",
+  "white",
+  "grey",
+  "silver",
+  "brown",
+  "bronze",
+  "red",
+  "pink",
+  "orange",
+  "yellow",
+  "green",
+  "blue",
+  "multicolor",
+];
 
 const CONDITIONS = ["like-new", "gently-used", "well-used", "heavily-used"];
 

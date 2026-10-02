@@ -87,6 +87,20 @@ router.get('/keywords', async (req, res) => {
   }
 });
 
+// Load the local models in the background so the first search is not slow.
+// Only when the store has rows; never blocks or crashes startup.
+setTimeout(() => {
+  const { store } = require('./vector-store/store');
+  const { textVector, clipTextVector } = require('./vector-store/embed');
+  store
+    .count()
+    .then(rows =>
+      rows > 0 ? Promise.all([textVector('warm up'), clipTextVector('warm up')]) : null
+    )
+    .then(done => done && console.log('Smart Search models ready'))
+    .catch(error => console.error('Smart Search model warm-up failed:', error.message));
+}, 0);
+
 router.get('/stats', (req, res) => res.json({ success: true, ...usage.stats() }));
 
 module.exports = router;

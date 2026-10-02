@@ -21,6 +21,7 @@ const sdk = require('./sdk');
 const { similarIds, labelsById } = require('./vector-store/semantic');
 const { searchKeywordIds } = require('./keyword-search');
 const usage = require('./usage');
+const { RELAX_ORDER, canDrop } = require('./relax');
 
 // Created on first use, so the template starts without an Anthropic key.
 let client = null;
@@ -63,7 +64,7 @@ Filters (use null for anything the shopper did not ask for):
   - clothing letter sizes: xs, s, m, l, xl, xxl
   - EU shoe sizes as "shoe-<EU>", e.g. "shoe-38" (kids 18–35, adults 35–47). Convert UK/US sizes to EU: women EU = UK + 33 = US + 30.5; men EU = UK + 34 = US + 33. Round to the nearest whole size.
   - kids' clothing by age as "kids-<age>": kids-3m, kids-6m, kids-9m, kids-12m, kids-18m, kids-2y … kids-14y. Pick the closest age.
-- color: ${COLORS.join(', ')}. Map shades to the nearest (navy → blue, beige/tan → brown). Use multicolor for patterned or mixed colours.
+- color: ${COLORS.join(', ')}. Map shades to the nearest (navy → blue, beige/tan → brown, burgundy → red, purple → pink, gold → yellow, charcoal → grey). Use multicolor for patterned or mixed colours.
 - condition: like-new, gently-used, well-used, heavily-used. "New"/"mint" → like-new.
 - minPrice / maxPrice: euros. "Under 20" → maxPrice 20. "Cheap" alone sets no price; use sort price-asc instead.
 - sort: newest, price-asc, price-desc.
@@ -165,8 +166,6 @@ async function countListings(filters) {
 
 // When the filters match nothing, drop the least important ones (in this
 // order) until something matches, and report what was dropped.
-const RELAX_ORDER = ['color', 'condition', 'size', 'minPrice', 'maxPrice', 'keywords', 'gender', 'type'];
-
 async function relaxUntilFound(filters) {
   const current = { ...filters };
   const dropped = [];
@@ -174,6 +173,7 @@ async function relaxUntilFound(filters) {
 
   for (const key of RELAX_ORDER) {
     if (!(key in current)) continue;
+    if (!canDrop(current, key)) break;
     delete current[key];
     dropped.push(key);
     if ((await countListings(current)) > 0) return { filters: current, dropped };
@@ -198,6 +198,16 @@ function remember(map, key, value) {
   map.set(key, value);
 }
 
+// Identical requests arriving at the same time share one Claude call.
+const inflight = new Map();
+
+function shared(key, work) {
+  if (!inflight.has(key)) {
+    inflight.set(key, work().finally(() => inflight.delete(key)));
+  }
+  return inflight.get(key);
+}
+
 function checkBudget() {
   if (usage.overBudget()) throw new AiSearchError("AI search has reached today's budget", 503);
 }
@@ -209,7 +219,10 @@ async function understand(query) {
     remember(cache, key, hit);
     return { ...hit, cached: true };
   }
+  return shared(`understand|${key}`, () => callUnderstand(query, key));
+}
 
+async function callUnderstand(query, key) {
   checkBudget();
   const response = await anthropic().beta.messages.parse({
     model: MODEL,
@@ -277,6 +290,8 @@ const describe = (l, n) =>
     `#${n}`,
     l.title,
     l.publicData.categoryLevel2,
+    l.publicData.categoryLevel1 === 'kids' && l.publicData.gender,
+    l.publicData.material && `material: ${l.publicData.material}`,
     l.labels && `labels: ${l.labels}`,
     l.publicData.size && `size: ${l.publicData.size}`,
     l.price && `€${l.price.amount / 100}`,
@@ -292,7 +307,10 @@ async function pickForNeed(query, filters) {
   const key = `${normalize(query)}|${JSON.stringify({ ...filters, keywords: null })}`;
   const hit = pickCache.get(key);
   if (hit && Date.now() - hit.at < PICK_TTL) return hit.picks;
+  return shared(`pick|${key}`, () => callPick(query, filters, key));
+}
 
+async function callPick(query, filters, key) {
   const all = await fetchNarrowed(filters);
   if (!all.length) return [];
 
