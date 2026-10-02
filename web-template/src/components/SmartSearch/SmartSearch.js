@@ -1,14 +1,17 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useId, useRef, useState } from 'react';
 import { Link, useHistory, useLocation } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import classNames from 'classnames';
 
 import { apiBaseUrl } from '../../util/api';
-import { parse } from '../../util/urlHelpers';
+import { createSlug, parse } from '../../util/urlHelpers';
+import { createResourceLocatorString } from '../../util/routes';
+import { useRouteConfiguration } from '../../context/routeConfigurationContext';
 
 import { widenedText } from './widened';
 import { clearAiResult, storeAiResult, useStoredAiResult } from './aiResults';
 import { MatrixLoader, ThinkingStatus } from './SmartSearchMotion';
+import Suggestions, { toOptions, useAutocomplete } from './Suggestions';
 
 import css from './SmartSearch.module.css';
 
@@ -70,7 +73,10 @@ const SmartSearch = props => {
   const { className } = props;
   const history = useHistory();
   const location = useLocation();
+  const routeConfiguration = useRouteConfiguration();
   const fileInput = useRef(null);
+  const rootRef = useRef(null);
+  const listboxId = useId();
 
   // A photo search started on another page (e.g. the landing page hero) arrives
   // here with its answer in the location state (a photo can't be stored).
@@ -84,6 +90,9 @@ const SmartSearch = props => {
   const [error, setError] = useState(null);
   const [photo, setPhoto] = useState(carried.photo || null); // { file, preview, result }
   const [dragging, setDragging] = useState(false);
+  // Suggestions dropdown while typing; `active` is the highlighted row (-1: none).
+  const [open, setOpen] = useState(false);
+  const [active, setActive] = useState(-1);
   // Phones and tablets can't drag files, but their photo picker offers the camera.
   // Set after the first render, so the server-rendered page matches.
   const [isTouch, setIsTouch] = useState(false);
@@ -99,9 +108,90 @@ const SmartSearch = props => {
     if (url) history.push(url, { smartSearch });
   };
 
+  // Never during an AI or photo search, nor while a photo is dragged over the bar.
+  const typing = open && !busy;
+  const options = toOptions(useAutocomplete(query, typing));
+  const expanded = typing && !dragging && options.length > 0;
+  const optionId = i => `${listboxId}-option-${i}`;
+
+  const closeSuggestions = () => {
+    setOpen(false);
+    setActive(-1);
+  };
+
+  // Clicking or tapping anywhere outside the bar closes the dropdown.
+  useEffect(() => {
+    if (!open) return undefined;
+    const onPointerDown = e => {
+      if (!rootRef.current?.contains(e.target)) closeSuggestions();
+    };
+    document.addEventListener('mousedown', onPointerDown);
+    document.addEventListener('touchstart', onPointerDown);
+    return () => {
+      document.removeEventListener('mousedown', onPointerDown);
+      document.removeEventListener('touchstart', onPointerDown);
+    };
+  }, [open]);
+
+  const keywordSearch = keywords => {
+    // A kept AI answer belongs to its own URL, so Back still shows it.
+    setQuery(keywords);
+    setError(null);
+    setPhoto(null);
+    history.push(createResourceLocatorString('SearchPage', routeConfiguration, {}, { keywords }));
+  };
+
+  // A picked item opens its listing page; a spelling or a place searches for it.
+  const choose = option => {
+    closeSuggestions();
+    if (option.kind === 'item') {
+      const { id, title } = option.item;
+      history.push(
+        createResourceLocatorString(
+          'ListingPage',
+          routeConfiguration,
+          { id, slug: createSlug(title || 'listing') },
+          {}
+        )
+      );
+    } else if (option.kind === 'place') {
+      keywordSearch(option.place.query);
+    } else if (option.kind === 'suggestion') {
+      keywordSearch(option.text);
+    }
+  };
+
+  const handleKeyDown = e => {
+    if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+      if (busy) return;
+      e.preventDefault();
+      if (!expanded) {
+        setOpen(true);
+        return;
+      }
+      // Cycle through the rows and back to the input (-1).
+      const step = e.key === 'ArrowDown' ? 1 : -1;
+      setActive(i => {
+        const next = i + step;
+        if (next >= options.length) return -1;
+        if (next < -1) return options.length - 1;
+        return next;
+      });
+    } else if (e.key === 'Enter' && expanded && active >= 0 && options[active]) {
+      // Enter on a highlighted row picks it instead of running the AI search.
+      e.preventDefault();
+      choose(options[active]);
+    } else if (e.key === 'Escape' && open) {
+      // Keep the typed text: Escape only closes the dropdown.
+      e.preventDefault();
+      closeSuggestions();
+    }
+  };
+
   const handleAiSearch = async e => {
     e.preventDefault();
     if (!query.trim() || busy) return;
+    closeSuggestions();
     setBusy('ai');
     setError(null);
     setPhoto(null);
@@ -134,6 +224,7 @@ const SmartSearch = props => {
 
   const startPhotoSearch = file => {
     if (!file || busy) return;
+    closeSuggestions();
     if (!PHOTO_TYPES.includes(file.type)) {
       setError('Use a JPG, PNG or WEBP photo');
       return;
@@ -183,28 +274,61 @@ const SmartSearch = props => {
 
   return (
     <div
+      ref={rootRef}
       className={classNames(css.root, className, { [css.dragging]: dragging })}
       onDragOver={handleDragOver}
       onDragEnter={handleDragOver}
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}
     >
-      <form className={css.form} onSubmit={handleAiSearch}>
-        <input
-          className={css.input}
-          type="search"
-          value={query}
-          maxLength={200}
-          onChange={e => setQuery(e.target.value)}
-          placeholder={
-            dragging
-              ? 'Drop your photo to search with it'
-              : isTouch
-              ? 'Describe what you need, or snap a photo'
-              : 'Describe what you need, or drop a photo here'
-          }
-          aria-label="Describe what you are looking for"
-        />
+      <form
+        className={css.form}
+        onSubmit={handleAiSearch}
+        onBlur={e => {
+          // Focus left the bar (e.g. Tab away): close the dropdown.
+          if (!e.currentTarget.contains(e.relatedTarget)) closeSuggestions();
+        }}
+      >
+        <div className={css.inputWrap}>
+          <input
+            className={css.input}
+            type="search"
+            value={query}
+            maxLength={200}
+            onChange={e => {
+              setQuery(e.target.value);
+              setOpen(true);
+              setActive(-1);
+            }}
+            onFocus={() => setOpen(true)}
+            onKeyDown={handleKeyDown}
+            role="combobox"
+            aria-autocomplete="list"
+            aria-expanded={expanded}
+            aria-controls={listboxId}
+            aria-activedescendant={expanded && active >= 0 ? optionId(active) : undefined}
+            autoComplete="off"
+            placeholder={
+              dragging
+                ? 'Drop your photo to search with it'
+                : isTouch
+                ? 'Describe what you need, or snap a photo'
+                : 'Describe what you need, or drop a photo here'
+            }
+            aria-label="Describe what you are looking for"
+          />
+          {expanded ? (
+            <Suggestions
+              id={listboxId}
+              options={options}
+              active={active}
+              typed={query}
+              optionId={optionId}
+              onChoose={choose}
+              onHover={setActive}
+            />
+          ) : null}
+        </div>
         <button className={css.searchButton} type="submit" disabled={!!busy || !query.trim()}>
           {busy === 'ai' ? (
             <span className={css.buttonBusy}>
@@ -219,7 +343,10 @@ const SmartSearch = props => {
           className={css.photoButton}
           type="button"
           disabled={!!busy}
-          onClick={() => fileInput.current?.click()}
+          onClick={() => {
+            closeSuggestions();
+            fileInput.current?.click();
+          }}
           title="Search with a photo"
         >
           {busy === 'photo' ? (

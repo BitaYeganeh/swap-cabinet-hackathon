@@ -12,8 +12,17 @@
   gap: 8px;
 }
 
-.input {
+/* Holds the box and the suggestions dropdown under it. */
+.inputWrap {
+  position: relative;
+  display: flex;
   flex: 1 1 320px;
+  min-width: 0;
+}
+
+.input {
+  flex: 1 1 auto;
+  width: 100%;
   min-width: 0;
   height: 48px;
   padding: 0 16px;

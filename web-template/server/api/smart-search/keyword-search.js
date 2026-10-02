@@ -17,6 +17,15 @@ const MAX_IDS = 100;
 const MAX_PAGES = 10;
 const CACHE_TTL_MS = 60 * 1000;
 
+// A small image for the search bar's suggestions. scaled-small is a built-in
+// Sharetribe variant, so it needs no variant config.
+const IMAGE_VARIANT = 'scaled-small';
+const QUERY_PARAMS = {
+  perPage: 100,
+  include: ['images'],
+  'fields.image': [`variants.${IMAGE_VARIANT}`],
+};
+
 // "Fleminginkatu 5, 00530 Helsinki, Finland"
 //   -> { street: "Fleminginkatu", postcode: "00530", city: "Helsinki", country: "Finland" }
 function parseAddress(address) {
@@ -31,13 +40,24 @@ function parseAddress(address) {
   };
 }
 
-// A listing in the shape the fuzzy search reads.
-function toSearchable(listing) {
-  const { title, description, publicData = {} } = listing.attributes;
+// URL of the listing's first image: the small variant, or any variant it has.
+function firstImageUrl(listing, imagesById) {
+  const ref = listing.relationships?.images?.data?.[0];
+  const variants = ref ? imagesById.get(ref.id.uuid)?.attributes?.variants || {} : {};
+  return (variants[IMAGE_VARIANT] || Object.values(variants)[0])?.url || null;
+}
+
+// A listing in the shape the fuzzy search reads, plus what the search bar's
+// suggestions show (price, listing type, image).
+function toSearchable(listing, imagesById = new Map()) {
+  const { title, description, price, publicData = {} } = listing.attributes;
   return {
     id: listing.id.uuid,
     title,
     description,
+    listingType: publicData.listingType || null,
+    price: price ? { amount: price.amount, currency: price.currency } : null,
+    image: firstImageUrl(listing, imagesById),
     category: publicData.categoryLevel1,
     subcategory: publicData.categoryLevel2,
     condition: publicData.condition,
@@ -48,20 +68,37 @@ function toSearchable(listing) {
   };
 }
 
-// Every published listing, shared by all searches for a minute.
+// Every published listing, shared by all searches for a minute. Requests that
+// arrive while the list is loading wait for that same load.
 let cached = null;
+let loading = null;
+
+async function fetchAllListings() {
+  const listings = [];
+  for (let page = 1; page <= MAX_PAGES; page++) {
+    const res = await sdk.listings.query({ ...QUERY_PARAMS, page });
+    const imagesById = new Map(
+      (res.data.included || []).filter(r => r.type === 'image').map(r => [r.id.uuid, r])
+    );
+    listings.push(...res.data.data.map(l => toSearchable(l, imagesById)));
+    if (page >= res.data.meta.totalPages) break;
+  }
+  return listings;
+}
 
 async function allListings() {
   if (cached && Date.now() - cached.at < CACHE_TTL_MS) return cached.listings;
-
-  const listings = [];
-  for (let page = 1; page <= MAX_PAGES; page++) {
-    const res = await sdk.listings.query({ perPage: 100, page });
-    listings.push(...res.data.data.map(toSearchable));
-    if (page >= res.data.meta.totalPages) break;
+  if (!loading) {
+    loading = fetchAllListings()
+      .then(listings => {
+        cached = { listings, at: Date.now() };
+        return listings;
+      })
+      .finally(() => {
+        loading = null;
+      });
   }
-  cached = { listings, at: Date.now() };
-  return listings;
+  return loading;
 }
 
 async function searchKeywordIds(rawKeywords) {
@@ -94,4 +131,4 @@ async function searchKeywordIds(rawKeywords) {
   return { ids, keywordMatches: matches.length, suggestion, corrected, similarOnly };
 }
 
-module.exports = { searchKeywordIds };
+module.exports = { searchKeywordIds, allListings };

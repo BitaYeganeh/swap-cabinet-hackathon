@@ -8,6 +8,7 @@
  *   POST /api/smart-search/ai     { "query": "a warm coat for my 5 year old" }
  *   POST /api/smart-search/photo  multipart/form-data, field "photo", optional "item"
  *   GET  /api/smart-search/keywords?q=jakcet  typo-tolerant keyword search -> ranked listing ids
+ *   GET  /api/smart-search/autocomplete?q=jak  suggestions while typing (items, places, spelling)
  *   GET  /api/smart-search/stats  today's AI calls and estimated spend
  */
 
@@ -16,6 +17,7 @@ const multer = require('multer');
 const { interpretSearch, AiSearchError } = require('./ai-search');
 const { searchByPhoto, PhotoSearchError } = require('./photo-search');
 const { searchKeywordIds } = require('./keyword-search');
+const { getAutocomplete } = require('./autocomplete');
 const { aiRateLimit } = require('./rate-limit');
 const usage = require('./usage');
 
@@ -84,6 +86,15 @@ router.get('/keywords', async (req, res) => {
     res.json({ success: true, ...(await searchKeywordIds(req.query.q)) });
   } catch (error) {
     sendError(res, error, 'Keyword search');
+  }
+});
+
+// Suggestions while typing. No Claude calls here either.
+router.get('/autocomplete', async (req, res) => {
+  try {
+    res.json({ success: true, ...(await getAutocomplete(req.query.q)) });
+  } catch (error) {
+    sendError(res, error, 'Autocomplete');
   }
 });
 
