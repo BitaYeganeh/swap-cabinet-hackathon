@@ -430,6 +430,8 @@ const searchPageSlice = createSlice({
         state.searchParams = action.meta.arg.searchParams;
         state.searchInProgress = true;
         state.searchListingsError = null;
+        state.smartSearchSimilarOnly = false;
+        state.smartSearchSuggestion = null;
       })
       .addCase(searchListings.fulfilled, (state, action) => {
         // Best match first, unless the shopper picked a sort order.
