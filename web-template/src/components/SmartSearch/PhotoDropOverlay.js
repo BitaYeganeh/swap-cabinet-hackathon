@@ -4,7 +4,14 @@ import { useHistory } from 'react-router-dom';
 import { createResourceLocatorString } from '../../util/routes';
 import { useRouteConfiguration } from '../../context/routeConfigurationContext';
 
-import { WRONG_TYPE_MESSAGE, createDragCounter, hasFiles, isPhoto, offerPhoto } from './photoDrop';
+import {
+  WRONG_TYPE_MESSAGE,
+  createDragCounter,
+  hasFiles,
+  isPhoto,
+  offerPhoto,
+  wasDropHandled,
+} from './photoDrop';
 
 import css from './PhotoDropOverlay.module.css';
 
@@ -56,7 +63,7 @@ const PhotoDropOverlay = () => {
       if (!hasFiles(e)) return;
       setDragging(counter.current.reset());
       // The search bar already took this drop.
-      if (e.defaultPrevented) return;
+      if (wasDropHandled(e)) return;
       e.preventDefault(); // stops the browser from opening the file
       const file = e.dataTransfer.files?.[0];
       if (!file) return;

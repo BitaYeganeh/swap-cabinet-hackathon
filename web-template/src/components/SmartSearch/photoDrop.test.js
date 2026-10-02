@@ -1,4 +1,12 @@
-import { createDragCounter, describeItem, isPhoto, listenForPhotos, offerPhoto } from './photoDrop';
+import {
+  createDragCounter,
+  describeItem,
+  isPhoto,
+  listenForPhotos,
+  markDropHandled,
+  offerPhoto,
+  wasDropHandled,
+} from './photoDrop';
 
 describe('createDragCounter', () => {
   it('stays over the page until every enter has left', () => {
@@ -65,5 +73,21 @@ describe('describeItem', () => {
     expect(describeItem({ kind: 'other-shoes', brand: null, model: null, color: null }, true)).toBe(
       'shoes'
     );
+  });
+});
+
+describe('markDropHandled / wasDropHandled', () => {
+  it('tells a drop the search bar took from one it did not', () => {
+    const drop = new Event('drop', { cancelable: true });
+    expect(wasDropHandled(drop)).toBe(false);
+    markDropHandled(drop);
+    expect(wasDropHandled(drop)).toBe(true);
+  });
+
+  it('is not fooled by a drop another listener cancelled', () => {
+    // The template's Page cancels every drop on the document.
+    const drop = new Event('drop', { cancelable: true });
+    drop.preventDefault();
+    expect(wasDropHandled(drop)).toBe(false);
   });
 });

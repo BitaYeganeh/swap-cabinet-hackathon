@@ -19,6 +19,7 @@ import {
   hasFiles,
   isPhoto,
   listenForPhotos,
+  markDropHandled,
 } from './photoDrop';
 import { AI_EXAMPLES, examplePlaceholder, useTypedExample } from './aiExamples';
 import { AI_TIMEOUT_MS, TIMEOUT_NOTE, shouldUseAi } from './searchMode';
@@ -327,6 +328,7 @@ const SmartSearch = props => {
   const handleDrop = e => {
     if (!hasFiles(e)) return;
     e.preventDefault();
+    markDropHandled(e.nativeEvent); // so the page-wide overlay doesn't search too
     setDragging(false);
     startPhotoSearch(e.dataTransfer.files?.[0]);
   };

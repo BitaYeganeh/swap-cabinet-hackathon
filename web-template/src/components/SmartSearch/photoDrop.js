@@ -9,6 +9,19 @@ export const isPhoto = file => !!file && PHOTO_TYPES.includes(file.type);
 
 export const hasFiles = e => Array.from(e?.dataTransfer?.types || []).includes('Files');
 
+// The search bar marks a drop it handled itself, so the page-wide overlay
+// leaves it alone. `defaultPrevented` can't tell us that: the template's Page
+// cancels every drop on the document (so a file never replaces the page).
+const HANDLED = Symbol('smartSearchDropHandled');
+
+/** Marks a native drop event as handled by the search bar. */
+export const markDropHandled = e => {
+  e[HANDLED] = true;
+};
+
+/** Whether the search bar already handled this native drop event. */
+export const wasDropHandled = e => !!e?.[HANDLED];
+
 // A photo dropped on the page is offered to a mounted search bar first.
 const PHOTO_EVENT = 'smartsearch:photo';
 
