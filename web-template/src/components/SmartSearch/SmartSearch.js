@@ -20,6 +20,8 @@ import {
   isPhoto,
   listenForPhotos,
 } from './photoDrop';
+import { AI_EXAMPLES, examplePlaceholder, useTypedExample } from './aiExamples';
+import { AI_TIMEOUT_MS, TIMEOUT_NOTE, shouldUseAi } from './searchMode';
 
 import css from './SmartSearch.module.css';
 
@@ -45,11 +47,12 @@ const PHOTO_STATES = [
   'Ranking the closest matches',
 ];
 
-const postJson = (path, body) =>
+const postJson = (path, body, signal) =>
   fetch(`${apiBaseUrl()}/api/smart-search${path}`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(body),
+    signal,
   });
 
 const postPhoto = (file, item) => {
@@ -87,6 +90,8 @@ const SmartSearch = props => {
   // A photo search started on another page (e.g. the landing page hero) arrives
   // here with its answer in the location state (a photo can't be stored).
   const carried = location.state?.smartSearch || {};
+  // A one-shot note carried by a navigation (e.g. the AI search timed out).
+  const notice = carried.notice;
   // An AI answer is kept in sessionStorage for the URL it led to, so a reload
   // or Back still shows it, and any other search shows nothing.
   const aiResult = useStoredAiResult();
@@ -99,6 +104,9 @@ const SmartSearch = props => {
   // Suggestions dropdown while typing; `active` is the highlighted row (-1: none).
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState(-1);
+  const [focused, setFocused] = useState(false);
+  // The AI search in progress, so the cancel button and leaving the page can stop it.
+  const aiRequest = useRef(null);
   // Phones and tablets can't drag files, but their photo picker offers the camera.
   // Set after the first render, so the server-rendered page matches.
   const [isTouch, setIsTouch] = useState(false);
@@ -139,13 +147,30 @@ const SmartSearch = props => {
     };
   }, [open]);
 
-  const keywordSearch = keywords => {
+  const keywordSearch = (keywords, note) => {
     // A kept AI answer belongs to its own URL, so Back still shows it.
     setQuery(keywords);
     setError(null);
     setPhoto(null);
-    history.push(createResourceLocatorString('SearchPage', routeConfiguration, {}, { keywords }));
+    history.push(
+      createResourceLocatorString('SearchPage', routeConfiguration, {}, { keywords }),
+      note ? { smartSearch: { notice: note } } : undefined
+    );
   };
+
+  // Stop the running AI search (if any) without navigating anywhere.
+  const abortAi = () => {
+    const running = aiRequest.current;
+    aiRequest.current = null;
+    running?.abort();
+  };
+  const cancelAi = () => {
+    abortAi();
+    setBusy(b => (b === 'ai' ? null : b));
+  };
+  // Leaving the page (another URL, or unmount) stops a running AI search too.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => cancelAi, [location.pathname, location.search]);
 
   // A picked item opens its listing page; a spelling or a place searches for it.
   const choose = option => {
@@ -184,7 +209,7 @@ const SmartSearch = props => {
         return next;
       });
     } else if (e.key === 'Enter' && expanded && active >= 0 && options[active]) {
-      // Enter on a highlighted row picks it instead of running the AI search.
+      // Enter on a highlighted row picks it instead of running the search.
       e.preventDefault();
       choose(options[active]);
     } else if (e.key === 'Escape' && open) {
@@ -194,22 +219,48 @@ const SmartSearch = props => {
     }
   };
 
-  const handleAiSearch = async e => {
-    e.preventDefault();
-    if (!query.trim() || busy) return;
+  const runAiSearch = async text => {
+    abortAi();
+    const controller = new AbortController();
+    aiRequest.current = controller;
+    let timedOut = false;
+    const timer = setTimeout(() => {
+      timedOut = true;
+      controller.abort();
+    }, AI_TIMEOUT_MS);
     closeSuggestions();
     setBusy('ai');
     setError(null);
     setPhoto(null);
     try {
-      const data = await readAnswer(await postJson('/ai', { query }));
-      storeAiResult({ ...data, query: data.query || query });
+      const data = await readAnswer(await postJson('/ai', { query: text }, controller.signal));
+      if (aiRequest.current !== controller) return; // cancelled meanwhile
+      storeAiResult({ ...data, query: data.query || text });
       go(data.url);
     } catch (err) {
-      setError(err.message);
+      if (timedOut) {
+        // Too slow: the shopper still gets results, from the keyword search.
+        keywordSearch(text, TIMEOUT_NOTE);
+      } else if (!controller.signal.aborted) {
+        setError(err.message);
+      }
     } finally {
-      setBusy(null);
+      clearTimeout(timer);
+      if (aiRequest.current === controller) {
+        aiRequest.current = null;
+        setBusy(null);
+      }
     }
+  };
+
+  // One box: 2+ words go to the AI search, a single word to the keyword search.
+  const handleSubmit = e => {
+    e.preventDefault();
+    const text = query.trim();
+    if (!text || busy) return;
+    closeSuggestions();
+    if (shouldUseAi(text)) runAiSearch(text);
+    else keywordSearch(text);
   };
 
   const searchPhoto = async (file, item = 0, preview = photo?.preview) => {
@@ -293,6 +344,20 @@ const SmartSearch = props => {
   const photoResult = photo?.result;
   const exactQuery = aiResult?.query || query;
 
+  // The empty, idle box types out example AI searches as its placeholder.
+  const { typed: typedExample, reduced } = useTypedExample(
+    !focused && !query && !busy && !dragging
+  );
+  const photoHint = isTouch ? 'or snap a photo' : 'or drop a photo here';
+  const placeholder = dragging
+    ? 'Drop your photo to search with it'
+    : typedExample
+    ? typedExample
+    : reduced && !focused && !busy
+    ? `${examplePlaceholder(AI_EXAMPLES[0])}, ${photoHint}`
+    : `Describe what you need, ${photoHint}`;
+  const aiMode = shouldUseAi(query);
+
   return (
     <div
       ref={rootRef}
@@ -304,7 +369,7 @@ const SmartSearch = props => {
     >
       <form
         className={css.form}
-        onSubmit={handleAiSearch}
+        onSubmit={handleSubmit}
         onBlur={e => {
           // Focus left the bar (e.g. Tab away): close the dropdown.
           if (!e.currentTarget.contains(e.relatedTarget)) closeSuggestions();
@@ -312,7 +377,7 @@ const SmartSearch = props => {
       >
         <div className={css.inputWrap}>
           <input
-            className={css.input}
+            className={classNames(css.input, { [css.inputWithCancel]: busy === 'ai' })}
             type="search"
             value={query}
             maxLength={200}
@@ -321,7 +386,11 @@ const SmartSearch = props => {
               setOpen(true);
               setActive(-1);
             }}
-            onFocus={() => setOpen(true)}
+            onFocus={() => {
+              setFocused(true);
+              setOpen(true);
+            }}
+            onBlur={() => setFocused(false)}
             onKeyDown={handleKeyDown}
             role="combobox"
             aria-autocomplete="list"
@@ -329,15 +398,20 @@ const SmartSearch = props => {
             aria-controls={listboxId}
             aria-activedescendant={expanded && active >= 0 ? optionId(active) : undefined}
             autoComplete="off"
-            placeholder={
-              dragging
-                ? 'Drop your photo to search with it'
-                : isTouch
-                ? 'Describe what you need, or snap a photo'
-                : 'Describe what you need, or drop a photo here'
-            }
+            placeholder={placeholder}
             aria-label="Describe what you are looking for"
           />
+          {busy === 'ai' ? (
+            <button
+              className={css.cancelButton}
+              type="button"
+              onClick={cancelAi}
+              aria-label="Cancel AI search"
+              title="Cancel"
+            >
+              ✕
+            </button>
+          ) : null}
           {expanded ? (
             <Suggestions
               id={listboxId}
@@ -356,8 +430,10 @@ const SmartSearch = props => {
               <MatrixLoader variant="scan" className={css.buttonLoader} />
               Searching
             </span>
-          ) : (
+          ) : aiMode ? (
             'Smart search'
+          ) : (
+            'Search'
           )}
         </button>
         <button
@@ -408,6 +484,8 @@ const SmartSearch = props => {
       ) : null}
 
       {error ? <p className={css.error}>{error}</p> : null}
+
+      {notice && !busy ? <p className={css.note}>{notice}</p> : null}
 
       {showSuggestion ? (
         <p className={css.suggestion}>

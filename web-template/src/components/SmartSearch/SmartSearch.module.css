@@ -321,3 +321,31 @@
   list-style: none;
   font-size: 14px;
 }
+
+/* Stops a running AI search; sits inside the right end of the text box. */
+.cancelButton {
+  position: absolute;
+  top: 50%;
+  right: 8px;
+  transform: translateY(-50%);
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background-color: var(--colorGrey100);
+  color: var(--colorGrey800);
+  font-size: 14px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.cancelButton:hover {
+  background-color: var(--colorGrey300);
+}
+
+.inputWithCancel {
+  padding-right: 48px;
+}
