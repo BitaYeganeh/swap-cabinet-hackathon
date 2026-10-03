@@ -56,7 +56,7 @@ Real listings from the Sharetribe Marketplace API ──► link to the listing 
   (`server/data/`). Claude labels each listing once. Later syncs only handle new
   or changed listings, and remove sold ones.
 - **Cost guard:** AI search stops for the day after a set budget (default $5),
-  with a limit per visitor per minute.
+  with a limit per visitor per minute. See [AI cost and cheaper models](#ai-cost-and-cheaper-models).
 
 ## What is in this repo
 
@@ -155,6 +155,53 @@ The Web Template needs its own `web-template/.env`. Copy it from
 cd server
 npm test
 ```
+
+## AI cost and cheaper models
+
+We used Claude Opus 5.5 because the hackathon gave us a key. Opus is the largest
+Claude model. Our AI jobs are simple, so a smaller model can do them for much less.
+
+### What uses a paid AI model
+
+| Job | Where | How often |
+|---|---|---|
+| Turn a sentence into filters | `server/src/services/aiSearchService.js`, `web-template/server/api/smart-search/ai-search.js` | Each AI search |
+| Pick listings for a need | Same files | Each need-based search |
+| Read a photo and label listings | `server/src/vectorStore/labels.js`, `web-template/server/api/smart-search/vector-store/labels.js` | Each photo search, and once per listing at sync |
+
+The photo matcher (CLIP) and the meaning matcher (multilingual MiniLM) already
+run locally for free.
+
+### Cost per search
+
+Based on our measured token use: about 2,700 tokens in and 100 tokens out per AI search.
+
+| Model | Cost per search | Per 1,000 searches | Change needed |
+|---|---|---|---|
+| Claude Opus 5.5 (now) | ~$0.015 | ~$15 | None |
+| Claude Haiku 4.5 | ~$0.003 | ~$3 | Change the model name and remove the `effort` setting |
+| Google Gemini 2.5 Flash-Lite | ~$0.0003 | ~$0.30 | Rewrite the AI calls for the Gemini SDK |
+| Google Gemini free tier | $0 | $0 (rate-limited, about 1,000 requests per day) | Same as above |
+| OpenAI GPT-5 nano | ~$0.0002 | ~$0.20 | Rewrite the AI calls for the OpenAI SDK |
+| Local model with Ollama (Qwen3-VL or Gemma 3) | $0 | $0 | Rewrite the AI calls. Needs a computer with a GPU. Slower. |
+
+All of these models can read images and return structured data.
+
+### Our recommendation
+
+1. **First step: Claude Haiku 4.5.** About 5 times cheaper. Same SDK, same key, a
+   very small code change.
+2. **For no cost: Gemini Flash-Lite** (free tier) or a local Ollama model. This
+   needs more code changes.
+
+Before you switch, run `server/scripts/evalAiSearch.js` with the new model. A
+cheaper model can be less accurate, and the search must not lose matching
+listings. Also check the prices on the official pricing pages. The non-Claude
+prices above come from comparison sites (October 2026):
+[Anthropic](https://www.anthropic.com/pricing),
+[Gemini](https://tokenmix.ai/blog/gemini-api-pricing),
+[OpenAI](https://www.morphllm.com/openai-api-pricing),
+[local vision models](https://www.promptquorum.com/power-local-llm/local-vision-models-llava-ollama-2026).
 
 ## Security
 
