@@ -11,3 +11,6 @@ dist/
 
 # Local vector store and downloaded models (rebuild with `npm run sync` in server/)
 server/data/
+
+# Personal Claude Code settings
+.claude/

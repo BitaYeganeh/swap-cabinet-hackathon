@@ -6,7 +6,7 @@ import { WebView } from 'react-native-webview';
 
 // The Sharetribe Web Template with the Smart Search module, served from the
 // laptop on the same Wi-Fi. Change this when the laptop's address changes.
-const MARKETPLACE_URL = 'http://192.168.67.71:4000';
+const MARKETPLACE_URL = 'http://192.168.1.172:4000';
 
 // Development aid: send the page's JavaScript errors to the Expo log.
 const REPORT_ERRORS = `
