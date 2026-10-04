@@ -1,5 +1,5 @@
 import { useRef } from "react";
-import { LuSearch, LuSparkles, LuX } from "react-icons/lu";
+import { LuSearch, LuSlidersHorizontal, LuSparkles, LuX } from "react-icons/lu";
 import { Link, useLoaderData, useLocation, useNavigate, useNavigation, useSearchParams } from "react-router";
 import EmptyState from "../components/EmptyState";
 import FilterBar from "../components/FilterBar";
@@ -106,8 +106,8 @@ export default function HomePage() {
   // Count, filters and sort — on results pages and, as an entry point, above the hero.
   const filterBar = (
     <FilterBar params={params} brands={brands} onChange={update} count={pagination.totalItems}>
-      <label className="flex h-10 shrink-0 items-center gap-2 rounded-md border border-line bg-white pr-1.5 pl-4 transition hover:border-transparent hover:shadow-[0_2px_10px_rgb(0_0_0/0.12)] text-sm text-ink-2">
-        <span className="whitespace-nowrap max-sm:hidden">Sort by</span>
+      <label className="flex h-10 shrink-0 items-center gap-2 rounded-md border border-line bg-white pr-1.5 pl-3.5 transition hover:border-transparent hover:shadow-[0_2px_10px_rgb(0_0_0/0.12)] text-sm text-ink-2">
+        <LuSlidersHorizontal className="size-[18px] shrink-0 text-ink" aria-hidden="true" />
         <select
           value={params.sort ?? ""}
           onChange={(e) => update({ sort: e.target.value })}

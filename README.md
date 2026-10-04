@@ -2,6 +2,8 @@
 
 Team 4's project for the Tieto Bootcamp Sharetribe hackathon (October 2026).
 
+> This is Bita Yeganeh's fork of the team repository [Z4Tauhid/Hackathon_team4](https://github.com/Z4Tauhid/Hackathon_team4), kept for my portfolio. The prototype is the property of Sharetribe.
+
 We built a smarter search layer on top of a real Sharetribe secondhand clothing
 marketplace. A buyer describes what they want in their own words, or shows a
 photo. The search finds the right listings, even with typos, synonyms, Finnish
@@ -212,3 +214,7 @@ prices above come from comparison sites (October 2026):
 ## Team
 
 Team 4: Farouq, Tauhid, Nisha and Bita.
+
+### My part (Bita)
+
+Front end of the Swap Cabinet website: the landing page and hero with typing search hints, the category menu, the sticky filter bar (size, brand, colour and a two-handle price slider), the item popup, the basket and saved items. I also made the server port configurable and documented the environment variables.
