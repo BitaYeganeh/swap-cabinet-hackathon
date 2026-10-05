@@ -4,6 +4,10 @@ Team 4's project for the Tieto Bootcamp Sharetribe hackathon (October 2026).
 
 > This is Bita Yeganeh's fork of the team repository [Z4Tauhid/Hackathon_team4](https://github.com/Z4Tauhid/Hackathon_team4), kept for my portfolio. The prototype is the property of Sharetribe.
 
+![The Swap Cabinet demo: typo-proof search ("jakcet"), Finnish search ("farkut"), item popup and basket](docs/demo/swap-cabinet-demo.gif)
+
+*30-second demo, recorded locally after the hackathon. The AI sentence search is not shown because the event's Claude key has expired; keyword, typo and Finnish search, filters and the basket all run without it.*
+
 We built a smarter search layer on top of a real Sharetribe secondhand clothing
 marketplace. A buyer describes what they want in their own words, or shows a
 photo. The search finds the right listings, even with typos, synonyms, Finnish
