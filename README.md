@@ -157,6 +157,8 @@ The Web Template needs its own `web-template/.env`. Copy it from
 
 ### Run the tests
 
+The search server's tests are in [`server/test/`](server/test) and use the built-in Node test runner.
+
 ```bash
 cd server
 npm test
